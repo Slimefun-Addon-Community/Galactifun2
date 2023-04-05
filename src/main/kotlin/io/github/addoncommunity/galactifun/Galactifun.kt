@@ -49,12 +49,12 @@ class Galactifun : AbstractAddon() {
         runTask {
             log(
                 Level.INFO,
-                """################# Galactifun $pluginVersion #################
-                    
-                    Galactifun is open source, you can contribute or report bugs at $bugTrackerURL
-                    Join the Slimefun Addon Community Discord: discord.gg/SqD3gg5SAU
-                    
-                    ###################################################""".trimIndent()
+                "################# Galactifun $pluginVersion #################",
+                "",
+                "Galactifun is open source, you can contribute or report bugs at $bugTrackerURL",
+                "Join the Slimefun Addon Community Discord: discord.gg/SqD3gg5SAU",
+                "",
+                "###################################################"
             )
         }
     }
@@ -67,8 +67,10 @@ class Galactifun : AbstractAddon() {
 lateinit var pluginInstance: Galactifun
     private set
 
-fun Galactifun.log(level: Level, message: String) {
-    logger.log(level, message)
+fun Galactifun.log(level: Level, vararg messages: String) {
+    for (message in messages) {
+        logger.log(level, message)
+    }
 }
 
 fun Galactifun.runTask(runnable: Runnable) {

@@ -11,9 +11,9 @@ import kotlin.math.sqrt
 abstract class UniversalObject private constructor(
     name: String,
     baseItem: ItemStack,
+    val orbit: Orbit,
     // Special case for The Universe
-    private val _orbiting: UniversalObject?,
-    val orbit: Orbit
+    private val _orbiting: UniversalObject?
 ) {
 
     val name = ChatUtils.removeColorCodes(name)
@@ -30,14 +30,13 @@ abstract class UniversalObject private constructor(
     val orbiters: List<UniversalObject>
         get() = _orbiters.toList()
 
-    internal constructor() : this("The Universe", ItemStack(Material.NETHER_STAR), null, Orbit.lightYears(0.0, 0.0))
+    internal constructor() : this("The Universe", ItemStack(Material.NETHER_STAR), Orbit.lightYears(0.0, 0.0), null)
 
     protected constructor(name: String, baseItem: ItemStack, orbiting: UniversalObject, orbit: Orbit) : this(
         name,
         baseItem,
-        // Force it to call the private constructor
-        orbiting as UniversalObject?,
-        orbit
+        orbit,
+        orbiting
     )
 
     protected constructor(name: String, baseItem: Material, orbiting: UniversalObject, orbit: Orbit) : this(
