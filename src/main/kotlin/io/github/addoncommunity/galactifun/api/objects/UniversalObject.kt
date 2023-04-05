@@ -30,7 +30,7 @@ abstract class UniversalObject private constructor(
     val orbiters: List<UniversalObject>
         get() = _orbiters.toList()
 
-    internal constructor() : this("The Universe", ItemStack(Material.NETHER_STAR), null, Orbit(0.0))
+    internal constructor() : this("The Universe", ItemStack(Material.NETHER_STAR), null, Orbit.lightYears(0.0, 0.0))
 
     protected constructor(name: String, baseItem: ItemStack, orbiting: UniversalObject, orbit: Orbit) : this(
         name,
