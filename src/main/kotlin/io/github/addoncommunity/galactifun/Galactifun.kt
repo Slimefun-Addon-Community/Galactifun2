@@ -49,7 +49,7 @@ class Galactifun : AbstractAddon() {
         runTask {
             log(
                 Level.INFO,
-                "################# Galactifun $pluginVersion #################",
+                "################# Galactifun2 $pluginVersion #################",
                 "",
                 "Galactifun is open source, you can contribute or report bugs at $bugTrackerURL",
                 "Join the Slimefun Addon Community Discord: discord.gg/SqD3gg5SAU",

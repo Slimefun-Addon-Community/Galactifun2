@@ -52,7 +52,7 @@ abstract class PlanetaryWorld(
             0.1
         ) { it.persistentDataContainer.has(worldStorageKey, PersistentDataType.STRING) }
         if (markers.isEmpty()) {
-            worldStorage = world.spawn(Location(world, 0.0, 0.0, 0.0))
+            worldStorage = world.spawn<Marker>(Location(world, 0.0, 0.0, 0.0))
             worldStorage.persistentDataContainer.set(worldStorageKey, PersistentDataType.STRING, "")
         } else {
             worldStorage = markers.first()

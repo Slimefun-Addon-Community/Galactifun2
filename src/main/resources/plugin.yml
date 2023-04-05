@@ -1,25 +1,17 @@
-## CHANGE this to the name of your plugin.
-name: SlimefunAddon
-
-## CHANGE this to your username.
-author: CHANGEME
-
-## CHANGE this to a meaninful but short description of your plugin.
-description: A generic Slimefun4-Addon
-
-## CHANGE this to the path of the class that extends JavaPlugin.
-main: me.CHANGEME.slimefunaddon.ExampleAddon
-
-## You can change this to link to your website or repository. You can also remove this line if you want to.
-website: https://github.com/Slimefun/Addon-Template
-
-## This value is automatically replaced by the version specified in your pom.xml file.
-## Do not change this.
+name: Galactifun
+authors: [Seggan, Mooy1, ProfElements, GallowsDove]
+description: Space addon for Slimefun
+main: io.github.addoncommunity.galactifun.Galactifun
 version: ${project.version}
+api-version: 1.18
+depend: [Slimefun]
+# This makes ClayTech load before Galactifun, so we can check if it's enabled in onEnable()
+softdepend: [ClayTech]
+loadbefore:
+  - Multiverse-Core
 
-## This is the minimum minecraft version required to run your plugin.
-api-version: 1.14
-
-## This is required and marks Slimefun as a plugin dependency.
-depend:
-- Slimefun
+commands:
+  galactifun:
+    description: galactifun main command
+    usage: /galactifun <subcommand>
+    aliases: [gf, galactic]

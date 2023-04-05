@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.addoncommunity.galactifun</groupId>
-    <artifactId>Galactifun</artifactId>
+    <artifactId>Galactifun2</artifactId>
     <version>MODIFIED</version>
 
     <properties>
@@ -93,7 +93,7 @@
     <build>
         <finalName>${project.name} v${project.version}</finalName>
         <defaultGoal>clean package -T 2.0C</defaultGoal>
-        <sourceDirectory>${basedir}/src/main/kotlin</sourceDirectory>
+        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
 
         <resources>
             <resource>
