@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.base.objects
+package io.github.addoncommunity.galactifun.base.objects.earth
 
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
@@ -8,14 +8,14 @@ import io.github.addoncommunity.galactifun.pluginInstance
 import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.WorldCreator
+import org.bukkit.inventory.ItemStack
 
-object Earth : PlanetaryWorld(
-    "Earth",
-    Material.GRASS_BLOCK,
-    BaseUniverse.solarSystem,
-    Orbit.kilometers(149600000L, 1.0),
-    DayCycle.EARTH_LIKE
-) {
+class Earth : PlanetaryWorld("Earth", ItemStack(Material.GRASS_BLOCK)) {
+
+    override val orbiting = BaseUniverse.solarSystem
+    override val orbit = Orbit.kilometers(149600000L, years = 1.0)
+    override val dayCycle = DayCycle.EARTH_LIKE
+
     override fun loadWorld(): World {
         val name = pluginInstance.config.getString("worlds.earth") ?: "world"
         return WorldCreator(name).createWorld() // load the world

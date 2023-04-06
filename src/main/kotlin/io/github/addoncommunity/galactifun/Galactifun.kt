@@ -26,9 +26,9 @@ class Galactifun : AbstractAddon() {
             log(Level.SEVERE, "Please use Paper or a fork of Paper")
             shouldDisable = true
         }
-        if (Slimefun.getMinecraftVersion().isBefore(MinecraftVersion.MINECRAFT_1_18)) {
-            log(Level.SEVERE, "Galactifun only supports Minecraft 1.18 and above")
-            log(Level.SEVERE, "Please use Minecraft 1.18 or above")
+        if (Slimefun.getMinecraftVersion().isBefore(MinecraftVersion.MINECRAFT_1_19)) {
+            log(Level.SEVERE, "Galactifun only supports Minecraft 1.19 and above")
+            log(Level.SEVERE, "Please use Minecraft 1.19 or above")
             shouldDisable = true
         }
         if (Bukkit.getPluginManager().isPluginEnabled("ClayTech")) {
@@ -51,7 +51,7 @@ class Galactifun : AbstractAddon() {
                 Level.INFO,
                 "################# Galactifun2 $pluginVersion #################",
                 "",
-                "Galactifun is open source, you can contribute or report bugs at $bugTrackerURL",
+                "Galactifun2 is open source, you can contribute or report bugs at $bugTrackerURL",
                 "Join the Slimefun Addon Community Discord: discord.gg/SqD3gg5SAU",
                 "",
                 "###################################################"
@@ -61,7 +61,7 @@ class Galactifun : AbstractAddon() {
 
     override fun getJavaPlugin(): JavaPlugin = this
 
-    override fun getBugTrackerURL(): String = "https://github.com/Slimefun-Addon-Community/Galactifun/issues"
+    override fun getBugTrackerURL(): String = "https://github.com/Slimefun-Addon-Community/Galactifun2/issues"
 }
 
 lateinit var pluginInstance: Galactifun
@@ -72,6 +72,8 @@ fun Galactifun.log(level: Level, vararg messages: String) {
         logger.log(level, message)
     }
 }
+
+fun Galactifun.log(vararg messages: String) = log(Level.INFO, *messages)
 
 fun Galactifun.runTask(runnable: Runnable) {
     server.scheduler.runTask(this, runnable)

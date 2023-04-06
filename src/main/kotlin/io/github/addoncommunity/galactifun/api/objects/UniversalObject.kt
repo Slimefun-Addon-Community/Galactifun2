@@ -3,55 +3,33 @@ package io.github.addoncommunity.galactifun.api.objects
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.bakedlibs.dough.items.CustomItemStack
 import io.github.thebusybiscuit.slimefun4.utils.ChatUtils
-import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import kotlin.math.cos
 import kotlin.math.sqrt
 
-abstract class UniversalObject private constructor(
-    name: String,
-    baseItem: ItemStack,
-    val orbit: Orbit,
-    // Special case for The Universe
-    private val _orbiting: UniversalObject?
-) {
+abstract class UniversalObject protected constructor(name: String, baseItem: ItemStack) {
 
     val name = ChatUtils.removeColorCodes(name)
     val id = this.name.lowercase().replace(' ', '_')
 
     val item = CustomItemStack(baseItem, name)
 
-    val orbiting: UniversalObject
-        get() = _orbiting ?: error("The Universe does not orbit anything")
+    abstract val orbiting: UniversalObject
+    abstract val orbit: Orbit
 
-    val orbitLevel: Int = _orbiting?.let { it.orbitLevel + 1 } ?: 0
+    @Suppress("LeakingThis")
+    val orbitLevel: Int = if (this is TheUniverse) 0 else orbiting.orbitLevel + 1
 
     private val _orbiters = mutableListOf<UniversalObject>()
     val orbiters: List<UniversalObject>
         get() = _orbiters.toList()
-
-    internal constructor() : this("The Universe", ItemStack(Material.NETHER_STAR), Orbit.lightYears(0.0, 0.0), null)
-
-    protected constructor(name: String, baseItem: ItemStack, orbiting: UniversalObject, orbit: Orbit) : this(
-        name,
-        baseItem,
-        orbit,
-        orbiting
-    )
-
-    protected constructor(name: String, baseItem: Material, orbiting: UniversalObject, orbit: Orbit) : this(
-        name,
-        ItemStack(baseItem),
-        orbiting,
-        orbit
-    )
 
     fun addOrbiter(orbiter: UniversalObject) {
         _orbiters.add(orbiter)
     }
 
     open fun distanceTo(other: UniversalObject): Double {
-        if (_orbiting == null || orbitLevel < other.orbitLevel) {
+        if (orbitLevel == 0 || orbitLevel < other.orbitLevel) {
             return other.orbit.distance + distanceTo(other.orbiting)
         }
         if (orbiting == other.orbiting) {

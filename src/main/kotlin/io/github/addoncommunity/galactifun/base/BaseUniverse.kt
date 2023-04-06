@@ -5,7 +5,7 @@ import io.github.addoncommunity.galactifun.api.objects.StarSystem
 import io.github.addoncommunity.galactifun.api.objects.TheUniverse
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
-import io.github.addoncommunity.galactifun.base.objects.Earth
+import io.github.addoncommunity.galactifun.base.objects.earth.Earth
 import org.bukkit.Material
 
 object BaseUniverse {
@@ -23,7 +23,9 @@ object BaseUniverse {
         Orbit.lightYears(27000.0, 250000000.0)
     )
 
-    private val objects = listOf(Earth)
+    val earth = Earth()
+
+    private val objects = listOf(earth)
 
     fun init() {
         objects.forEach(PlanetaryWorld::register)
