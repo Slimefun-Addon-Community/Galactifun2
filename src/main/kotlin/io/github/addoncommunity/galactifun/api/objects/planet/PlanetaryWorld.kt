@@ -1,5 +1,6 @@
 package io.github.addoncommunity.galactifun.api.objects.planet
 
+import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
 import io.github.addoncommunity.galactifun.core.managers.WorldManager
 import org.bukkit.World
 import org.bukkit.inventory.ItemStack
@@ -15,6 +16,8 @@ abstract class PlanetaryWorld(
     name: String,
     baseItem: ItemStack
 ) : PlanetaryObject(name, baseItem) {
+
+    abstract val atmosphere: Atmosphere
 
     lateinit var world: World
         private set

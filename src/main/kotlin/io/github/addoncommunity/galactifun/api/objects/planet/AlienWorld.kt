@@ -5,6 +5,7 @@ import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atm
 import io.github.addoncommunity.galactifun.log
 import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.util.set
+import org.bukkit.GameRule
 import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.WorldCreator
@@ -14,8 +15,7 @@ import java.util.EnumMap
 abstract class AlienWorld(name: String, baseItem: ItemStack) : PlanetaryWorld(name, baseItem) {
 
     protected abstract val generator: WorldGenerator
-
-    abstract val atmosphere: Atmosphere
+    protected open val spawnVanillaMobs = false
 
     private val blockMappings = EnumMap<Material, ItemStack>(Material::class.java)
 
@@ -36,6 +36,11 @@ abstract class AlienWorld(name: String, baseItem: ItemStack) : PlanetaryWorld(na
             world[0, 0, 1] = Material.BEDROCK
             world[0, 0, -1] = Material.BEDROCK
         }
+
+        atmosphere.applyEffects(world)
+        dayCycle.applyEffects(world)
+
+        world.setGameRule(GameRule.DO_MOB_SPAWNING, spawnVanillaMobs)
 
         return world
     }

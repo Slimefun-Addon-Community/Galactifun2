@@ -49,6 +49,14 @@ class Atmosphere private constructor(
         fun buildAtmosphere(builder: AtmosphereBuilder.() -> Unit): Atmosphere {
             val atmosphereBuilder = AtmosphereBuilder()
             builder(atmosphereBuilder)
+
+            val sum = atmosphereBuilder.composition.values.sum()
+            require(sum < 101 && sum >= 0) { "Atmosphere composition cannot be greater than 101%, was $sum%" }
+            if (sum > 0) {
+                atmosphereBuilder.composition[Gas.OTHER] =
+                    atmosphereBuilder.composition.getOrDefault(Gas.OTHER, 0.0) + (100 - sum)
+            }
+
             return Atmosphere(
                 atmosphereBuilder.weatherEnabled,
                 atmosphereBuilder.storming,
@@ -57,6 +65,25 @@ class Atmosphere private constructor(
                 atmosphereBuilder.environment,
                 atmosphereBuilder.composition
             )
+        }
+
+        val EARTH_LIKE = buildAtmosphere {
+            weatherEnabled = true
+            pressure = 1.0
+
+            composition {
+                77.084 percent Gas.NITROGEN // subtracted 1 to allow water to fit in
+                20.946 percent Gas.OXYGEN
+                0.95 percent Gas.WATER
+                0.934 percent Gas.ARGON
+                earthCo2 percent Gas.CARBON_DIOXIDE
+            }
+        }
+
+        val NONE = buildAtmosphere {
+            weatherEnabled = false
+            pressure = 0.0
+            environment = World.Environment.THE_END
         }
     }
 }

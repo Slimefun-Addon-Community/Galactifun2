@@ -1,6 +1,7 @@
 package io.github.addoncommunity.galactifun
 
 import io.github.addoncommunity.galactifun.base.BaseUniverse
+import io.github.addoncommunity.galactifun.util.reflect.Reflect
 import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun
 import io.github.thebusybiscuit.slimefun4.libraries.paperlib.PaperLib
@@ -45,6 +46,8 @@ class Galactifun : AbstractAddon() {
         Metrics(this, 11613)
 
         BaseUniverse.init()
+
+        log(Reflect.version)
 
         runTask {
             log(

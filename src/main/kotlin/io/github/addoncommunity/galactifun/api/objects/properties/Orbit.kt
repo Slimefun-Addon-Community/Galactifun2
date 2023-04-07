@@ -19,8 +19,8 @@ class Orbit private constructor(val distance: Double, year: Double) {
     }
 
     companion object {
-        fun lightYears(distance: Double, years: Double, days: Double = 0.0) = Orbit(distance, years + days / 365.25)
-        fun kilometers(distance: Long, years: Double, days: Double = 0.0) =
+        fun lightYears(distance: Double, years: Double = 0.0, days: Double = 0.0) = Orbit(distance, years + days / 365.25)
+        fun kilometers(distance: Long, years: Double = 0.0, days: Double = 0.0) =
             Orbit(distance / Constants.KM_PER_LY, years + days / 365.25)
     }
 }
