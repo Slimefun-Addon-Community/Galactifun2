@@ -18,7 +18,8 @@ abstract class UniversalObject protected constructor(name: String, baseItem: Ite
     abstract val orbit: Orbit
 
     @Suppress("LeakingThis")
-    val orbitLevel: Int = if (this is TheUniverse) 0 else orbiting.orbitLevel + 1
+    val orbitLevel: Int
+        get() = if (this is TheUniverse) 0 else orbiting.orbitLevel + 1
 
     private val _orbiters = mutableListOf<UniversalObject>()
     val orbiters: List<UniversalObject>
