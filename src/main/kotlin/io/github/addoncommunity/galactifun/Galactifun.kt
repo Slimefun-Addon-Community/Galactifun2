@@ -1,6 +1,7 @@
 package io.github.addoncommunity.galactifun
 
 import io.github.addoncommunity.galactifun.base.BaseUniverse
+import io.github.seggan.custombiomeapi.CustomBiomeManager
 import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun
 import io.github.thebusybiscuit.slimefun4.libraries.paperlib.PaperLib
@@ -12,6 +13,9 @@ import java.util.logging.Level
 class Galactifun : AbstractAddon() {
 
     companion object;
+
+    lateinit var customBiomeManager: CustomBiomeManager
+        private set
 
     override fun onLoad() {
         Bukkit.spigot().config["world-settings.default.verbose"] = false
@@ -43,6 +47,8 @@ class Galactifun : AbstractAddon() {
         }
 
         Metrics(this, 11613)
+
+        customBiomeManager = CustomBiomeManager(this)
 
         BaseUniverse.init()
 
