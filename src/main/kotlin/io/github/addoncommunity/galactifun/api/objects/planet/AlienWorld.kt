@@ -2,7 +2,6 @@ package io.github.addoncommunity.galactifun.api.objects.planet
 
 import io.github.addoncommunity.galactifun.api.objects.planet.gen.CustomBiomeProvider
 import io.github.addoncommunity.galactifun.api.objects.planet.gen.WorldGenerator
-import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
 import io.github.addoncommunity.galactifun.log
 import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.util.set
@@ -30,7 +29,7 @@ abstract class AlienWorld(name: String, baseItem: ItemStack) : PlanetaryWorld(na
 
         val provider = generator.biomeProvider
         if (provider is CustomBiomeProvider) {
-            val manager = pluginInstance.customBiomeManager
+            val manager = pluginInstance.biomeManager
             for (biome in provider.getAllBiomes()) {
                 if (!manager.isBiomeRegistered(biome)) {
                     manager.registerBiome(biome)

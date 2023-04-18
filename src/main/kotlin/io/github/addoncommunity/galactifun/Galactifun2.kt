@@ -10,11 +10,11 @@ import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.logging.Level
 
-class Galactifun : AbstractAddon() {
+class Galactifun2 : AbstractAddon() {
 
     companion object;
 
-    lateinit var customBiomeManager: CustomBiomeManager
+    lateinit var biomeManager: CustomBiomeManager
         private set
 
     override fun onLoad() {
@@ -48,7 +48,7 @@ class Galactifun : AbstractAddon() {
 
         Metrics(this, 11613)
 
-        customBiomeManager = CustomBiomeManager(this)
+        biomeManager = CustomBiomeManager(this)
 
         BaseUniverse.init()
 
@@ -70,21 +70,21 @@ class Galactifun : AbstractAddon() {
     override fun getBugTrackerURL(): String = "https://github.com/Slimefun-Addon-Community/Galactifun2/issues"
 }
 
-lateinit var pluginInstance: Galactifun
+lateinit var pluginInstance: Galactifun2
     private set
 
-fun Galactifun.log(level: Level, vararg messages: String) {
+fun Galactifun2.log(level: Level, vararg messages: String) {
     for (message in messages) {
         logger.log(level, message)
     }
 }
 
-fun Galactifun.log(vararg messages: String) = log(Level.INFO, *messages)
+fun Galactifun2.log(vararg messages: String) = log(Level.INFO, *messages)
 
-fun Galactifun.runTask(runnable: Runnable) {
+fun Galactifun2.runTask(runnable: Runnable) {
     server.scheduler.runTask(this, runnable)
 }
 
-fun Galactifun.runTaskRepeat(period: Long, delay: Long = 0, runnable: Runnable) {
+fun Galactifun2.runTaskRepeat(period: Long, delay: Long = 0, runnable: Runnable) {
     server.scheduler.runTaskTimer(this, runnable, delay, period)
 }
