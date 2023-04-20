@@ -6,6 +6,7 @@ import io.github.addoncommunity.galactifun.api.objects.TheUniverse
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.base.objects.earth.Earth
+import io.github.addoncommunity.galactifun.base.objects.earth.Moon
 import org.bukkit.Material
 
 object BaseUniverse {
@@ -24,10 +25,10 @@ object BaseUniverse {
     )
 
     val earth = Earth()
-
-    private val objects = listOf(earth)
+    val moon = Moon()
 
     fun init() {
-        objects.forEach(PlanetaryWorld::register)
+        listOf(earth, moon)
+            .forEach(PlanetaryWorld::register)
     }
 }

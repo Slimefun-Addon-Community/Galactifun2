@@ -1,6 +1,5 @@
 package io.github.addoncommunity.galactifun.base.objects.earth
 
-import io.github.addoncommunity.galactifun.api.objects.UniversalObject
 import io.github.addoncommunity.galactifun.api.objects.planet.AlienWorld
 import io.github.addoncommunity.galactifun.api.objects.planet.gen.WorldGenerator
 import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
@@ -11,11 +10,9 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
 class Moon : AlienWorld("Moon", ItemStack(Material.END_STONE)) {
-
     override val atmosphere = Atmosphere.NONE
     override val dayCycle = DayCycle(days = 29, hours = 12)
     override val orbiting = BaseUniverse.earth
     override val orbit = Orbit.kilometers(382500L, days = 27.0)
-    override val generator: WorldGenerator
-        get() = TODO("Not yet implemented")
+    override val generator: WorldGenerator = MoonGenerator()
 }

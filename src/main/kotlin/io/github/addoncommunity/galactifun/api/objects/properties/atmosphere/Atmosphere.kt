@@ -83,7 +83,7 @@ class Atmosphere private constructor(
         val NONE = buildAtmosphere {
             weatherEnabled = false
             pressure = 0.0
-            environment = World.Environment.THE_END
+            environment = World.Environment.NORMAL
         }
     }
 }
