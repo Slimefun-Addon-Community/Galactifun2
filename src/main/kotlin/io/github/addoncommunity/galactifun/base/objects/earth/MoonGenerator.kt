@@ -2,8 +2,8 @@ package io.github.addoncommunity.galactifun.base.objects.earth
 
 import io.github.addoncommunity.galactifun.api.objects.planet.gen.CustomBiomeProvider
 import io.github.addoncommunity.galactifun.api.objects.planet.gen.WorldGenerator
-import io.github.addoncommunity.galactifun.util.ChunkPosition
 import io.github.addoncommunity.galactifun.util.buildCustomBiome
+import io.github.addoncommunity.galactifun.util.gen.DoubleChunkGrid
 import io.github.addoncommunity.galactifun.util.toKey
 import io.github.seggan.custombiomeapi.CustomBiome
 import org.bukkit.Color
@@ -23,6 +23,9 @@ internal class MoonGenerator : WorldGenerator() {
 
     @Volatile
     private lateinit var heightNoise: SimplexOctaveGenerator
+
+    private val baseNoiseGrid = DoubleChunkGrid(256 * 2)
+    private val heightNoiseGrid = DoubleChunkGrid(256 * 3)
 
     override fun generateBedrock(worldInfo: WorldInfo, random: Random, chunkX: Int, chunkZ: Int, chunkData: ChunkData) {
         for (x in 0..15) {
@@ -59,12 +62,14 @@ internal class MoonGenerator : WorldGenerator() {
                     }
                 } else {
                     chunkData.setBlock(x, height - 2, z, Material.GRAY_CONCRETE_POWDER)
-                    chunkData.setBlock(x, height - 1, z, when (terrainType) {
-                        TerrainType.TRANSITION_25 -> if (random.nextDouble() < 0.25) Material.GRAY_CONCRETE_POWDER else Material.LIGHT_GRAY_CONCRETE_POWDER
-                        TerrainType.TRANSITION_50 -> if (random.nextBoolean()) Material.GRAY_CONCRETE_POWDER else Material.LIGHT_GRAY_CONCRETE_POWDER
-                        TerrainType.TRANSITION_75 -> if (random.nextDouble() < 0.75) Material.GRAY_CONCRETE_POWDER else Material.LIGHT_GRAY_CONCRETE_POWDER
-                        else -> Material.LIGHT_GRAY_CONCRETE_POWDER
-                    })
+                    chunkData.setBlock(
+                        x, height - 1, z, when (terrainType) {
+                            TerrainType.TRANSITION_25 -> if (random.nextDouble() < 0.25) Material.GRAY_CONCRETE_POWDER else Material.LIGHT_GRAY_CONCRETE_POWDER
+                            TerrainType.TRANSITION_50 -> if (random.nextBoolean()) Material.GRAY_CONCRETE_POWDER else Material.LIGHT_GRAY_CONCRETE_POWDER
+                            TerrainType.TRANSITION_75 -> if (random.nextDouble() < 0.75) Material.GRAY_CONCRETE_POWDER else Material.LIGHT_GRAY_CONCRETE_POWDER
+                            else -> Material.LIGHT_GRAY_CONCRETE_POWDER
+                        }
+                    )
                 }
             }
         }
@@ -76,8 +81,9 @@ internal class MoonGenerator : WorldGenerator() {
             baseNoise.setScale(1 / 64.0)
         }
 
-        var base = baseNoise.noise(x.toDouble(), y.toDouble(), 0.5, 0.5, true) + 1
-        base /= 2
+        var base = baseNoiseGrid.getOrSet(x, y) {
+            (baseNoise.noise(x.toDouble(), y.toDouble(), 0.5, 0.5, true) + 1) / 2
+        }
         base = base.pow(getHeightValue(worldInfo, x, y))
 
         return (base * 40 - worldInfo.minHeight).toInt()
@@ -89,8 +95,9 @@ internal class MoonGenerator : WorldGenerator() {
             heightNoise.setScale(1 / 1024.0)
         }
 
-        var height = heightNoise.noise(x.toDouble(), y.toDouble(), 0.5, 0.5, true) + 1
-        height /= 2
+        val height = heightNoiseGrid.getOrSet(x, y) {
+            (heightNoise.noise(x.toDouble(), y.toDouble(), 0.5, 0.5, true) + 1) / 2
+        }
         return height * 4 + 1
     }
 
@@ -106,28 +113,8 @@ internal class MoonGenerator : WorldGenerator() {
     }
 
     inner class MoonBiomeProvider : CustomBiomeProvider() {
-
-        @Volatile
-        private lateinit var currentChunk: ChunkPosition
-        @Volatile
-        private lateinit var currentBiomes: Array<Array<CustomBiome>>
-
-        override fun getCustomBiome(worldInfo: WorldInfo, x: Int, y: Int, z: Int): CustomBiome {
-            synchronized(this) {
-                if (!::currentChunk.isInitialized || x / 16 != currentChunk.x || z / 16 != currentChunk.y) {
-                    currentChunk = ChunkPosition(x / 16, z / 16)
-                    currentBiomes = Array(16) { x ->
-                        Array(16) { z ->
-                            val cx = currentChunk.worldX + (x % 16)
-                            val cz = currentChunk.worldY + (z % 16)
-                            if (getTerrainType(worldInfo, cx, cz) == TerrainType.MARE) lunarMare else lunarHills
-                        }
-                    }
-                }
-            }
-
-            return currentBiomes[x and 15][z and 15]
-        }
+        override fun getCustomBiome(worldInfo: WorldInfo, x: Int, y: Int, z: Int): CustomBiome =
+            if (getTerrainType(worldInfo, x, z) == TerrainType.MARE) lunarMare else lunarHills
 
         override fun getAllBiomes(): List<CustomBiome> = listOf(lunarHills, lunarMare)
     }
