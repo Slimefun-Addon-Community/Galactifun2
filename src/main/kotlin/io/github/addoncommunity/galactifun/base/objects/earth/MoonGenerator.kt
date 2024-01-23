@@ -1,10 +1,10 @@
 package io.github.addoncommunity.galactifun.base.objects.earth
 
-import io.github.addoncommunity.galactifun.api.objects.planet.gen.SingleBiomeProvider
 import io.github.addoncommunity.galactifun.api.objects.planet.gen.WorldGenerator
 import io.github.addoncommunity.galactifun.util.gen.DoubleChunkGrid
 import org.bukkit.Material
 import org.bukkit.block.Biome
+import org.bukkit.generator.BiomeProvider
 import org.bukkit.generator.WorldInfo
 import org.bukkit.util.noise.SimplexOctaveGenerator
 import java.util.*
@@ -12,7 +12,7 @@ import kotlin.math.pow
 
 internal class MoonGenerator : WorldGenerator() {
 
-    override val biomeProvider = SingleBiomeProvider(Biome.DESERT)
+    override val biomeProvider: BiomeProvider = MoonBiomeProvider()
 
     @Volatile
     private lateinit var baseNoise: SimplexOctaveGenerator
@@ -20,8 +20,8 @@ internal class MoonGenerator : WorldGenerator() {
     @Volatile
     private lateinit var heightNoise: SimplexOctaveGenerator
 
-    private val baseNoiseGrid = DoubleChunkGrid(256 * 2)
-    private val heightNoiseGrid = DoubleChunkGrid(256 * 3)
+    private val baseNoiseGrid = DoubleChunkGrid()
+    private val heightNoiseGrid = DoubleChunkGrid()
 
     override fun generateBedrock(worldInfo: WorldInfo, random: Random, chunkX: Int, chunkZ: Int, chunkData: ChunkData) {
         for (x in 0..15) {
@@ -52,24 +52,21 @@ internal class MoonGenerator : WorldGenerator() {
             for (z in 0..15) {
                 val height = getHeight(worldInfo, cx + x, cz + z)
                 val terrainType = getTerrainType(worldInfo, cx + x, cz + z)
-                if (terrainType == TerrainType.MARE) {
-                    for (y in height - 2 until height) {
-                        chunkData.setBlock(x, y, z, Material.GRAY_CONCRETE)
+                chunkData.setBlock(x, height - 2, z, Material.GRAY_CONCRETE_POWDER)
+                chunkData.setBlock(
+                    x,
+                    height - 1,
+                    z,
+                    when (terrainType) {
+                        is TerrainType.Mare -> Material.GRAY_CONCRETE_POWDER
+
+                        is TerrainType.Transition ->
+                            if (random.nextDouble() < terrainType.chance) Material.GRAY_CONCRETE_POWDER
+                            else Material.LIGHT_GRAY_CONCRETE_POWDER
+
+                        is TerrainType.Hills -> Material.LIGHT_GRAY_CONCRETE_POWDER
                     }
-                } else {
-                    chunkData.setBlock(x, height - 2, z, Material.GRAY_CONCRETE_POWDER)
-                    chunkData.setBlock(
-                        x,
-                        height - 1,
-                        z,
-                        when (terrainType) {
-                            TerrainType.TRANSITION_25 -> if (random.nextDouble() < 0.25) Material.GRAY_CONCRETE_POWDER else Material.LIGHT_GRAY_CONCRETE_POWDER
-                            TerrainType.TRANSITION_50 -> if (random.nextBoolean()) Material.GRAY_CONCRETE_POWDER else Material.LIGHT_GRAY_CONCRETE_POWDER
-                            TerrainType.TRANSITION_75 -> if (random.nextDouble() < 0.75) Material.GRAY_CONCRETE_POWDER else Material.LIGHT_GRAY_CONCRETE_POWDER
-                            else -> Material.LIGHT_GRAY_CONCRETE_POWDER
-                        }
-                    )
-                }
+                )
             }
         }
     }
@@ -103,19 +100,23 @@ internal class MoonGenerator : WorldGenerator() {
     private fun getTerrainType(worldInfo: WorldInfo, x: Int, y: Int): TerrainType {
         val height = getHeightValue(worldInfo, x, y)
         return when {
-            height < 3.5 -> TerrainType.HILLS
-            height < 3.75 -> TerrainType.TRANSITION_25
-            height < 4.0 -> TerrainType.TRANSITION_50
-            height < 4.25 -> TerrainType.TRANSITION_75
-            else -> TerrainType.MARE
+            height < 2.5 -> TerrainType.Hills
+            height < 3 -> TerrainType.Transition((height - 2.5) / 0.5)
+            else -> TerrainType.Mare
         }
+    }
+
+    private inner class MoonBiomeProvider : BiomeProvider() {
+        override fun getBiome(worldInfo: WorldInfo, x: Int, y: Int, z: Int): Biome {
+            return if (getTerrainType(worldInfo, x, z) == TerrainType.Mare) Biome.BADLANDS else Biome.DESERT
+        }
+
+        override fun getBiomes(worldInfo: WorldInfo): MutableList<Biome> = mutableListOf(Biome.DESERT, Biome.BADLANDS)
     }
 }
 
-private enum class TerrainType {
-    HILLS,
-    TRANSITION_25,
-    TRANSITION_50,
-    TRANSITION_75,
-    MARE
+private sealed interface TerrainType {
+    data object Hills : TerrainType
+    data class Transition(val chance: Double) : TerrainType
+    data object Mare : TerrainType
 }

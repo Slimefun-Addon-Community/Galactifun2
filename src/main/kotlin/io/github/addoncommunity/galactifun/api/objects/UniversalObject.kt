@@ -21,8 +21,7 @@ abstract class UniversalObject protected constructor(name: String, baseItem: Ite
         get() = if (this is TheUniverse) 0 else orbiting.orbitLevel + 1
 
     private val _orbiters = mutableListOf<UniversalObject>()
-    val orbiters: List<UniversalObject>
-        get() = _orbiters.toList()
+    val orbiters: List<UniversalObject> = _orbiters
 
     fun addOrbiter(orbiter: UniversalObject) {
         _orbiters.add(orbiter)
