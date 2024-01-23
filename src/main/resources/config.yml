@@ -32,15 +32,8 @@ rockets:
     - Taking one small step
     - Going Boomer
     - Not going home
-
-other:
-  # The range that the automatic door checks for players
-  auto-door-range: 2
-  # Blocks prohibited to be used by the automatic door
-  auto-door-banned-types:
-    - BEDROCK
-    - CAKE
-    - BARRIER
-    - COMMAND_BLOCK
-    - END_PORTAL
-    - STRUCTURE_BLOCK
+    - Calibrating the 'Are We There Yet?'ometer
+    - Packing extra duct tape
+    - Applying SPF 5000 sunscreen to the engine
+    - Pointing the correct end towards space
+    - Launching on a wing and a prayer (and a slightly dodgy fuel injector)

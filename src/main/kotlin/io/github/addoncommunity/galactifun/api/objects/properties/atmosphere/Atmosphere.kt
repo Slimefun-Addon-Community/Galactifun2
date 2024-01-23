@@ -1,6 +1,6 @@
 package io.github.addoncommunity.galactifun.api.objects.properties.atmosphere
 
-import io.github.bakedlibs.dough.collections.RandomizedSet
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.RandomizedSet
 import org.bukkit.GameRule
 import org.bukkit.World
 

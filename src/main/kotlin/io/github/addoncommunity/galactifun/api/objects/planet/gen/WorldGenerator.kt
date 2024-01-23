@@ -10,6 +10,7 @@ import org.bukkit.generator.WorldInfo
  * A world generator for an [AlienWorld], plus a [BiomeProvider] and a [BlockPopulator]
  */
 abstract class WorldGenerator : ChunkGenerator() {
+
     abstract val biomeProvider: BiomeProvider
     protected val populators = mutableListOf<BlockPopulator>()
 

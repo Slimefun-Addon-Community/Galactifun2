@@ -1,8 +1,8 @@
 package io.github.addoncommunity.galactifun.util.items
 
-import io.github.bakedlibs.dough.items.CustomItemStack
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun
+import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils
 import it.unimi.dsi.fastutil.ints.IntArrayList

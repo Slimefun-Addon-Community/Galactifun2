@@ -1,22 +1,18 @@
 package io.github.addoncommunity.galactifun.base.objects.earth
 
-import io.github.addoncommunity.galactifun.api.objects.planet.gen.CustomBiomeProvider
+import io.github.addoncommunity.galactifun.api.objects.planet.gen.SingleBiomeProvider
 import io.github.addoncommunity.galactifun.api.objects.planet.gen.WorldGenerator
-import io.github.addoncommunity.galactifun.util.buildCustomBiome
 import io.github.addoncommunity.galactifun.util.gen.DoubleChunkGrid
-import io.github.addoncommunity.galactifun.util.toKey
-import io.github.seggan.custombiomeapi.CustomBiome
-import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.block.Biome
 import org.bukkit.generator.WorldInfo
 import org.bukkit.util.noise.SimplexOctaveGenerator
-import java.util.Random
+import java.util.*
 import kotlin.math.pow
 
 internal class MoonGenerator : WorldGenerator() {
 
-    override val biomeProvider = MoonBiomeProvider()
+    override val biomeProvider = SingleBiomeProvider(Biome.DESERT)
 
     @Volatile
     private lateinit var baseNoise: SimplexOctaveGenerator
@@ -63,7 +59,10 @@ internal class MoonGenerator : WorldGenerator() {
                 } else {
                     chunkData.setBlock(x, height - 2, z, Material.GRAY_CONCRETE_POWDER)
                     chunkData.setBlock(
-                        x, height - 1, z, when (terrainType) {
+                        x,
+                        height - 1,
+                        z,
+                        when (terrainType) {
                             TerrainType.TRANSITION_25 -> if (random.nextDouble() < 0.25) Material.GRAY_CONCRETE_POWDER else Material.LIGHT_GRAY_CONCRETE_POWDER
                             TerrainType.TRANSITION_50 -> if (random.nextBoolean()) Material.GRAY_CONCRETE_POWDER else Material.LIGHT_GRAY_CONCRETE_POWDER
                             TerrainType.TRANSITION_75 -> if (random.nextDouble() < 0.75) Material.GRAY_CONCRETE_POWDER else Material.LIGHT_GRAY_CONCRETE_POWDER
@@ -111,13 +110,6 @@ internal class MoonGenerator : WorldGenerator() {
             else -> TerrainType.MARE
         }
     }
-
-    inner class MoonBiomeProvider : CustomBiomeProvider() {
-        override fun getCustomBiome(worldInfo: WorldInfo, x: Int, y: Int, z: Int): CustomBiome =
-            if (getTerrainType(worldInfo, x, z) == TerrainType.MARE) lunarMare else lunarHills
-
-        override fun getAllBiomes(): List<CustomBiome> = listOf(lunarHills, lunarMare)
-    }
 }
 
 private enum class TerrainType {
@@ -126,14 +118,4 @@ private enum class TerrainType {
     TRANSITION_50,
     TRANSITION_75,
     MARE
-}
-
-private val lunarHills = buildCustomBiome("lunar_hills".toKey(), Biome.WINDSWEPT_HILLS) {
-    skyColor = Color.BLACK
-    fogColor = Color.BLACK
-}
-
-private val lunarMare = buildCustomBiome("lunar_mare".toKey(), Biome.DEEP_OCEAN) {
-    skyColor = Color.BLACK
-    fogColor = Color.BLACK
 }

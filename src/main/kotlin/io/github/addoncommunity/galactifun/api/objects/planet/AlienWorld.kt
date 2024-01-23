@@ -1,6 +1,5 @@
 package io.github.addoncommunity.galactifun.api.objects.planet
 
-import io.github.addoncommunity.galactifun.api.objects.planet.gen.CustomBiomeProvider
 import io.github.addoncommunity.galactifun.api.objects.planet.gen.WorldGenerator
 import io.github.addoncommunity.galactifun.log
 import io.github.addoncommunity.galactifun.pluginInstance
@@ -10,7 +9,7 @@ import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.WorldCreator
 import org.bukkit.inventory.ItemStack
-import java.util.EnumMap
+import java.util.*
 
 abstract class AlienWorld(name: String, baseItem: ItemStack) : PlanetaryWorld(name, baseItem) {
 
@@ -26,17 +25,6 @@ abstract class AlienWorld(name: String, baseItem: ItemStack) : PlanetaryWorld(na
             .generator(generator)
             .environment(atmosphere.environment)
             .createWorld() ?: error("Could not create world world_galactifun_$id")
-
-        val provider = generator.biomeProvider
-        if (provider is CustomBiomeProvider) {
-            val manager = pluginInstance.biomeManager
-            for (biome in provider.getAllBiomes()) {
-                if (!manager.isBiomeRegistered(biome)) {
-                    manager.registerBiome(biome)
-                }
-                manager.addBiomeToWorld(world, biome)
-            }
-        }
 
         if (world.environment == World.Environment.THE_END) {
             // Prevents ender dragon spawn using portal, surrounds portal with bedrock

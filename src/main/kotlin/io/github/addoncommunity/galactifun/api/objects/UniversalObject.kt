@@ -1,7 +1,7 @@
 package io.github.addoncommunity.galactifun.api.objects
 
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
-import io.github.bakedlibs.dough.items.CustomItemStack
+import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack
 import io.github.thebusybiscuit.slimefun4.utils.ChatUtils
 import org.bukkit.inventory.ItemStack
 import kotlin.math.cos
@@ -17,7 +17,6 @@ abstract class UniversalObject protected constructor(name: String, baseItem: Ite
     abstract val orbiting: UniversalObject
     abstract val orbit: Orbit
 
-    @Suppress("LeakingThis")
     val orbitLevel: Int
         get() = if (this is TheUniverse) 0 else orbiting.orbitLevel + 1
 

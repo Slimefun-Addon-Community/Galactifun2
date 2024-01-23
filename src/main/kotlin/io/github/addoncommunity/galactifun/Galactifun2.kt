@@ -1,7 +1,7 @@
 package io.github.addoncommunity.galactifun
 
 import io.github.addoncommunity.galactifun.base.BaseUniverse
-import io.github.seggan.custombiomeapi.CustomBiomeManager
+import io.github.seggan.kfun.AbstractAddon
 import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun
 import io.github.thebusybiscuit.slimefun4.libraries.paperlib.PaperLib
@@ -12,17 +12,12 @@ import java.util.logging.Level
 
 class Galactifun2 : AbstractAddon() {
 
-    companion object;
-
-    lateinit var biomeManager: CustomBiomeManager
-        private set
-
     override fun onLoad() {
         Bukkit.spigot().config["world-settings.default.verbose"] = false
     }
 
     override fun onEnable() {
-        pluginInstance = this
+        instance = this
 
         var shouldDisable = false
         if (!PaperLib.isPaper()) {
@@ -48,11 +43,9 @@ class Galactifun2 : AbstractAddon() {
 
         Metrics(this, 11613)
 
-        biomeManager = CustomBiomeManager(this)
-
         BaseUniverse.init()
 
-        runTask {
+        runOnNextTick {
             log(
                 Level.INFO,
                 "################# Galactifun2 $pluginVersion #################",
@@ -65,26 +58,32 @@ class Galactifun2 : AbstractAddon() {
         }
     }
 
+    override fun onDisable() {
+        instance = null
+    }
+
     override fun getJavaPlugin(): JavaPlugin = this
 
     override fun getBugTrackerURL(): String = "https://github.com/Slimefun-Addon-Community/Galactifun2/issues"
 }
 
-lateinit var pluginInstance: Galactifun2
-    private set
+private var instance: Galactifun2? = null
 
-fun Galactifun2.log(level: Level, vararg messages: String) {
+val pluginInstance: Galactifun2
+    get() = instance ?: error("Plugin is not enabled")
+
+fun JavaPlugin.log(level: Level, vararg messages: String) {
     for (message in messages) {
         logger.log(level, message)
     }
 }
 
-fun Galactifun2.log(vararg messages: String) = log(Level.INFO, *messages)
+fun JavaPlugin.log(vararg messages: String) = log(Level.INFO, *messages)
 
-fun Galactifun2.runTask(runnable: Runnable) {
+fun JavaPlugin.runOnNextTick(runnable: Runnable) {
     server.scheduler.runTask(this, runnable)
 }
 
-fun Galactifun2.runTaskRepeat(period: Long, delay: Long = 0, runnable: Runnable) {
+fun JavaPlugin.runTaskRepeat(period: Long, delay: Long = 0, runnable: Runnable) {
     server.scheduler.runTaskTimer(this, runnable, delay, period)
 }

@@ -2,7 +2,7 @@ package io.github.addoncommunity.galactifun.core.managers
 
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.pluginInstance
-import io.github.addoncommunity.galactifun.runTask
+import io.github.addoncommunity.galactifun.runOnNextTick
 import org.bukkit.World
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
@@ -29,7 +29,7 @@ object WorldManager {
             }
         }
 
-        pluginInstance.runTask {
+        pluginInstance.runOnNextTick {
             config.options().copyDefaults(true)
             config.save(configFile)
         }
