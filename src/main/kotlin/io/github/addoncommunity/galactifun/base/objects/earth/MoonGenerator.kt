@@ -100,8 +100,8 @@ internal class MoonGenerator : WorldGenerator() {
     private fun getTerrainType(worldInfo: WorldInfo, x: Int, y: Int): TerrainType {
         val height = getHeightValue(worldInfo, x, y)
         return when {
-            height < 2.5 -> TerrainType.Hills
-            height < 3 -> TerrainType.Transition((height - 2.5) / 0.5)
+            height < 3 -> TerrainType.Hills
+            height < 3.5 -> TerrainType.Transition((height - 3) / 0.5)
             else -> TerrainType.Mare
         }
     }
