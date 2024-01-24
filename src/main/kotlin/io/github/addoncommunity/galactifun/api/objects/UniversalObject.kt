@@ -1,5 +1,7 @@
 package io.github.addoncommunity.galactifun.api.objects
 
+import io.github.addoncommunity.galactifun.api.objects.properties.Distance
+import io.github.addoncommunity.galactifun.api.objects.properties.Distance.Companion.lightYears
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack
 import io.github.thebusybiscuit.slimefun4.utils.ChatUtils
@@ -27,15 +29,15 @@ abstract class UniversalObject protected constructor(name: String, baseItem: Ite
         _orbiters.add(orbiter)
     }
 
-    open fun distanceTo(other: UniversalObject): Double {
+    open fun distanceTo(other: UniversalObject): Distance {
         if (orbitLevel == 0 || orbitLevel < other.orbitLevel) {
             return other.orbit.distance + distanceTo(other.orbiting)
         }
         if (orbiting == other.orbiting) {
-            val thisDist = orbit.distance
-            val otherDist = other.orbit.distance
+            val thisDist = orbit.distance.lightYears
+            val otherDist = other.orbit.distance.lightYears
             val cosAngle = cos(orbit.position - other.orbit.position)
-            return sqrt(thisDist * thisDist + otherDist * otherDist - 2 * thisDist * otherDist * cosAngle)
+            return sqrt(thisDist * thisDist + otherDist * otherDist - 2 * thisDist * otherDist * cosAngle).lightYears
         }
         return orbit.distance + orbiting.distanceTo(other)
     }

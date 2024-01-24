@@ -1,9 +1,9 @@
 package io.github.addoncommunity.galactifun.api.objects
 
+import io.github.addoncommunity.galactifun.api.objects.properties.Distance
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import kotlin.math.abs
 
 class StarSystem(
     name: String,
@@ -11,11 +11,11 @@ class StarSystem(
     override val orbit: Orbit
 ) : UniversalObject(name, ItemStack(Material.SUNFLOWER)) {
 
-    override fun distanceTo(other: UniversalObject): Double {
+    override fun distanceTo(other: UniversalObject): Distance {
         return if (orbitLevel > other.orbitLevel) {
             other.orbit.distance + distanceTo(other.orbiting)
         } else if (orbitLevel == other.orbitLevel) {
-            abs(this.orbit.distance - other.orbit.distance)
+            this.orbit.distance - other.orbit.distance
         } else {
             super.distanceTo(other)
         }
