@@ -25,8 +25,11 @@ object BaseUniverse {
         Orbit(27000.lightYears, 250000000.years)
     )
 
+    val earth = Earth()
+    val moon = Moon()
+
     fun init() {
-        Earth.register()
-        Moon.register()
+        earth.register()
+        moon.register()
     }
 }

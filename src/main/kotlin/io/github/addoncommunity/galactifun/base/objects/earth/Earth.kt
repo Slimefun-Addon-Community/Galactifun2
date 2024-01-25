@@ -13,7 +13,7 @@ import org.bukkit.World
 import org.bukkit.WorldCreator
 import org.bukkit.inventory.ItemStack
 
-object Earth : PlanetaryWorld("Earth", ItemStack(Material.GRASS_BLOCK)) {
+class Earth : PlanetaryWorld("Earth", ItemStack(Material.GRASS_BLOCK)) {
 
     override val orbiting = BaseUniverse.solarSystem
     override val orbit = Orbit(149600000.kilometers, 1.years)

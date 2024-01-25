@@ -30,6 +30,18 @@ value class Distance private constructor(val lightYears: Double) {
         @get:JvmName("kilometers")
         val Int.kilometers: Distance
             get() = Distance(this / Constants.KM_PER_LY)
+
+        @get:JvmName("au")
+        val Double.au: Distance
+            get() = Distance(this * Constants.AU_PER_LY)
+
+        @get:JvmName("au")
+        val Int.au: Distance
+            get() = Distance(this * Constants.AU_PER_LY)
+
+        @get:JvmName("au")
+        val Long.au: Distance
+            get() = Distance(this * Constants.AU_PER_LY)
     }
 
     init {

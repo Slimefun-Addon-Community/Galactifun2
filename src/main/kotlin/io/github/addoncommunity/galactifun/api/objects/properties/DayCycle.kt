@@ -9,11 +9,11 @@ class DayCycle {
 
     companion object {
 
-        val ETERNAL_DAY = DayCycle(6000)
-        val ETERNAL_NIGHT = DayCycle(18000)
+        val ETERNAL_DAY = eternal(6000)
+        val ETERNAL_NIGHT = eternal(18000)
         val EARTH_LIKE = DayCycle(1.days)
 
-        fun eternal(time: Long) = DayCycle(time)
+        fun eternal(time: Int) = DayCycle(time)
     }
 
     val description: String
@@ -48,10 +48,10 @@ class DayCycle {
     /**
      * Constructor for eternal day or night
      */
-    private constructor(time: Long) {
+    private constructor(time: Int) {
         description = "Eternal " + (if (time < 12000) "day" else "night")
         perFiveSeconds = 0
-        startTime = time
+        startTime = time.toLong()
     }
 
     fun applyEffects(world: World) {
