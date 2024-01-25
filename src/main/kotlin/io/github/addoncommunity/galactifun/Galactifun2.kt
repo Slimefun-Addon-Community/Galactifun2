@@ -1,7 +1,10 @@
 package io.github.addoncommunity.galactifun
 
+import co.aikar.commands.PaperCommandManager
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.base.BaseUniverse
+import io.github.addoncommunity.galactifun.core.Gf2Command
+import io.github.addoncommunity.galactifun.core.managers.WorldManager
 import io.github.addoncommunity.galactifun.scripting.PlanetScript
 import io.github.addoncommunity.galactifun.scripting.evalScript
 import io.github.seggan.kfun.AbstractAddon
@@ -18,6 +21,9 @@ import kotlin.script.experimental.api.valueOrThrow
 import kotlin.script.experimental.host.toScriptSource
 
 class Galactifun2 : AbstractAddon() {
+
+    lateinit var manager: PaperCommandManager
+        private set
 
     override fun onLoad() {
         Bukkit.spigot().config["world-settings.default.verbose"] = false
@@ -54,6 +60,17 @@ class Galactifun2 : AbstractAddon() {
         }
 
         Metrics(this, 11613)
+
+        manager = PaperCommandManager(this)
+        manager.enableUnstableAPI("help")
+        manager.commandCompletions.registerAsyncCompletion("planets") { _ ->
+            WorldManager.allPlanetaryWorlds.map { it.name }.sorted()
+        }
+        manager.commandContexts.registerContext(PlanetaryWorld::class.java) { context ->
+            val arg = context.popFirstArg()
+            WorldManager.allPlanetaryWorlds.find { it.name == arg }
+        }
+        manager.registerCommand(Gf2Command)
 
         BaseUniverse.init()
 

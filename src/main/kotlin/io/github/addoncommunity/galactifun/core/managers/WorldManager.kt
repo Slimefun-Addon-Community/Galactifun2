@@ -5,17 +5,19 @@ import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.runOnNextTick
 import org.bukkit.World
 import org.bukkit.configuration.file.YamlConfiguration
-import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 object WorldManager {
 
-    private val spaceWorlds = mutableMapOf<World, PlanetaryWorld>()
+    private val spaceWorlds = ConcurrentHashMap<World, PlanetaryWorld>()
+    val allPlanetaryWorlds: Collection<PlanetaryWorld>
+        get() = spaceWorlds.values
 
     private val config: YamlConfiguration
     private val defaultConfig: YamlConfiguration
 
     init {
-        val configFile = File(pluginInstance.dataFolder, "worlds.yml")
+        val configFile = pluginInstance.dataFolder.resolve("worlds.yml")
         config = YamlConfiguration()
         defaultConfig = YamlConfiguration()
         config.setDefaults(defaultConfig)
