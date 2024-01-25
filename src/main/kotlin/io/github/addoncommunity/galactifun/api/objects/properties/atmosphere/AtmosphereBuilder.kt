@@ -1,7 +1,7 @@
 package io.github.addoncommunity.galactifun.api.objects.properties.atmosphere
 
 import org.bukkit.World
-import java.util.EnumMap
+import java.util.*
 
 @AtmosphereDsl
 class AtmosphereBuilder internal constructor() {
@@ -20,11 +20,11 @@ class AtmosphereBuilder internal constructor() {
             this@AtmosphereBuilder.composition[gas] = this
         }
     }
+}
 
-    fun composition(builder: CompositionBuilder.() -> Unit) {
-        val compositionBuilder = CompositionBuilder()
-        builder(compositionBuilder)
-    }
+fun AtmosphereBuilder.composition(builder: AtmosphereBuilder.CompositionBuilder.() -> Unit) {
+    val compositionBuilder = CompositionBuilder()
+    builder(compositionBuilder)
 }
 
 @DslMarker

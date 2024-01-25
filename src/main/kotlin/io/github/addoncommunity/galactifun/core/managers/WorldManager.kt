@@ -15,7 +15,7 @@ object WorldManager {
     private val defaultConfig: YamlConfiguration
 
     init {
-        val configFile = File("plugins/Galactifun", "worlds.yml")
+        val configFile = File(pluginInstance.dataFolder, "worlds.yml")
         config = YamlConfiguration()
         defaultConfig = YamlConfiguration()
         config.setDefaults(defaultConfig)

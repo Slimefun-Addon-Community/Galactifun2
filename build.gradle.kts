@@ -19,6 +19,7 @@ dependencies {
     library(kotlin("scripting-common"))
     library(kotlin("scripting-jvm"))
     library(kotlin("scripting-jvm-host"))
+    library(kotlin("script-runtime"))
 
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
     compileOnly("com.github.Slimefun:Slimefun4:RC-36")
@@ -49,7 +50,6 @@ tasks.shadowJar {
 
     dependencies {
         exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
-        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8"))
     }
 }
 

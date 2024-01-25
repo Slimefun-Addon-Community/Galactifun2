@@ -1,6 +1,8 @@
 package io.github.addoncommunity.galactifun
 
+import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.base.BaseUniverse
+import io.github.addoncommunity.galactifun.scripting.PlanetScript
 import io.github.addoncommunity.galactifun.scripting.evalScript
 import io.github.seggan.kfun.AbstractAddon
 import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion
@@ -26,18 +28,23 @@ class Galactifun2 : AbstractAddon() {
 
         var shouldDisable = false
         if (!PaperLib.isPaper()) {
-            log(Level.SEVERE, "Galactifun only supports Paper and its forks (e.x. Airplane and Purpur)")
+            log(Level.SEVERE, "Galactifun2 only supports Paper and its forks (e.x. Airplane and Purpur)")
             log(Level.SEVERE, "Please use Paper or a fork of Paper")
             shouldDisable = true
         }
         if (Slimefun.getMinecraftVersion().isBefore(MinecraftVersion.MINECRAFT_1_19)) {
-            log(Level.SEVERE, "Galactifun only supports Minecraft 1.19 and above")
+            log(Level.SEVERE, "Galactifun2 only supports Minecraft 1.19 and above")
             log(Level.SEVERE, "Please use Minecraft 1.19 or above")
             shouldDisable = true
         }
         if (Bukkit.getPluginManager().isPluginEnabled("ClayTech")) {
-            log(Level.SEVERE, "Galactifun will not work properly with ClayTech")
+            log(Level.SEVERE, "Galactifun2 will not work properly with ClayTech")
             log(Level.SEVERE, "Please disable ClayTech")
+            shouldDisable = true
+        }
+        if (Bukkit.getPluginManager().isPluginEnabled("Galactifun")) {
+            log(Level.SEVERE, "Galactifun2 will not work properly with Galactifun")
+            log(Level.SEVERE, "Please remove Galactifun")
             shouldDisable = true
         }
 
@@ -72,6 +79,13 @@ class Galactifun2 : AbstractAddon() {
                 val returnValue = result.valueOrThrow().returnValue
                 if (returnValue is ResultValue.Error) {
                     throw returnValue.error
+                } else {
+                    for (planet in (returnValue.scriptInstance as PlanetScript).toRegister) {
+                        if (planet is PlanetaryWorld) {
+                            planet.register()
+                        }
+                        log("Registered planet: ${planet.name}")
+                    }
                 }
             }
         }
