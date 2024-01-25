@@ -2,6 +2,8 @@ package io.github.addoncommunity.galactifun.api.objects.properties
 
 import org.bukkit.GameRule
 import org.bukkit.World
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 
 class DayCycle {
 
@@ -9,24 +11,24 @@ class DayCycle {
 
         val ETERNAL_DAY = DayCycle(6000)
         val ETERNAL_NIGHT = DayCycle(18000)
-        val EARTH_LIKE = DayCycle(days = 1)
+        val EARTH_LIKE = DayCycle(1.days)
 
         fun eternal(time: Long) = DayCycle(time)
-
-        fun relativeToEarth(ratio: Double) = DayCycle(days = ratio.toInt(), hours = (ratio * 24).toInt())
     }
 
     val description: String
     private val perFiveSeconds: Long
     private val startTime: Long
 
-    constructor(days: Int = 0, hours: Int = 0) {
+    constructor(duration: Duration) {
+        val days = duration.inWholeDays
+        val hours = duration.inWholeHours - days * 24
         require(days * 24 + hours > 0) { "A day cycle must last longer than 1 hour" }
         description = buildString {
             if (days > 0) {
                 append(days)
                 append(" day")
-                if (days != 1) {
+                if (days != 1L) {
                     append('s')
                 }
                 append(' ')
@@ -34,12 +36,12 @@ class DayCycle {
             if (hours > 0) {
                 append(hours)
                 append(" hour")
-                if (hours != 1) {
+                if (hours != 1L) {
                     append('s')
                 }
             }
         }
-        perFiveSeconds = days * 100L + hours * 4L
+        perFiveSeconds = days * 100L + hours * 4L // magic happens here, do not touch
         startTime = -1
     }
 
