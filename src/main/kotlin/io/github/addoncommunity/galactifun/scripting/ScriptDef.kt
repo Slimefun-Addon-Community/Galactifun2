@@ -10,12 +10,10 @@ import org.bukkit.Material
 import kotlin.script.experimental.annotations.KotlinScript
 import kotlin.script.experimental.api.*
 import kotlin.script.experimental.jvm.baseClassLoader
-import kotlin.script.experimental.jvm.dependenciesFromCurrentContext
+import kotlin.script.experimental.jvm.dependenciesFromClassloader
 import kotlin.script.experimental.jvm.jvm
 import kotlin.script.experimental.jvm.jvmTarget
 import kotlin.script.experimental.jvmhost.BasicJvmScriptingHost
-import kotlin.script.experimental.jvmhost.createJvmCompilationConfigurationFromTemplate
-import kotlin.script.experimental.jvmhost.createJvmEvaluationConfigurationFromTemplate
 
 @KotlinScript(
     fileExtension = "planet.kts",
@@ -40,7 +38,7 @@ object PlanetScriptConfig : ScriptCompilationConfiguration({
     defaultImports(Material::class, BaseUniverse::class, TheUniverse::class, Earth::class, Moon::class)
     compilerOptions.append("-Xadd-modules=ALL-MODULE-PATH")
     jvm {
-        dependenciesFromCurrentContext(wholeClasspath = true)
+        dependenciesFromClassloader(classLoader = pluginInstance::class.java.classLoader, wholeClasspath = true)
         jvmTarget("17")
     }
 })
@@ -52,7 +50,5 @@ object PlanetScriptEval : ScriptEvaluationConfiguration({
 })
 
 fun evalScript(script: SourceCode): ResultWithDiagnostics<EvaluationResult> {
-    val config = createJvmCompilationConfigurationFromTemplate<PlanetScript>()
-    val evalConfig = createJvmEvaluationConfigurationFromTemplate<PlanetScript>()
-    return BasicJvmScriptingHost().eval(script, config, evalConfig)
+    return BasicJvmScriptingHost().eval(script, PlanetScriptConfig, PlanetScriptEval)
 }

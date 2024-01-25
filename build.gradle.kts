@@ -14,11 +14,11 @@ repositories {
 
 dependencies {
     library(kotlin("stdlib"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC2")
+    library("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC2")
 
-    implementation(kotlin("scripting-common"))
-    implementation(kotlin("scripting-jvm"))
-    implementation(kotlin("scripting-jvm-host"))
+    library(kotlin("scripting-common"))
+    library(kotlin("scripting-jvm"))
+    library(kotlin("scripting-jvm-host"))
 
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
     compileOnly("com.github.Slimefun:Slimefun4:RC-36")
@@ -46,6 +46,11 @@ tasks.shadowJar {
     relocate("org.bstats", "io.github.addoncommunity.galactifun.bstats")
     relocate("co.aikar.commands", "io.github.addoncommunity.galactifun.acf")
     relocate("co.aikar.locales", "io.github.addoncommunity.galactifun.acf.locales")
+
+    dependencies {
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8"))
+    }
 }
 
 bukkit {
