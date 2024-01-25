@@ -1,6 +1,7 @@
 package io.github.addoncommunity.galactifun
 
 import io.github.addoncommunity.galactifun.base.BaseUniverse
+import io.github.addoncommunity.galactifun.scripting.evalScript
 import io.github.seggan.kfun.AbstractAddon
 import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun
@@ -9,6 +10,10 @@ import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.logging.Level
+import kotlin.script.experimental.api.ResultValue
+import kotlin.script.experimental.api.ScriptDiagnostic
+import kotlin.script.experimental.api.valueOrThrow
+import kotlin.script.experimental.host.toScriptSource
 
 class Galactifun2 : AbstractAddon() {
 
@@ -44,6 +49,32 @@ class Galactifun2 : AbstractAddon() {
         Metrics(this, 11613)
 
         BaseUniverse.init()
+
+        val scriptsFolder = dataFolder.resolve("planets")
+        if (!scriptsFolder.exists()) {
+            scriptsFolder.mkdirs()
+        }
+        for (script in scriptsFolder.listFiles()!!) {
+            if (script.isFile && script.name.endsWith(".planet.kts")) {
+                log("Loading planet script: ${script.name}")
+                val result = evalScript(script.toScriptSource())
+                for (diagnostic in result.reports) {
+                    log(
+                        when (diagnostic.severity) {
+                            ScriptDiagnostic.Severity.ERROR, ScriptDiagnostic.Severity.FATAL -> Level.SEVERE
+                            ScriptDiagnostic.Severity.WARNING -> Level.WARNING
+                            ScriptDiagnostic.Severity.INFO -> Level.INFO
+                            ScriptDiagnostic.Severity.DEBUG -> Level.FINE
+                        },
+                        diagnostic.message
+                    )
+                }
+                val returnValue = result.valueOrThrow().returnValue
+                if (returnValue is ResultValue.Error) {
+                    throw returnValue.error
+                }
+            }
+        }
 
         runOnNextTick {
             log(

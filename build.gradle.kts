@@ -16,9 +16,9 @@ dependencies {
     library(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC2")
 
-    library(kotlin("scripting-common"))
-    library(kotlin("scripting-jvm"))
-    library(kotlin("scripting-jvm-host"))
+    implementation(kotlin("scripting-common"))
+    implementation(kotlin("scripting-jvm"))
+    implementation(kotlin("scripting-jvm-host"))
 
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
     compileOnly("com.github.Slimefun:Slimefun4:RC-36")

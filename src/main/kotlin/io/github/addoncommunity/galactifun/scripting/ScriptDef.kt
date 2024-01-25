@@ -5,17 +5,22 @@ import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
 import io.github.addoncommunity.galactifun.base.BaseUniverse
 import io.github.addoncommunity.galactifun.base.objects.earth.Earth
 import io.github.addoncommunity.galactifun.base.objects.earth.Moon
+import io.github.addoncommunity.galactifun.pluginInstance
 import org.bukkit.Material
 import kotlin.script.experimental.annotations.KotlinScript
 import kotlin.script.experimental.api.*
-import kotlin.script.experimental.jvm.dependenciesFromClassContext
+import kotlin.script.experimental.jvm.baseClassLoader
+import kotlin.script.experimental.jvm.dependenciesFromCurrentContext
 import kotlin.script.experimental.jvm.jvm
+import kotlin.script.experimental.jvm.jvmTarget
 import kotlin.script.experimental.jvmhost.BasicJvmScriptingHost
 import kotlin.script.experimental.jvmhost.createJvmCompilationConfigurationFromTemplate
+import kotlin.script.experimental.jvmhost.createJvmEvaluationConfigurationFromTemplate
 
 @KotlinScript(
     fileExtension = "planet.kts",
-    compilationConfiguration = PlanetScriptConfig::class
+    compilationConfiguration = PlanetScriptConfig::class,
+    evaluationConfiguration = PlanetScriptEval::class
 )
 abstract class PlanetScript {
     val eternalDay = DayCycle.ETERNAL_DAY
@@ -33,13 +38,21 @@ object PlanetScriptConfig : ScriptCompilationConfiguration({
         "kotlin.time.Duration.Companion.days"
     )
     defaultImports(Material::class, BaseUniverse::class, TheUniverse::class, Earth::class, Moon::class)
-    compilerOptions("-jvm-target", "17")
+    compilerOptions.append("-Xadd-modules=ALL-MODULE-PATH")
     jvm {
-        dependenciesFromClassContext(PlanetScript::class, wholeClasspath = true)
+        dependenciesFromCurrentContext(wholeClasspath = true)
+        jvmTarget("17")
+    }
+})
+
+object PlanetScriptEval : ScriptEvaluationConfiguration({
+    jvm {
+        baseClassLoader(pluginInstance::class.java.classLoader)
     }
 })
 
 fun evalScript(script: SourceCode): ResultWithDiagnostics<EvaluationResult> {
     val config = createJvmCompilationConfigurationFromTemplate<PlanetScript>()
-    return BasicJvmScriptingHost().eval(script, config, null)
+    val evalConfig = createJvmEvaluationConfigurationFromTemplate<PlanetScript>()
+    return BasicJvmScriptingHost().eval(script, config, evalConfig)
 }
