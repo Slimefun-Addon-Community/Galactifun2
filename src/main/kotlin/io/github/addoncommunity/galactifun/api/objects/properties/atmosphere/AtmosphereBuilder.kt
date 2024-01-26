@@ -1,8 +1,10 @@
 package io.github.addoncommunity.galactifun.api.objects.properties.atmosphere
 
+import io.github.addoncommunity.galactifun.scripting.PlanetDsl
 import org.bukkit.World
 import java.util.*
 
+@PlanetDsl
 @AtmosphereDsl
 class AtmosphereBuilder internal constructor() {
 
@@ -14,11 +16,14 @@ class AtmosphereBuilder internal constructor() {
 
     internal val composition = EnumMap<Gas, Double>(Gas::class.java)
 
+    @PlanetDsl
     @AtmosphereDsl
     inner class CompositionBuilder internal constructor() {
         infix fun Double.percent(gas: Gas) {
             this@AtmosphereBuilder.composition[gas] = this
         }
+
+        infix fun Int.percent(gas: Gas) = this.toDouble() percent gas
     }
 }
 

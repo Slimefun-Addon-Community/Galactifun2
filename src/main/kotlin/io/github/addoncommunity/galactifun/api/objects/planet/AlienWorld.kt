@@ -43,4 +43,12 @@ abstract class AlienWorld(name: String, baseItem: ItemStack) : PlanetaryWorld(na
 
         return world
     }
+
+    fun addBlockMapping(material: Material, item: ItemStack) {
+        blockMappings[material] = item
+    }
+
+    fun getBlockMapping(material: Material): ItemStack? {
+        return blockMappings[material]
+    }
 }

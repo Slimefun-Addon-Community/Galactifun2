@@ -4,10 +4,12 @@ import io.github.addoncommunity.galactifun.api.objects.TheUniverse
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
+import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.base.BaseUniverse
 import io.github.addoncommunity.galactifun.pluginInstance
 import org.bukkit.Material
 import org.bukkit.World
+import org.bukkit.block.Biome
 import kotlin.reflect.KClass
 import kotlin.script.experimental.annotations.KotlinScript
 import kotlin.script.experimental.api.*
@@ -19,10 +21,10 @@ import kotlin.script.experimental.jvmhost.createJvmCompilationConfigurationFromT
 import kotlin.script.experimental.jvmhost.createJvmEvaluationConfigurationFromTemplate
 
 @KotlinScript(
+    displayName = "Galactifun2 Planet Definition",
     fileExtension = "planet.kts",
     compilationConfiguration = PlanetScriptConfig::class,
-    evaluationConfiguration = PlanetScriptEval::class,
-    hostConfiguration = PlanetScriptHost::class
+    evaluationConfiguration = PlanetScriptEval::class
 )
 abstract class PlanetScript {
     val eternalDay = DayCycle.ETERNAL_DAY
@@ -35,6 +37,7 @@ object PlanetScriptConfig : ScriptCompilationConfiguration({
     defaultImports(
         "io.github.addoncommunity.galactifun.util.*",
         "io.github.addoncommunity.galactifun.scripting.dsl.*",
+        "io.github.addoncommunity.galactifun.scripting.dsl.gen.*",
         "io.github.addoncommunity.galactifun.api.objects.properties.Distance.Companion.lightYears",
         "io.github.addoncommunity.galactifun.api.objects.properties.Distance.Companion.kilometers",
         "io.github.addoncommunity.galactifun.api.objects.properties.Distance.Companion.au",
@@ -43,10 +46,13 @@ object PlanetScriptConfig : ScriptCompilationConfiguration({
     )
     defaultImports(
         Material::class,
+        World.Environment::class,
+        Biome::class,
+
         BaseUniverse::class,
         TheUniverse::class,
         Atmosphere::class,
-        World.Environment::class
+        Gas::class,
     )
     compilerOptions.append("-Xadd-modules=ALL-MODULE-PATH")
     jvm {

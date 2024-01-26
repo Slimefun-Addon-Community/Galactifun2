@@ -20,3 +20,7 @@ class OrbitBuilder {
 inline fun orbit(block: OrbitBuilder.() -> Unit): Orbit {
     return OrbitBuilder().apply(block).build()
 }
+
+inline fun PlanetBuilder.orbit(block: OrbitBuilder.() -> Unit) {
+    orbit = OrbitBuilder().apply(block).build()
+}

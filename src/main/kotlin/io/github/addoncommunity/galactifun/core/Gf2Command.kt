@@ -6,6 +6,7 @@ import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import org.bukkit.Location
 import org.bukkit.entity.Player
 
+@Suppress("unused")
 @CommandAlias("gf2")
 object Gf2Command : BaseCommand() {
 
