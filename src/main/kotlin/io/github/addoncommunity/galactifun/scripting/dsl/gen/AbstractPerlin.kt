@@ -5,12 +5,10 @@ import io.github.addoncommunity.galactifun.scripting.RequiredProperty
 
 @PlanetDsl
 abstract class AbstractPerlin : GeneratorBuilder() {
-
-    var config: PerlinConfig by RequiredProperty()
-
     var generateBedrock = true
 
     var averageHeight: Int by RequiredProperty()
+    var maxDeviation: Int by RequiredProperty()
     var minHeight: Int by RequiredProperty()
     var surfaceHeight = 10
 
@@ -21,10 +19,5 @@ abstract class AbstractPerlin : GeneratorBuilder() {
         var frequency: Double by RequiredProperty()
 
         var flattenFactor: Double = 1.0
-        var smoothen: Boolean = false
     }
-}
-
-inline fun AbstractPerlin.noiseConfig(block: AbstractPerlin.PerlinConfig.() -> Unit) {
-    config = AbstractPerlin.PerlinConfig().apply(block)
 }

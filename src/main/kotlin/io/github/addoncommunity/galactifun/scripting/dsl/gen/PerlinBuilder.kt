@@ -1,38 +1,29 @@
 package io.github.addoncommunity.galactifun.scripting.dsl.gen
 
 import io.github.addoncommunity.galactifun.api.objects.planet.gen.WorldGenerator
+import io.github.addoncommunity.galactifun.scripting.RequiredProperty
 import org.bukkit.Material
 import org.bukkit.generator.WorldInfo
-import org.bukkit.util.noise.SimplexOctaveGenerator
 import java.util.*
-import kotlin.math.pow
+import kotlin.math.roundToInt
 
 class PerlinBuilder : AbstractPerlin() {
 
-    var noiseGenerator: (WorldInfo, Random, Int, Int, Int, Int) -> Material =
-        { _, _, _, _, _, _ -> Material.AIR }
+    var noiseGenerator: GenInfo.() -> Material by RequiredProperty()
+    var noiseCombiner: NoiseInfo.() -> Double by RequiredProperty()
 
-    var surfaceGenerator: (WorldInfo, Random, Int, Int, Int, Int) -> Material =
-        { _, _, _, _, _, _ -> Material.AIR }
-
+    val noises = mutableMapOf<String, PerlinConfig>()
 
     override fun build(): WorldGenerator {
-        // Prevent performance issues by unboxing before building the generator
-        val octaves = config.octaves
-        val scale = config.scale
-        val amplitude = config.amplitude
-        val frequency = config.frequency
-        val flattenFactor = config.flattenFactor
-        val smoothen = config.smoothen
-
         val averageHeight = averageHeight
+        val maxDeviation = maxDeviation
         val minHeight = minHeight + if (generateBedrock) 1 else 0
 
-        return object : WorldGenerator() {
-            override val biomeProvider = this@PerlinBuilder.biomeProvider
+        val noises = NoiseMap(noises)
 
-            @Volatile
-            private lateinit var baseNoise: SimplexOctaveGenerator
+        return object : WorldGenerator() {
+
+            override val biomeProvider = this@PerlinBuilder.biomeProvider
 
             fun getMinHeight(worldInfo: WorldInfo): Int = minHeight.coerceAtLeast(worldInfo.minHeight)
 
@@ -46,11 +37,18 @@ class PerlinBuilder : AbstractPerlin() {
                 val cx = chunkX * 16
                 val cz = chunkZ * 16
                 val min = getMinHeight(worldInfo)
+                val info = GenInfo(worldInfo, random, chunkX, chunkZ)
                 for (x in 0..15) {
                     for (z in 0..15) {
-                        val height = getHeight(worldInfo, cx + x, cz + z)
+                        val realX = cx + x
+                        val realZ = cz + z
+                        val height = getHeight(worldInfo, random, realX, realZ)
+                        info.x = realX
+                        info.z = realZ
+                        info.height = height
                         for (y in min until height - surfaceHeight) {
-                            chunkData.setBlock(x, y, z, noiseGenerator(worldInfo, random, cx + x, y, cz + z, height))
+                            info.y = y
+                            chunkData.setBlock(x, y, z, noiseGenerator(info))
                         }
                     }
                 }
@@ -65,11 +63,18 @@ class PerlinBuilder : AbstractPerlin() {
             ) {
                 val cx = chunkX * 16
                 val cz = chunkZ * 16
+                val info = GenInfo(worldInfo, random, chunkX, chunkZ)
                 for (x in 0..15) {
                     for (z in 0..15) {
-                        val height = getHeight(worldInfo, cx + x, cz + z)
+                        val realX = cx + x
+                        val realZ = cz + z
+                        val height = getHeight(worldInfo, random, realX, realZ)
+                        info.x = realX
+                        info.z = realZ
+                        info.height = height
                         for (y in height - surfaceHeight until height) {
-                            chunkData.setBlock(x, y, z, surfaceGenerator(worldInfo, random, cx + x, y, cz + z, height))
+                            info.y = y
+                            chunkData.setBlock(x, y, z, noiseGenerator(info))
                         }
                     }
                 }
@@ -91,32 +96,41 @@ class PerlinBuilder : AbstractPerlin() {
                 }
             }
 
-            private fun getHeight(worldInfo: WorldInfo, x: Int, z: Int): Int {
-                if (!::baseNoise.isInitialized) {
-                    baseNoise = SimplexOctaveGenerator(worldInfo.seed, octaves)
-                    baseNoise.setScale(scale)
-                }
-                var height = baseNoise.noise(x.toDouble(), z.toDouble(), frequency, amplitude, true)
-                height = height.pow(flattenFactor)
-                height = (height + 1) / 2
-                return (height * (averageHeight - minHeight)).toInt()
+            private fun getHeight(worldInfo: WorldInfo, random: Random, x: Int, z: Int): Int {
+                noises.init(worldInfo.seed)
+                val height = noiseCombiner(NoiseInfo(worldInfo, noises, random, x, z))
+                return (height * maxDeviation + averageHeight).roundToInt()
             }
         }
     }
+
+    data class GenInfo(
+        val world: WorldInfo,
+        val random: Random,
+        val chunkX: Int,
+        val chunkZ: Int
+    ) {
+        var x: Int = 0
+        var y: Int = 0
+        var z: Int = 0
+        var height: Int = 0
+    }
+
+    data class NoiseInfo(val world: WorldInfo, val noise: NoiseMap, val random: Random, val x: Int, val z: Int)
 }
 
-fun PerlinBuilder.generateNoiseBlock(
-    block: (WorldInfo, Random, Int, Int, Int, Int) -> Material
-) {
+fun PerlinBuilder.generateBlock(block: PerlinBuilder.GenInfo.() -> Material) {
     noiseGenerator = block
 }
 
-fun PerlinBuilder.generateSurfaceBlock(
-    block: (WorldInfo, Random, Int, Int, Int, Int) -> Material
-) {
-    surfaceGenerator = block
+fun PerlinBuilder.combineNoise(noise: PerlinBuilder.NoiseInfo.() -> Double) {
+    noiseCombiner = noise
 }
 
-object Perlin : GeneratorBuilderProvider<PerlinBuilder> {
+fun PerlinBuilder.noiseConfig(name: String, config: AbstractPerlin.PerlinConfig.() -> Unit) {
+    noises[name] = AbstractPerlin.PerlinConfig().apply(config)
+}
+
+object MultiNoise : GeneratorBuilderProvider<PerlinBuilder> {
     override fun provide() = PerlinBuilder()
 }
