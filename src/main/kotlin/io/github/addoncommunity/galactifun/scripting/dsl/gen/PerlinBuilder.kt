@@ -1,16 +1,22 @@
 package io.github.addoncommunity.galactifun.scripting.dsl.gen
 
 import io.github.addoncommunity.galactifun.api.objects.planet.gen.WorldGenerator
+import io.github.addoncommunity.galactifun.scripting.PlanetDsl
 import io.github.addoncommunity.galactifun.scripting.RequiredProperty
 import org.bukkit.Material
+import org.bukkit.block.Biome
+import org.bukkit.generator.BiomeProvider
 import org.bukkit.generator.WorldInfo
 import java.util.*
 import kotlin.math.roundToInt
 
-class PerlinBuilder : AbstractPerlin() {
+@PlanetDsl
+class PerlinBuilder : AbstractPerlin(), NoiseCombiner {
 
     var noiseGenerator: GenInfo.() -> Material by RequiredProperty()
-    var noiseCombiner: NoiseInfo.() -> Double by RequiredProperty()
+    override var noiseCombiner: NoiseCombiner.NoiseInfo.() -> Double by RequiredProperty()
+
+    var biomeBuilder: BiomeBuilder? = null
 
     val noises = mutableMapOf<String, PerlinConfig>()
 
@@ -23,7 +29,7 @@ class PerlinBuilder : AbstractPerlin() {
 
         return object : WorldGenerator() {
 
-            override val biomeProvider = this@PerlinBuilder.biomeProvider
+            override val biomeProvider = biomeBuilder?.build(noises) ?: this@PerlinBuilder.biomeProvider
 
             fun getMinHeight(worldInfo: WorldInfo): Int = minHeight.coerceAtLeast(worldInfo.minHeight)
 
@@ -37,7 +43,7 @@ class PerlinBuilder : AbstractPerlin() {
                 val cx = chunkX * 16
                 val cz = chunkZ * 16
                 val min = getMinHeight(worldInfo)
-                val info = GenInfo(worldInfo, random, chunkX, chunkZ)
+                val info = GenInfo(worldInfo, random, chunkX, chunkZ, noises)
                 for (x in 0..15) {
                     for (z in 0..15) {
                         val realX = cx + x
@@ -63,7 +69,7 @@ class PerlinBuilder : AbstractPerlin() {
             ) {
                 val cx = chunkX * 16
                 val cz = chunkZ * 16
-                val info = GenInfo(worldInfo, random, chunkX, chunkZ)
+                val info = GenInfo(worldInfo, random, chunkX, chunkZ, noises)
                 for (x in 0..15) {
                     for (z in 0..15) {
                         val realX = cx + x
@@ -98,7 +104,7 @@ class PerlinBuilder : AbstractPerlin() {
 
             private fun getHeight(worldInfo: WorldInfo, random: Random, x: Int, z: Int): Int {
                 noises.init(worldInfo.seed)
-                val height = noiseCombiner(NoiseInfo(worldInfo, noises, random, x, z))
+                val height = noiseCombiner(NoiseCombiner.NoiseInfo(worldInfo, noises, random, x, z))
                 return (height * maxDeviation + averageHeight).roundToInt()
             }
         }
@@ -108,7 +114,8 @@ class PerlinBuilder : AbstractPerlin() {
         val world: WorldInfo,
         val random: Random,
         val chunkX: Int,
-        val chunkZ: Int
+        val chunkZ: Int,
+        val noise: NoiseMap,
     ) {
         var x: Int = 0
         var y: Int = 0
@@ -116,19 +123,45 @@ class PerlinBuilder : AbstractPerlin() {
         var height: Int = 0
     }
 
-    data class NoiseInfo(val world: WorldInfo, val noise: NoiseMap, val random: Random, val x: Int, val z: Int)
+    @PlanetDsl
+    class BiomeBuilder {
+        var biomeGenerator: BiomeInfo.() -> Biome by RequiredProperty()
+
+        var biomes = mutableListOf<Biome>()
+
+        fun build(noises: NoiseMap): BiomeProvider {
+            return object : BiomeProvider() {
+
+                override fun getBiome(worldInfo: WorldInfo, x: Int, y: Int, z: Int): Biome {
+                    return biomeGenerator(BiomeInfo(worldInfo, x / 16, z / 16, noises, x, y, z))
+                }
+
+                override fun getBiomes(worldInfo: WorldInfo): MutableList<Biome> = biomes
+            }
+        }
+
+        data class BiomeInfo(
+            val world: WorldInfo,
+            val chunkX: Int,
+            val chunkZ: Int,
+            val noise: NoiseMap,
+            val x: Int,
+            val y: Int,
+            val z: Int,
+        )
+    }
 }
 
 fun PerlinBuilder.generateBlock(block: PerlinBuilder.GenInfo.() -> Material) {
     noiseGenerator = block
 }
 
-fun PerlinBuilder.combineNoise(noise: PerlinBuilder.NoiseInfo.() -> Double) {
-    noiseCombiner = noise
-}
-
 fun PerlinBuilder.noiseConfig(name: String, config: AbstractPerlin.PerlinConfig.() -> Unit) {
     noises[name] = AbstractPerlin.PerlinConfig().apply(config)
+}
+
+fun PerlinBuilder.biomes(config: PerlinBuilder.BiomeBuilder.() -> Unit) {
+    biomeBuilder = PerlinBuilder.BiomeBuilder().apply(config)
 }
 
 object MultiNoise : GeneratorBuilderProvider<PerlinBuilder> {

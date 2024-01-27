@@ -1,9 +1,7 @@
 package io.github.addoncommunity.galactifun.scripting.dsl.gen
 
-import io.github.addoncommunity.galactifun.scripting.PlanetDsl
 import io.github.addoncommunity.galactifun.scripting.RequiredProperty
 
-@PlanetDsl
 abstract class AbstractPerlin : GeneratorBuilder() {
     var generateBedrock = true
 
