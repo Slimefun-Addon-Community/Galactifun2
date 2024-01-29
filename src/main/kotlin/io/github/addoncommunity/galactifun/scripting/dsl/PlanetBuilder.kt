@@ -82,3 +82,7 @@ fun PlanetBuilder.eternal(ticks: Int): DayCycle = DayCycle.eternal(ticks)
 fun PlanetBuilder.atmosphere(block: AtmosphereBuilder.() -> Unit) {
     atmosphere = Atmosphere.buildAtmosphere(block)
 }
+
+fun PlanetBuilder.world(block: WorldBuilder.() -> Unit) {
+    worldConfig = WorldBuilder().apply(block)
+}

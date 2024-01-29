@@ -2,23 +2,33 @@ package io.github.addoncommunity.galactifun
 
 import co.aikar.commands.PaperCommandManager
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
+import io.github.addoncommunity.galactifun.api.objects.properties.Distance.Companion.au
+import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
+import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.composition
 import io.github.addoncommunity.galactifun.base.BaseUniverse
 import io.github.addoncommunity.galactifun.core.Gf2Command
 import io.github.addoncommunity.galactifun.core.managers.WorldManager
 import io.github.addoncommunity.galactifun.scripting.PlanetScript
+import io.github.addoncommunity.galactifun.scripting.dsl.*
+import io.github.addoncommunity.galactifun.scripting.dsl.gen.*
 import io.github.addoncommunity.galactifun.scripting.evalScript
+import io.github.addoncommunity.galactifun.util.years
 import io.github.seggan.kfun.AbstractAddon
 import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun
 import io.github.thebusybiscuit.slimefun4.libraries.paperlib.PaperLib
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
+import org.bukkit.Material
+import org.bukkit.block.Biome
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.logging.Level
 import kotlin.script.experimental.api.ResultValue
 import kotlin.script.experimental.api.ScriptDiagnostic
 import kotlin.script.experimental.api.valueOrThrow
 import kotlin.script.experimental.host.toScriptSource
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 
 class Galactifun2 : AbstractAddon() {
 
@@ -118,6 +128,8 @@ class Galactifun2 : AbstractAddon() {
                 "###################################################"
             )
         }
+
+        doTestingStuff()
     }
 
     override fun onDisable() {
@@ -127,6 +139,64 @@ class Galactifun2 : AbstractAddon() {
     override fun getJavaPlugin(): JavaPlugin = this
 
     override fun getBugTrackerURL(): String = "https://github.com/Slimefun-Addon-Community/Galactifun2/issues"
+
+    private fun doTestingStuff() {
+        val script = object : PlanetScript() {}
+
+        script.planet {
+            name = "Mars"
+            item = Material.RED_CONCRETE
+            orbiting = BaseUniverse.solarSystem
+            orbit {
+                distance = 1.52.au
+                yearLength = 1.88.years
+            }
+            dayCycle = (1.days + 0.65.hours).long
+
+            atmosphere {
+                pressure = 0.006
+
+                composition {
+                    95 percent Gas.CARBON_DIOXIDE
+                    2.8 percent Gas.NITROGEN
+                    2 percent Gas.ARGON
+                    0.2 percent Gas.OXYGEN
+                }
+            }
+
+            world {
+                generator(SimplePerlin) {
+                    configNoise {
+                        scale = 0.01
+                        frequency = 0.5
+                        amplitude = 0.1
+                        smoothen = true
+                    }
+
+                    averageHeight = 50
+                    maxDeviation = 20
+
+                    blocks {
+                        Material.RED_SAND top 2
+
+                        fillInRestWith(random {
+                            Material.RED_SANDSTONE withWeight 0.8f
+                            Material.IRON_ORE withWeight 0.2f
+                        })
+                    }
+
+                    singleBiome(Biome.DESERT)
+                }
+            }
+        }
+
+        for (planet in script.toRegister) {
+            if (planet is PlanetaryWorld) {
+                planet.register()
+            }
+            log("Registered planet: ${planet.name}")
+        }
+    }
 }
 
 private var instance: Galactifun2? = null

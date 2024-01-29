@@ -23,15 +23,13 @@ class PerlinBuilder : AbstractPerlin(), NoiseCombiner {
     override fun build(): WorldGenerator {
         val averageHeight = averageHeight
         val maxDeviation = maxDeviation
-        val minHeight = minHeight + if (generateBedrock) 1 else 0
+        val minHeight = minY + if (generateBedrock) 1 else 0
 
         val noises = NoiseMap(noises)
 
         return object : WorldGenerator() {
 
             override val biomeProvider = biomeBuilder?.build(noises) ?: this@PerlinBuilder.biomeProvider
-
-            fun getMinHeight(worldInfo: WorldInfo): Int = minHeight.coerceAtLeast(worldInfo.minHeight)
 
             override fun generateNoise(
                 worldInfo: WorldInfo,
@@ -107,6 +105,8 @@ class PerlinBuilder : AbstractPerlin(), NoiseCombiner {
                 val height = noiseCombiner(NoiseCombiner.NoiseInfo(worldInfo, noises, random, x, z))
                 return (height * maxDeviation + averageHeight).roundToInt()
             }
+
+            private fun getMinHeight(worldInfo: WorldInfo): Int = minHeight.coerceAtLeast(worldInfo.minHeight)
         }
     }
 
@@ -156,7 +156,7 @@ fun PerlinBuilder.generateBlock(block: PerlinBuilder.GenInfo.() -> Material) {
     noiseGenerator = block
 }
 
-fun PerlinBuilder.noiseConfig(name: String, config: AbstractPerlin.PerlinConfig.() -> Unit) {
+fun PerlinBuilder.configNoise(name: String, config: AbstractPerlin.PerlinConfig.() -> Unit) {
     noises[name] = AbstractPerlin.PerlinConfig().apply(config)
 }
 

@@ -3,7 +3,6 @@ package io.github.addoncommunity.galactifun.scripting.dsl.gen
 import io.github.addoncommunity.galactifun.util.gen.DoubleChunkGrid
 import org.bukkit.util.noise.OctaveGenerator
 import org.bukkit.util.noise.SimplexOctaveGenerator
-import kotlin.math.pow
 
 class NoiseMap(noises: Map<String, AbstractPerlin.PerlinConfig>) {
 
@@ -27,7 +26,7 @@ class NoiseMap(noises: Map<String, AbstractPerlin.PerlinConfig>) {
         private val scale = config.scale
         private val amplitude = config.amplitude
         private val frequency = config.frequency
-        private val flattenFactor = config.flattenFactor
+        private val smoothen = config.smoothen
 
         @Volatile
         private lateinit var noise: OctaveGenerator
@@ -41,7 +40,11 @@ class NoiseMap(noises: Map<String, AbstractPerlin.PerlinConfig>) {
 
         operator fun invoke(x: Int, z: Int): Double {
             return grid.getOrSet(x, z) {
-                noise.noise(x.toDouble(), z.toDouble(), frequency, amplitude, true).pow(flattenFactor)
+                var noise = noise.noise(x.toDouble(), z.toDouble(), frequency, amplitude, true)
+                if (smoothen) {
+                    noise *= noise
+                }
+                noise
             }
         }
     }
