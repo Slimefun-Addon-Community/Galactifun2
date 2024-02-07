@@ -18,18 +18,14 @@ enum class Gas(texture: String?) {
     AMMONIA("c7a1ece691ad28d17bbbcecb22270c85e1c9581485806264c676de67c272e2d0"),
     OTHER(null);
 
-    val item: SlimefunItemStack?
-
-    init {
-        item = texture?.let {
-            SlimefunItemStack(
-                "ATMOSPHERIC_GAS_$name",
-                SlimefunUtils.getCustomHead(texture),
-                "&f${ChatUtils.humanize(name)} Gas Canister",
-                "",
-                "&f&oTexture by Sefiraat"
-            )
-        }
+    val item = texture?.let {
+        SlimefunItemStack(
+            "ATMOSPHERIC_GAS_$name",
+            SlimefunUtils.getCustomHead(texture),
+            "&f$this Gas Canister",
+            "",
+            "&f&oTexture by Sefiraat"
+        )
     }
 
     override fun toString(): String = ChatUtils.humanize(name)
