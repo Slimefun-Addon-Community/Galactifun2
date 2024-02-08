@@ -4,7 +4,6 @@ import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.RandomizedSet
 import org.bukkit.*
 import org.bukkit.entity.Entity
-import org.bukkit.entity.LivingEntity
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.metadata.FixedMetadataValue
 import java.util.concurrent.CompletableFuture
@@ -32,12 +31,15 @@ operator fun RegionAccessor.set(x: Int, y: Int, z: Int, material: Material) = se
 inline fun <T> buildRandomizedSet(builder: RandomizedSet<T>.() -> Unit): RandomizedSet<T> =
     RandomizedSet<T>().apply(builder)
 
-fun LivingEntity.galactifunTeleport(
+/**
+ * Teleports while telling Galactifun that the teleport should not be blocked
+ */
+fun Entity.galactifunTeleport(
     dest: Location,
     reason: PlayerTeleportEvent.TeleportCause = PlayerTeleportEvent.TeleportCause.PLUGIN
 ): CompletableFuture<Boolean> {
-    setMetadata("galactifun.teleporting", FixedMetadataValue(pluginInstance, true))
-    return teleportAsync(dest, reason).thenApplyAsync {
+    setMetadata("galactifun.teleporting", FixedMetadataValue(pluginInstance, Unit))
+    return teleportAsync(dest, reason).thenApply {
         removeMetadata("galactifun.teleporting", pluginInstance)
         it
     }
