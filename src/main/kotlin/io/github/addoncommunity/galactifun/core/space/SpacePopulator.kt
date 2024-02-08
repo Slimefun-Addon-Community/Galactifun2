@@ -12,13 +12,11 @@ import kotlin.random.asKotlinRandom
 
 internal object SpacePopulator : BlockPopulator() {
 
-    private val asteroids = ThreadLocal.withInitial {
-        buildRandomizedSet {
-            add(AsteroidType.TYPE_C, 40f)
-            add(AsteroidType.TYPE_S, 30f)
-            add(AsteroidType.TYPE_M, 10f)
-            add(AsteroidType.COMET, 20f)
-        }
+    private val asteroids = buildRandomizedSet {
+        add(AsteroidType.TYPE_C, 40f)
+        add(AsteroidType.TYPE_S, 30f)
+        add(AsteroidType.TYPE_M, 10f)
+        add(AsteroidType.COMET, 20f)
     }
 
     override fun populate(
@@ -42,7 +40,7 @@ internal object SpacePopulator : BlockPopulator() {
             var toSearch = mutableSetOf(Location(null, x.toDouble(), y.toDouble(), z.toDouble()))
             var toSearchNext = mutableSetOf<Location>()
 
-            outer@while (true) {
+            outer@ while (true) {
                 if (toSearch.isEmpty()) break
                 for (pos in toSearch) {
                     if (pos in searched || !limitedRegion.isInRegion(pos)) continue
@@ -62,7 +60,7 @@ internal object SpacePopulator : BlockPopulator() {
 
             // Make sure the asteroid is not too small
             if (random.nextDouble(10.0) > 10 - searched.size) {
-                val materials = asteroids.get().getRandom(random).materials.get()
+                val materials = asteroids.getRandom(random).materials
                 for (pos in searched) {
                     val material = materials.getRandom(random)
                     limitedRegion.setType(pos, material)
@@ -97,11 +95,9 @@ internal object SpacePopulator : BlockPopulator() {
         ),
         ;
 
-        val materials = ThreadLocal.withInitial {
-            buildRandomizedSet {
-                for ((material, weight) in materials) {
-                    add(material, weight.toFloat())
-                }
+        val materials = buildRandomizedSet {
+            for ((material, weight) in materials) {
+                add(material, weight.toFloat())
             }
         }
     }

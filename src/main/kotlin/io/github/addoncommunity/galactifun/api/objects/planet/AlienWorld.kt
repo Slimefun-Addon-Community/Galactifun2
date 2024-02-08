@@ -30,6 +30,7 @@ abstract class AlienWorld(name: String, baseItem: ItemStack) : PlanetaryWorld(na
             // Prevents ender dragon spawn using portal, surrounds portal with bedrock
             world[0, 0, 0] = Material.END_PORTAL
             world[0, 1, 0] = Material.BEDROCK
+            world[0, -1, 0] = Material.BEDROCK
             world[1, 0, 0] = Material.BEDROCK
             world[-1, 0, 0] = Material.BEDROCK
             world[0, 0, 1] = Material.BEDROCK
