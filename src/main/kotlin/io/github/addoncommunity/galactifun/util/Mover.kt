@@ -15,9 +15,9 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 
 
-private val sfDataKey = "sfData".toKey()
-private val extraDataKey = "extraData".toKey()
-private val extraData2Key = "extraData2".toKey()
+private val sfDataKey = "sfData".key()
+private val extraDataKey = "extraData".key()
+private val extraData2Key = "extraData2".key()
 
 private val bytesListPdt = DataType.asList(DataType.BYTE_ARRAY)
 private val stringListPdt = DataType.asList(DataType.STRING)
