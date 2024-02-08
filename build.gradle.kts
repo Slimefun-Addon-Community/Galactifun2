@@ -8,8 +8,9 @@ plugins {
 repositories {
     mavenCentral()
     maven(url = "https://papermc.io/repo/repository/maven-public/")
-    maven(url = "https://jitpack.io")
+    maven(url = "https://jitpack.io/")
     maven(url = "https://repo.aikar.co/content/groups/aikar/")
+    maven(url = "https://hub.jeff-media.com/nexus/repository/jeff-media-public/")
 }
 
 dependencies {
@@ -26,6 +27,7 @@ dependencies {
 
     implementation("org.bstats:bstats-bukkit:3.0.2")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
+    implementation("com.jeff_media:MorePersistentDataTypes:2.4.0")
 
     implementation("com.github.Seggan:kfun:0.1.0")
 }
@@ -47,8 +49,9 @@ tasks.shadowJar {
     relocate("org.bstats", "io.github.addoncommunity.galactifun.bstats")
     relocate("co.aikar.commands", "io.github.addoncommunity.galactifun.acf")
     relocate("co.aikar.locales", "io.github.addoncommunity.galactifun.acf.locales")
+    relocate("com.jeff_media.morepersistentdatatypes", "io.github.addoncommunity.galactifun.pdts")
 
-    dependencies {
+dependencies {
         exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
     }
 }

@@ -1,7 +1,6 @@
 package io.github.addoncommunity.galactifun.api.objects.planet
 
-import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
-import io.github.addoncommunity.galactifun.core.managers.WorldManager
+import io.github.addoncommunity.galactifun.core.managers.PlanetManager
 import org.bukkit.World
 import org.bukkit.inventory.ItemStack
 
@@ -17,14 +16,12 @@ abstract class PlanetaryWorld(
     baseItem: ItemStack
 ) : PlanetaryObject(name, baseItem) {
 
-    abstract val atmosphere: Atmosphere
-
     lateinit var world: World
         private set
 
     fun register() {
         world = loadWorld()
-        WorldManager.registerWorld(this)
+        PlanetManager.register(this)
     }
 
     abstract fun loadWorld(): World

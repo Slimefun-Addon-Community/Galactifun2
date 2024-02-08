@@ -2,9 +2,10 @@ package io.github.addoncommunity.galactifun.core
 
 import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
+import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
-import io.github.addoncommunity.galactifun.core.managers.WorldManager
 import io.github.addoncommunity.galactifun.util.galactifunTeleport
+import io.github.seggan.kfun.location.plusAssign
 import org.bukkit.Location
 import org.bukkit.entity.Player
 
@@ -13,7 +14,7 @@ import org.bukkit.entity.Player
 object Gf2Command : BaseCommand() {
 
     @Subcommand("planet")
-    @CommandCompletion("@planets")
+    @CommandCompletion("@worlds")
     @CommandPermission(Permissions.TELEPORT)
     @Description("Teleport to a planet")
     fun tpPlanet(player: Player, planet: PlanetaryWorld, @Optional location: Location?) {
@@ -22,12 +23,15 @@ object Gf2Command : BaseCommand() {
         player.galactifunTeleport(loc)
     }
 
-    @Subcommand("space")
+    @Subcommand("orbit")
+    @CommandCompletion("@planets")
     @CommandPermission(Permissions.TELEPORT)
-    @Description("Teleport to space")
-    fun tpSpace(player: Player, @Optional location: Location?) {
-        val loc = location ?: WorldManager.spaceWorld.spawnLocation
-        loc.world = WorldManager.spaceWorld
-        player.galactifunTeleport(loc)
+    @Description("Teleport to orbit")
+    fun tpSpace(player: Player, planet: PlanetaryObject, @Optional offset: Location?) {
+        val location = planet.orbitPosition.centerLocation
+        if (offset != null) {
+            location += offset
+        }
+        player.galactifunTeleport(location)
     }
 }

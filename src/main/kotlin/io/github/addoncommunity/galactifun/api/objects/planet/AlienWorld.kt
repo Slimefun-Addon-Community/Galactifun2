@@ -3,13 +3,13 @@ package io.github.addoncommunity.galactifun.api.objects.planet
 import io.github.addoncommunity.galactifun.api.objects.planet.gen.WorldGenerator
 import io.github.addoncommunity.galactifun.log
 import io.github.addoncommunity.galactifun.pluginInstance
-import io.github.addoncommunity.galactifun.util.set
 import org.bukkit.GameRule
 import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.WorldCreator
 import org.bukkit.inventory.ItemStack
 import java.util.*
+import kotlin.collections.set
 
 abstract class AlienWorld(name: String, baseItem: ItemStack) : PlanetaryWorld(name, baseItem) {
 
@@ -25,17 +25,6 @@ abstract class AlienWorld(name: String, baseItem: ItemStack) : PlanetaryWorld(na
             .generator(generator)
             .environment(atmosphere.environment)
             .createWorld() ?: error("Could not create world world_galactifun_$id")
-
-        if (world.environment == World.Environment.THE_END) {
-            // Prevents ender dragon spawn using portal, surrounds portal with bedrock
-            world[0, 0, 0] = Material.END_PORTAL
-            world[0, 1, 0] = Material.BEDROCK
-            world[0, -1, 0] = Material.BEDROCK
-            world[1, 0, 0] = Material.BEDROCK
-            world[-1, 0, 0] = Material.BEDROCK
-            world[0, 0, 1] = Material.BEDROCK
-            world[0, 0, -1] = Material.BEDROCK
-        }
 
         atmosphere.applyEffects(world)
         dayCycle.applyEffects(world)

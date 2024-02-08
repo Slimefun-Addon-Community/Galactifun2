@@ -63,6 +63,7 @@ class PlanetBuilder {
                 override val dayCycle = this@PlanetBuilder.dayCycle
                 override val orbiting = this@PlanetBuilder.orbiting
                 override val orbit = this@PlanetBuilder.orbit
+                override val atmosphere = this@PlanetBuilder.atmosphere
             }
         }
     }

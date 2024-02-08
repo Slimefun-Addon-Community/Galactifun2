@@ -1,7 +1,9 @@
 package io.github.addoncommunity.galactifun.api.objects.properties.atmosphere
 
+import io.github.addoncommunity.galactifun.util.set
 import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.RandomizedSet
 import org.bukkit.GameRule
+import org.bukkit.Material
 import org.bukkit.World
 
 class Atmosphere private constructor(
@@ -9,11 +11,17 @@ class Atmosphere private constructor(
     private val storming: Boolean,
     private val thundering: Boolean,
     private val pressure: Double,
-    val environment: World.Environment,
     private val composition: Map<Gas, Double>
 ) {
 
+    val environment = when {
+        pressure > 2.0 -> World.Environment.NETHER
+        pressure < 0.001 -> World.Environment.THE_END
+        else -> World.Environment.NORMAL
+    }
+
     private val flammable = composition.getOrDefault(Gas.OXYGEN, 0.0) > 5
+
     private val growthAttempts = (pressurizedCompositionOf(Gas.CARBON_DIOXIDE) / earthCo2).toInt()
 
     val weightedCompositionSet = RandomizedSet<Gas>().apply {
@@ -43,6 +51,17 @@ class Atmosphere private constructor(
             world.thunderDuration = Int.MAX_VALUE
         }
         world.setGameRule(GameRule.DO_FIRE_TICK, flammable)
+
+        if (world.environment == World.Environment.THE_END) {
+            // Prevents ender dragon spawn using portal, surrounds portal with bedrock
+            world[0, 0, 0] = Material.END_PORTAL
+            world[0, 1, 0] = Material.BEDROCK
+            world[0, -1, 0] = Material.BEDROCK
+            world[1, 0, 0] = Material.BEDROCK
+            world[-1, 0, 0] = Material.BEDROCK
+            world[0, 0, 1] = Material.BEDROCK
+            world[0, 0, -1] = Material.BEDROCK
+        }
     }
 
     companion object {
@@ -62,7 +81,6 @@ class Atmosphere private constructor(
                 atmosphereBuilder.storming,
                 atmosphereBuilder.thundering,
                 atmosphereBuilder.pressure,
-                atmosphereBuilder.environment,
                 atmosphereBuilder.composition
             )
         }
@@ -83,7 +101,6 @@ class Atmosphere private constructor(
         val NONE = buildAtmosphere {
             weatherEnabled = false
             pressure = 0.0
-            environment = World.Environment.NORMAL
         }
     }
 }

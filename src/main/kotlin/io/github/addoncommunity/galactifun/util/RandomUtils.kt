@@ -8,7 +8,9 @@ import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.metadata.FixedMetadataValue
 import java.util.concurrent.CompletableFuture
 
-fun String.toKey(): NamespacedKey = NamespacedKey(pluginInstance, this)
+fun String.key(): NamespacedKey = NamespacedKey(pluginInstance, this)
+
+fun Location.withWorld(world: World): Location = Location(world, x, y, z, yaw, pitch)
 
 inline fun <reified T : Entity> World.getNearbyEntitiesByType(
     location: Location,
@@ -25,8 +27,10 @@ inline fun <reified T : Entity> World.getNearbyEntitiesByType(
 inline fun <reified T : Entity> World.spawn(location: Location): T = spawn(location, T::class.java)
 
 operator fun RegionAccessor.get(x: Int, y: Int, z: Int): Material = getType(x, y, z)
+operator fun RegionAccessor.get(location: Location): Material = getType(location)
 
 operator fun RegionAccessor.set(x: Int, y: Int, z: Int, material: Material) = setType(x, y, z, material)
+operator fun RegionAccessor.set(location: Location, material: Material) = setType(location, material)
 
 inline fun <T> buildRandomizedSet(builder: RandomizedSet<T>.() -> Unit): RandomizedSet<T> =
     RandomizedSet<T>().apply(builder)

@@ -1,13 +1,14 @@
 package io.github.addoncommunity.galactifun
 
 import co.aikar.commands.PaperCommandManager
+import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.api.objects.properties.Distance.Companion.au
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.composition
 import io.github.addoncommunity.galactifun.base.BaseUniverse
 import io.github.addoncommunity.galactifun.core.Gf2Command
-import io.github.addoncommunity.galactifun.core.managers.WorldManager
+import io.github.addoncommunity.galactifun.core.managers.PlanetManager
 import io.github.addoncommunity.galactifun.scripting.PlanetScript
 import io.github.addoncommunity.galactifun.scripting.dsl.*
 import io.github.addoncommunity.galactifun.scripting.dsl.gen.*
@@ -73,12 +74,19 @@ class Galactifun2 : AbstractAddon() {
 
         manager = PaperCommandManager(this)
         manager.enableUnstableAPI("help")
+        manager.commandCompletions.registerAsyncCompletion("worlds") { _ ->
+            PlanetManager.allPlanetaryWorlds.map { it.name }.sorted()
+        }
         manager.commandCompletions.registerAsyncCompletion("planets") { _ ->
-            WorldManager.allPlanetaryWorlds.map { it.name }.sorted()
+            PlanetManager.allPlanets.map { it.name }.sorted()
         }
         manager.commandContexts.registerContext(PlanetaryWorld::class.java) { context ->
             val arg = context.popFirstArg()
-            WorldManager.allPlanetaryWorlds.find { it.name == arg }
+            PlanetManager.allPlanetaryWorlds.find { it.name == arg }
+        }
+        manager.commandContexts.registerContext(PlanetaryObject::class.java) { context ->
+            val arg = context.popFirstArg()
+            PlanetManager.allPlanets.find { it.name == arg }
         }
         manager.registerCommand(Gf2Command)
 
@@ -202,7 +210,7 @@ class Galactifun2 : AbstractAddon() {
 private var instance: Galactifun2? = null
 
 val pluginInstance: Galactifun2
-    get() = instance ?: error("Plugin is not enabled")
+    get() = checkNotNull(instance) { "Plugin is not enabled" }
 
 fun JavaPlugin.log(level: Level, vararg messages: String) {
     for (message in messages) {

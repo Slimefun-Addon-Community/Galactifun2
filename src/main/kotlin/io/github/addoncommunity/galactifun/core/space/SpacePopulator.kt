@@ -2,6 +2,7 @@ package io.github.addoncommunity.galactifun.core.space
 
 import io.github.addoncommunity.galactifun.util.buildRandomizedSet
 import io.github.addoncommunity.galactifun.util.floodSearchFaces
+import io.github.addoncommunity.galactifun.util.set
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.generator.BlockPopulator
@@ -62,8 +63,7 @@ internal object SpacePopulator : BlockPopulator() {
             if (random.nextDouble(10.0) > 10 - searched.size) {
                 val materials = asteroids.getRandom(random).materials
                 for (pos in searched) {
-                    val material = materials.getRandom(random)
-                    limitedRegion.setType(pos, material)
+                    limitedRegion[pos] = materials.getRandom(random)
                 }
             }
         }
@@ -72,8 +72,8 @@ internal object SpacePopulator : BlockPopulator() {
     private enum class AsteroidType(vararg materials: Pair<Material, Int>) {
         TYPE_C(
             Material.DEEPSLATE to 70,
-            Material.DEEPSLATE_COAL_ORE to 20,
-            Material.DEEPSLATE_IRON_ORE to 4,
+            Material.DEEPSLATE_COAL_ORE to 23,
+            Material.DEEPSLATE_IRON_ORE to 1,
             Material.COAL_BLOCK to 5,
             Material.DEEPSLATE_DIAMOND_ORE to 1
         ),
@@ -89,11 +89,11 @@ internal object SpacePopulator : BlockPopulator() {
             Material.RAW_IRON_BLOCK to 20
         ),
         COMET(
-            Material.PACKED_ICE to 50,
+            Material.PACKED_ICE to 40,
             Material.BLUE_ICE to 30,
-            Material.ICE to 20
-        ),
-        ;
+            Material.ICE to 20,
+            Material.COARSE_DIRT to 10
+        );
 
         val materials = buildRandomizedSet {
             for ((material, weight) in materials) {
