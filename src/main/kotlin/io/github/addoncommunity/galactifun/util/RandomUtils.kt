@@ -1,11 +1,8 @@
 package io.github.addoncommunity.galactifun.util
 
 import io.github.addoncommunity.galactifun.pluginInstance
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.NamespacedKey
-import org.bukkit.RegionAccessor
-import org.bukkit.World
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.RandomizedSet
+import org.bukkit.*
 import org.bukkit.entity.Entity
 
 fun String.toKey(): NamespacedKey = NamespacedKey(pluginInstance, this)
@@ -27,3 +24,5 @@ inline fun <reified T : Entity> World.spawn(location: Location): T = spawn(locat
 operator fun RegionAccessor.get(x: Int, y: Int, z: Int): Material = getType(x, y, z)
 
 operator fun RegionAccessor.set(x: Int, y: Int, z: Int, material: Material) = setType(x, y, z, material)
+
+inline fun <T> buildRandomizedSet(builder: RandomizedSet<T>.() -> Unit): RandomizedSet<T> = RandomizedSet<T>().apply(builder)
