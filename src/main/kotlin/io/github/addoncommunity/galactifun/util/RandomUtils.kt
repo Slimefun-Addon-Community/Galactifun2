@@ -1,11 +1,16 @@
 package io.github.addoncommunity.galactifun.util
 
 import io.github.addoncommunity.galactifun.pluginInstance
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem
 import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.RandomizedSet
+import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config
+import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker
 import org.bukkit.*
+import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.metadata.FixedMetadataValue
+import java.util.*
 import java.util.concurrent.CompletableFuture
 
 fun String.key(): NamespacedKey = NamespacedKey(pluginInstance, this)
@@ -30,6 +35,19 @@ operator fun RegionAccessor.get(x: Int, y: Int, z: Int): Material = getType(x, y
 operator fun RegionAccessor.get(location: Location): Material = getType(location)
 
 operator fun RegionAccessor.set(x: Int, y: Int, z: Int, material: Material) = setType(x, y, z, material)
+
+inline fun <reified E : Enum<E>> enumSetOf(vararg elements: E): EnumSet<E> {
+    val set = EnumSet.noneOf(E::class.java)
+    set.addAll(elements)
+    return set
+}
+
+inline fun <reified E : Enum<E>> enumSetOf(): EnumSet<E> = EnumSet.noneOf(E::class.java)
+
+inline fun BlockTicker(sync: Boolean, crossinline tick: (Block) -> Unit) = object : BlockTicker() {
+    override fun isSynchronized() = sync
+    override fun tick(b: Block, item: SlimefunItem, data: Config) = tick(b)
+}
 operator fun RegionAccessor.set(location: Location, material: Material) = setType(location, material)
 
 inline fun <T> buildRandomizedSet(builder: RandomizedSet<T>.() -> Unit): RandomizedSet<T> =
