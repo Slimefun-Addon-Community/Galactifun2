@@ -42,7 +42,15 @@ inline fun <reified E : Enum<E>> enumSetOf(vararg elements: E): EnumSet<E> {
     return set
 }
 
+inline fun <reified K : Enum<K>, V> enumMapOf(vararg pairs: Pair<K, V>): EnumMap<K, V> {
+    val map: EnumMap<K, V> = EnumMap(K::class.java)
+    map.putAll(pairs)
+    return map
+}
+
 inline fun <reified E : Enum<E>> enumSetOf(): EnumSet<E> = EnumSet.noneOf(E::class.java)
+
+inline fun <reified K : Enum<K>, V> enumMapOf(): EnumMap<K, V> = EnumMap(K::class.java)
 
 inline fun BlockTicker(sync: Boolean, crossinline tick: (Block) -> Unit) = object : BlockTicker() {
     override fun isSynchronized() = sync
@@ -65,4 +73,25 @@ fun Entity.galactifunTeleport(
         removeMetadata("galactifun.teleporting", pluginInstance)
         it
     }
+}
+
+fun Int.encodeBase(base: Int): String {
+    if (this == 0) return "\u0000"
+    val sb = StringBuilder()
+    var n = this
+    while (n > 0) {
+        sb.append((n % base).toChar())
+        n /= base
+    }
+    sb.reverse()
+    return sb.toString()
+}
+
+fun String.decodeBase(base: Int): Int {
+    var num = 0
+    for (i in lastIndex downTo 0) {
+        num *= base
+        num += get(i).code
+    }
+    return num
 }
