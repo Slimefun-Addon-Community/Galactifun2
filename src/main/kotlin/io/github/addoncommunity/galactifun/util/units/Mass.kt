@@ -1,7 +1,7 @@
 package io.github.addoncommunity.galactifun.util.units
 
 @JvmInline
-value class Mass private constructor(val tons: Double) {
+value class Mass private constructor(val tons: Double) : Comparable<Mass> {
 
     val kilograms: Long
         get() = (tons * 1000).toLong()
@@ -57,4 +57,10 @@ value class Mass private constructor(val tons: Double) {
     operator fun div(other: Long): Mass {
         return Mass(tons / other)
     }
+
+    override fun compareTo(other: Mass): Int {
+        return tons.compareTo(other.tons)
+    }
+
+
 }

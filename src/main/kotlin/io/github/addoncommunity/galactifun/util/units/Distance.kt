@@ -4,10 +4,10 @@ import io.github.addoncommunity.galactifun.util.Constants
 import kotlin.math.abs
 
 @JvmInline
-value class Distance private constructor(val lightYears: Double) {
+value class Distance private constructor(val lightYears: Double) : Comparable<Distance> {
 
-    val kilometers: Long
-        get() = (lightYears * Constants.KM_PER_LY).toLong()
+    val kilometers: Double
+        get() = lightYears * Constants.KM_PER_LY
 
     companion object {
         val Double.lightYears: Distance
@@ -72,5 +72,9 @@ value class Distance private constructor(val lightYears: Double) {
 
     operator fun div(other: Long): Distance {
         return Distance(lightYears / other)
+    }
+
+    override fun compareTo(other: Distance): Int {
+        return lightYears.compareTo(other.lightYears)
     }
 }

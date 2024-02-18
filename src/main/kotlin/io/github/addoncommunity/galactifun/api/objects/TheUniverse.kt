@@ -9,9 +9,7 @@ import org.bukkit.inventory.ItemStack
 import kotlin.time.Duration.Companion.days
 
 object TheUniverse : UniversalObject("The Universe", ItemStack(Material.NETHER_STAR)) {
-    override val orbiting: UniversalObject
-        get() = error("The Universe is not orbiting anything")
-
+    override val orbiting = null
     override val orbit = Orbit(0.lightYears, 0.days)
     override val mass: Mass
         get() = error("The Universe does nto have a defined mass")

@@ -100,6 +100,10 @@ object PlanetManager : Listener {
         return orbits[planet.name] ?: error("Orbit not found for planet ${planet.name}")
     }
 
+    fun getByWorld(world: World): PlanetaryWorld? {
+        return planetaryWorlds[world]
+    }
+
     //<editor-fold desc="Orbit barrier handlers" defaultstate="collapsed">
     @EventHandler
     private fun onEntityMoveInSpace(e: EntityMoveEvent) {
