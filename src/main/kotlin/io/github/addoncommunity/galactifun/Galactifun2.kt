@@ -3,7 +3,6 @@ package io.github.addoncommunity.galactifun
 import co.aikar.commands.PaperCommandManager
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
-import io.github.addoncommunity.galactifun.api.objects.properties.Distance.Companion.au
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.composition
 import io.github.addoncommunity.galactifun.base.BaseUniverse
@@ -14,6 +13,9 @@ import io.github.addoncommunity.galactifun.scripting.PlanetScript
 import io.github.addoncommunity.galactifun.scripting.dsl.*
 import io.github.addoncommunity.galactifun.scripting.dsl.gen.*
 import io.github.addoncommunity.galactifun.scripting.evalScript
+import io.github.addoncommunity.galactifun.util.units.Distance.Companion.au
+import io.github.addoncommunity.galactifun.util.units.Distance.Companion.kilometers
+import io.github.addoncommunity.galactifun.util.units.Mass.Companion.kilograms
 import io.github.addoncommunity.galactifun.util.years
 import io.github.seggan.kfun.AbstractAddon
 import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion
@@ -162,6 +164,8 @@ class Galactifun2 : AbstractAddon() {
                 distance = 1.52.au
                 yearLength = 1.88.years
             }
+            mass = 6.417e23.kilograms
+            radius = 3389.5.kilometers
             dayCycle = (1.days + 0.65.hours).long
 
             atmosphere {

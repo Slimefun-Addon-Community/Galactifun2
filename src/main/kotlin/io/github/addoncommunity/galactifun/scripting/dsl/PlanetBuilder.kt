@@ -11,6 +11,8 @@ import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atm
 import io.github.addoncommunity.galactifun.scripting.PlanetDsl
 import io.github.addoncommunity.galactifun.scripting.PlanetScript
 import io.github.addoncommunity.galactifun.util.RequiredProperty
+import io.github.addoncommunity.galactifun.util.units.Distance
+import io.github.addoncommunity.galactifun.util.units.Mass
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.World
@@ -24,6 +26,8 @@ class PlanetBuilder {
     var item: Material by RequiredProperty()
     var orbiting: UniversalObject by RequiredProperty()
     var orbit: Orbit by RequiredProperty()
+    var mass: Mass by RequiredProperty()
+    var radius: Distance by RequiredProperty()
     var dayCycle: DayCycle by RequiredProperty()
 
     var atmosphere = Atmosphere.NONE
@@ -39,6 +43,8 @@ class PlanetBuilder {
                     override val dayCycle = this@PlanetBuilder.dayCycle
                     override val orbiting = this@PlanetBuilder.orbiting
                     override val orbit = this@PlanetBuilder.orbit
+                    override val mass = this@PlanetBuilder.mass
+                    override val radius = this@PlanetBuilder.radius
                     override val atmosphere = this@PlanetBuilder.atmosphere
 
                     override fun loadWorld(): World = Bukkit.getWorld(world) ?: error("World $world does not exist")
@@ -48,6 +54,8 @@ class PlanetBuilder {
                     override val dayCycle = this@PlanetBuilder.dayCycle
                     override val orbiting = this@PlanetBuilder.orbiting
                     override val orbit = this@PlanetBuilder.orbit
+                    override val mass = this@PlanetBuilder.mass
+                    override val radius = this@PlanetBuilder.radius
                     override val atmosphere = this@PlanetBuilder.atmosphere
                     override val generator = config.generator
 
@@ -63,6 +71,8 @@ class PlanetBuilder {
                 override val dayCycle = this@PlanetBuilder.dayCycle
                 override val orbiting = this@PlanetBuilder.orbiting
                 override val orbit = this@PlanetBuilder.orbit
+                override val mass = this@PlanetBuilder.mass
+                override val radius = this@PlanetBuilder.radius
                 override val atmosphere = this@PlanetBuilder.atmosphere
             }
         }

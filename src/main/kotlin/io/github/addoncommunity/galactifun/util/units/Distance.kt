@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.api.objects.properties
+package io.github.addoncommunity.galactifun.util.units
 
 import io.github.addoncommunity.galactifun.util.Constants
 import kotlin.math.abs
@@ -10,36 +10,30 @@ value class Distance private constructor(val lightYears: Double) {
         get() = (lightYears * Constants.KM_PER_LY).toLong()
 
     companion object {
-
-        @get:JvmName("lightYears")
         val Double.lightYears: Distance
             get() = Distance(this)
 
-        @get:JvmName("lightYears")
         val Int.lightYears: Distance
             get() = Distance(this.toDouble())
 
-        @get:JvmName("lightYears")
         val Long.lightYears: Distance
             get() = Distance(this.toDouble())
 
-        @get:JvmName("kilometers")
+        val Double.kilometers: Distance
+            get() = Distance(this / Constants.KM_PER_LY)
+
         val Long.kilometers: Distance
             get() = Distance(this / Constants.KM_PER_LY)
 
-        @get:JvmName("kilometers")
         val Int.kilometers: Distance
             get() = Distance(this / Constants.KM_PER_LY)
 
-        @get:JvmName("au")
         val Double.au: Distance
             get() = Distance(this * Constants.AU_PER_LY)
 
-        @get:JvmName("au")
         val Int.au: Distance
             get() = Distance(this * Constants.AU_PER_LY)
 
-        @get:JvmName("au")
         val Long.au: Distance
             get() = Distance(this * Constants.AU_PER_LY)
     }

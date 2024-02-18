@@ -1,8 +1,10 @@
 package io.github.addoncommunity.galactifun.api.objects
 
-import io.github.addoncommunity.galactifun.api.objects.properties.Distance
-import io.github.addoncommunity.galactifun.api.objects.properties.Distance.Companion.lightYears
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
+import io.github.addoncommunity.galactifun.util.Constants
+import io.github.addoncommunity.galactifun.util.units.Distance
+import io.github.addoncommunity.galactifun.util.units.Distance.Companion.lightYears
+import io.github.addoncommunity.galactifun.util.units.Mass
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack
 import io.github.thebusybiscuit.slimefun4.utils.ChatUtils
 import org.bukkit.inventory.ItemStack
@@ -18,6 +20,13 @@ abstract class UniversalObject protected constructor(name: String, baseItem: Ite
 
     abstract val orbiting: UniversalObject
     abstract val orbit: Orbit
+    abstract val mass: Mass
+    abstract val radius: Distance
+
+    val escapeVelocity: Double
+        get() = sqrt(2 * Constants.GRAVITATIONAL_CONSTANT * mass.kilograms / radius.kilometers)
+    val parkingOrbit: Distance
+        get() = radius / 10
 
     val orbitLevel: Int
         get() = if (this is TheUniverse) 0 else orbiting.orbitLevel + 1

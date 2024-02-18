@@ -1,5 +1,6 @@
 package io.github.addoncommunity.galactifun.api.objects.properties
 
+import io.github.addoncommunity.galactifun.util.units.Distance
 import kotlin.math.PI
 import kotlin.time.Duration
 import kotlin.time.DurationUnit

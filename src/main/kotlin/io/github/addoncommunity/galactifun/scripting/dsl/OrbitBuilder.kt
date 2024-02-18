@@ -1,9 +1,9 @@
 package io.github.addoncommunity.galactifun.scripting.dsl
 
-import io.github.addoncommunity.galactifun.api.objects.properties.Distance
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.scripting.PlanetDsl
 import io.github.addoncommunity.galactifun.util.RequiredProperty
+import io.github.addoncommunity.galactifun.util.units.Distance
 import kotlin.time.Duration
 
 @PlanetDsl

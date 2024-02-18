@@ -38,9 +38,9 @@ object PlanetScriptConfig : ScriptCompilationConfiguration({
         "io.github.addoncommunity.galactifun.util.*",
         "io.github.addoncommunity.galactifun.scripting.dsl.*",
         "io.github.addoncommunity.galactifun.scripting.dsl.gen.*",
-        "io.github.addoncommunity.galactifun.api.objects.properties.Distance.Companion.lightYears",
-        "io.github.addoncommunity.galactifun.api.objects.properties.Distance.Companion.kilometers",
-        "io.github.addoncommunity.galactifun.api.objects.properties.Distance.Companion.au",
+        "io.github.addoncommunity.galactifun.util.units.Distance.Companion.lightYears",
+        "io.github.addoncommunity.galactifun.util.units.Distance.Companion.kilometers",
+        "io.github.addoncommunity.galactifun.util.units.Distance.Companion.au",
         "kotlin.time.Duration.Companion.hours",
         "kotlin.time.Duration.Companion.days"
     )
