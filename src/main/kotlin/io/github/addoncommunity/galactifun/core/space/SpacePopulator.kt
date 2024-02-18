@@ -1,7 +1,7 @@
 package io.github.addoncommunity.galactifun.core.space
 
+import io.github.addoncommunity.galactifun.util.adjacentFaces
 import io.github.addoncommunity.galactifun.util.buildRandomizedSet
-import io.github.addoncommunity.galactifun.util.floodSearchFaces
 import io.github.addoncommunity.galactifun.util.set
 import org.bukkit.Location
 import org.bukkit.Material
@@ -47,7 +47,7 @@ internal object SpacePopulator : BlockPopulator() {
                     if (pos in searched || !limitedRegion.isInRegion(pos)) continue
                     searched.add(pos)
                     if (searched.size >= size) break@outer
-                    for (face in floodSearchFaces) {
+                    for (face in adjacentFaces) {
                         if (rand.nextBoolean()) continue // Forces asteroids to have a more irregular shape
                         val next = pos.clone().add(face.modX.toDouble(), face.modY.toDouble(), face.modZ.toDouble())
                         if (next !in searched && next !in toSearch && next !in toSearchNext) {

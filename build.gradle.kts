@@ -22,7 +22,7 @@ dependencies {
     library(kotlin("scripting-jvm-host"))
     library(kotlin("script-runtime"))
 
-    compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("com.github.Slimefun:Slimefun4:RC-36")
 
     implementation("org.bstats:bstats-bukkit:3.0.2")
@@ -30,6 +30,10 @@ dependencies {
     implementation("com.jeff_media:MorePersistentDataTypes:2.4.0")
 
     implementation("com.github.Seggan:kfun:0.1.0")
+
+    testImplementation(kotlin("test"))
+    testImplementation("io.kotest:kotest-assertions-core:5.8.0")
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.9.0")
 }
 
 group = "io.github.addoncommunity.galactifun"
@@ -43,6 +47,10 @@ tasks.compileKotlin {
     kotlinOptions.javaParameters = true
 }
 
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
+
 tasks.shadowJar {
     dependsOn(tasks.test)
     relocate("io.github.seggan.kfun", "io.github.addoncommunity.galactifun.kfun")
@@ -51,7 +59,7 @@ tasks.shadowJar {
     relocate("co.aikar.locales", "io.github.addoncommunity.galactifun.acf.locales")
     relocate("com.jeff_media.morepersistentdatatypes", "io.github.addoncommunity.galactifun.pdts")
 
-dependencies {
+    dependencies {
         exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
     }
 }
@@ -72,5 +80,5 @@ tasks.runServer {
         url("https://blob.build/dl/Slimefun4/Dev/1116")
     }
     maxHeapSize = "4G"
-    minecraftVersion("1.20.1")
+    minecraftVersion("1.20.4")
 }

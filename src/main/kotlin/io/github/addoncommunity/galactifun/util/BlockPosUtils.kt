@@ -8,7 +8,7 @@ fun BlockPosition.getFace(face: BlockFace): BlockPosition {
     return BlockPosition(this.world, this.x + face.modX, this.y + face.modY, this.z + face.modZ)
 }
 
-val floodSearchFaces = arrayOf(
+val adjacentFaces = arrayOf(
     BlockFace.UP,
     BlockFace.DOWN,
     BlockFace.NORTH,
@@ -32,11 +32,15 @@ inline fun BlockPosition.floodSearch(searchLimit: Int = 1024, predicate: Block.(
                 return FloodSearchResult(found, true)
             }
             val block = pos.block
-            for (face in floodSearchFaces) {
+            for (face in adjacentFaces) {
                 val next = pos.getFace(face)
                 if (next !in found && next !in toSearch && next !in toSearchNext) {
-                    if (block.predicate(next.block)) {
-                        toSearchNext.add(next)
+                    try {
+                        if (block.predicate(next.block)) {
+                            toSearchNext.add(next)
+                        }
+                    } catch (e: IllegalArgumentException) {
+                        // Invalid block position, ignore
                     }
                 }
             }

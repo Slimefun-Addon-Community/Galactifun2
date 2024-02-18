@@ -10,7 +10,7 @@ import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atm
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.AtmosphereBuilder
 import io.github.addoncommunity.galactifun.scripting.PlanetDsl
 import io.github.addoncommunity.galactifun.scripting.PlanetScript
-import io.github.addoncommunity.galactifun.scripting.RequiredProperty
+import io.github.addoncommunity.galactifun.util.RequiredProperty
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.World

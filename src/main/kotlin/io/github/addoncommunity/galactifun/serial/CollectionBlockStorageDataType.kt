@@ -1,7 +1,6 @@
 package io.github.addoncommunity.galactifun.serial
 
-import io.github.addoncommunity.galactifun.util.decodeBase
-import io.github.addoncommunity.galactifun.util.encodeBase
+import io.github.addoncommunity.galactifun.util.Constants
 import io.github.seggan.kfun.serial.BlockStorageDataType
 
 abstract class CollectionBlockStorageDataType<E, C : Collection<E>>(
@@ -10,27 +9,27 @@ abstract class CollectionBlockStorageDataType<E, C : Collection<E>>(
 
     override fun serialize(value: C): String {
         val sb = StringBuilder()
-        sb.append(value.size.encodeBase(126))
-        sb.append('\u007F')
+        sb.append(value.size.toString(Constants.MAX_RADIX))
+        sb.append(' ')
         for (element in value) {
             val serialized = contentSerializer.serialize(element)
-            sb.append(serialized.length.encodeBase(126))
-            sb.append('\u007F')
+            sb.append(serialized.length.toString(Constants.MAX_RADIX))
+            sb.append(' ')
             sb.append(serialized)
         }
         return sb.toString()
     }
 
     override fun deserialize(value: String): C? {
-        val parts = value.split('\u007F', limit = 2)
+        val parts = value.split(' ', limit = 2)
         if (parts.size != 2) return null
-        val size = parts[0].decodeBase(126)
+        val size = parts[0].toInt(Constants.MAX_RADIX)
         val coll = provideCollection(size)
         var rest = parts[1]
         for (i in 0 until size) {
-            val nextParts = rest.split('\u007F', limit = 2)
+            val nextParts = rest.split(' ', limit = 2)
             if (nextParts.size != 2) return null
-            val length = nextParts[0].decodeBase(126)
+            val length = nextParts[0].toInt(Constants.MAX_RADIX)
             val serialized = nextParts[1].substring(0, length)
             coll.add(contentSerializer.deserialize(serialized) ?: return null)
             rest = nextParts[1].substring(length)
@@ -64,8 +63,7 @@ class MapBlockStorageDataType<K, V>(
         PairBlockStorageDataType(keySerializer, valueSerializer)
     )
 
-    override fun serialize(value: Map<K, V>): String =
-        internalSerializer.serialize(value.toList())
+    override fun serialize(value: Map<K, V>): String = internalSerializer.serialize(value.toList())
 
     override fun deserialize(value: String): Map<K, V>? = internalSerializer.deserialize(value)?.toMap()
 }

@@ -1,7 +1,7 @@
 package io.github.addoncommunity.galactifun.scripting.dsl.gen
 
 import io.github.addoncommunity.galactifun.api.objects.planet.gen.WorldGenerator
-import io.github.addoncommunity.galactifun.scripting.RequiredProperty
+import io.github.addoncommunity.galactifun.util.RequiredProperty
 import org.bukkit.block.Biome
 import org.bukkit.generator.BiomeProvider
 import org.bukkit.generator.WorldInfo

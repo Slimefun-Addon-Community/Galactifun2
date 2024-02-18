@@ -7,6 +7,7 @@ import io.github.addoncommunity.galactifun.api.objects.properties.Distance.Compa
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.composition
 import io.github.addoncommunity.galactifun.base.BaseUniverse
+import io.github.addoncommunity.galactifun.base.GalactifunItems
 import io.github.addoncommunity.galactifun.core.Gf2Command
 import io.github.addoncommunity.galactifun.core.managers.PlanetManager
 import io.github.addoncommunity.galactifun.scripting.PlanetScript
@@ -124,6 +125,8 @@ class Galactifun2 : AbstractAddon() {
                 }
             }
         }
+
+        GalactifunItems // Trigger static init
 
         runOnNextTick {
             log(

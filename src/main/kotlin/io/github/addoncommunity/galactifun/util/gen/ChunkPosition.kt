@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.util
+package io.github.addoncommunity.galactifun.util.gen
 
 import org.bukkit.Chunk
 import org.bukkit.Location

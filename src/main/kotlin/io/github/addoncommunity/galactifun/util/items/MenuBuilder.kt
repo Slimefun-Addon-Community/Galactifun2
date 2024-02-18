@@ -8,10 +8,12 @@ import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils
 import it.unimi.dsi.fastutil.ints.IntArrayList
 import it.unimi.dsi.fastutil.ints.IntList
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.MenuClickHandler
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 
 
 class MenuBuilder {
@@ -21,6 +23,8 @@ class MenuBuilder {
     private val inputs = IntArrayList()
     private val outputs = IntArrayList()
 
+    private val otherItems = mutableListOf<MenuItem>()
+
     var inputBorderItem = CustomItemStack(ChestMenuUtils.getInputSlotTexture(), "&9Input")
     var outputBorderItem = CustomItemStack(ChestMenuUtils.getOutputSlotTexture(), "&6Output")
 
@@ -28,6 +32,10 @@ class MenuBuilder {
         set(value) {
             field = value.coerceIn(1, 6)
         }
+
+    fun item(x: Int, y: Int, item: ItemStack, onClick: MenuClickHandler = ChestMenuUtils.getEmptyClickHandler()) {
+        otherItems.add(MenuItem(coordsToSlot(x, y), item, onClick))
+    }
 
     fun inputBorder(vararg points: Int) = inputBorder.addAll(points)
 
@@ -47,53 +55,56 @@ class MenuBuilder {
         fun addBorder() {
             var i = 0
             while (i < points.size) {
-                val cx = points[i]
-                val cy = points[i + 1]
-                for (x in border) {
-                    for (y in border) {
+                val cx = points[i++]
+                val cy = points[i++]
+                for (x in -1..1) {
+                    for (y in -1..1) {
                         val result = coordsToSlot(cx + x, cy + y)
                         if (result !in inputs && result !in outputs && result in 0 until numRows * 9) {
                             borderList.add(result)
                         }
                     }
                 }
-                i += 2
             }
         }
     }
 
-    fun applyOn(item: SlimefunItem) {
-        object : BlockMenuPreset(item.id, item.itemName) {
-            private val lastIndex = numRows * 9
-            private val ins = inputs.toIntArray()
-            private val outs = outputs.toIntArray()
+    fun applyOn(sfItem: SlimefunItem) {
+        val lastIndex = numRows * 9
+        val ins = inputs.toIntArray()
+        val outs = outputs.toIntArray()
+        val inBorder = inputBorder.toIntArray()
+        val outBorder = outputBorder.toIntArray()
 
+        val bg = IntOpenHashSet(IntArray(lastIndex) { it })
+        ins.forEach(bg::remove)
+        outs.forEach(bg::remove)
+        inBorder.forEach(bg::remove)
+        outBorder.forEach(bg::remove)
+        otherItems.forEach { bg.remove(it.slot) }
+
+        object : BlockMenuPreset(sfItem.id, sfItem.itemName) {
             override fun init() {
-                val bg = IntOpenHashSet(IntArray(lastIndex) { it })
-                for (i in 0 until inputBorder.size) {
-                    val index = inputBorder.getInt(i)
-                    bg.remove(index)
+                for (index in inBorder) {
                     this.addItem(index, inputBorderItem, ChestMenuUtils.getEmptyClickHandler())
                 }
-                for (i in 0 until outputBorder.size) {
-                    val index = outputBorder.getInt(i)
-                    bg.remove(index)
+                for (index in outBorder) {
                     this.addItem(index, outputBorderItem, ChestMenuUtils.getEmptyClickHandler())
                 }
-                ins.forEach(bg::remove)
-                outs.forEach(bg::remove)
-                val bgIt = bg.iterator()
-                while (bgIt.hasNext()) {
-                    this.addItem(bgIt.nextInt(), ChestMenuUtils.getBackground(), ChestMenuUtils.getEmptyClickHandler())
+                for (item in otherItems) {
+                    this.addItem(item.slot, item.item, item.handler)
+                }
+                for (index in bg.toIntArray()) {
+                    this.addItem(index, ChestMenuUtils.getBackground(), ChestMenuUtils.getEmptyClickHandler())
                 }
                 this.isEmptySlotsClickable = true
             }
 
-            override fun canOpen(b: Block, p: Player): Boolean {
-                return if (p.hasPermission("slimefun.inventory.bypass")) true
-                else item.canUse(p, false) && Slimefun.getProtectionManager()
-                    .hasPermission(p, b, Interaction.INTERACT_BLOCK)
-            }
+            override fun canOpen(b: Block, p: Player) =
+                p.hasPermission("slimefun.inventory.bypass")
+                        || (sfItem.canUse(p, false)
+                        && Slimefun.getProtectionManager().hasPermission(p, b, Interaction.INTERACT_BLOCK)
+                        )
 
             override fun getSlotsAccessedByItemTransport(flow: ItemTransportFlow): IntArray {
                 return when (flow) {
@@ -113,7 +124,7 @@ private fun IntList.addAll(array: IntArray) {
     array.forEach(this::add)
 }
 
-private val border = -1..1
+private data class MenuItem(val slot: Int, val item: ItemStack, val handler: MenuClickHandler)
 
 inline fun buildMenu(block: MenuBuilder.() -> Unit): MenuBuilder {
     return MenuBuilder().apply(block)

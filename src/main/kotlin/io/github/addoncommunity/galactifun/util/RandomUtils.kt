@@ -3,8 +3,10 @@ package io.github.addoncommunity.galactifun.util
 import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem
 import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.RandomizedSet
-import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config
-import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker
+import me.mrCookieSlime.Slimefun.api.BlockStorage
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.format.TextColor
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
@@ -12,6 +14,8 @@ import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.metadata.FixedMetadataValue
 import java.util.*
 import java.util.concurrent.CompletableFuture
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 
 fun String.key(): NamespacedKey = NamespacedKey(pluginInstance, this)
 
@@ -35,6 +39,7 @@ operator fun RegionAccessor.get(x: Int, y: Int, z: Int): Material = getType(x, y
 operator fun RegionAccessor.get(location: Location): Material = getType(location)
 
 operator fun RegionAccessor.set(x: Int, y: Int, z: Int, material: Material) = setType(x, y, z, material)
+operator fun RegionAccessor.set(location: Location, material: Material) = setType(location, material)
 
 inline fun <reified E : Enum<E>> enumSetOf(vararg elements: E): EnumSet<E> {
     val set = EnumSet.noneOf(E::class.java)
@@ -51,12 +56,6 @@ inline fun <reified K : Enum<K>, V> enumMapOf(vararg pairs: Pair<K, V>): EnumMap
 inline fun <reified E : Enum<E>> enumSetOf(): EnumSet<E> = EnumSet.noneOf(E::class.java)
 
 inline fun <reified K : Enum<K>, V> enumMapOf(): EnumMap<K, V> = EnumMap(K::class.java)
-
-inline fun BlockTicker(sync: Boolean, crossinline tick: (Block) -> Unit) = object : BlockTicker() {
-    override fun isSynchronized() = sync
-    override fun tick(b: Block, item: SlimefunItem, data: Config) = tick(b)
-}
-operator fun RegionAccessor.set(location: Location, material: Material) = setType(location, material)
 
 inline fun <T> buildRandomizedSet(builder: RandomizedSet<T>.() -> Unit): RandomizedSet<T> =
     RandomizedSet<T>().apply(builder)
@@ -75,23 +74,25 @@ fun Entity.galactifunTeleport(
     }
 }
 
-fun Int.encodeBase(base: Int): String {
-    if (this == 0) return "\u0000"
-    val sb = StringBuilder()
-    var n = this
-    while (n > 0) {
-        sb.append((n % base).toChar())
-        n /= base
-    }
-    sb.reverse()
-    return sb.toString()
+inline fun <reified I : SlimefunItem> Location.checkBlock(): Block? {
+    return if (BlockStorage.check(this) is I) block else null
 }
 
-fun String.decodeBase(base: Int): Int {
-    var num = 0
-    for (i in lastIndex downTo 0) {
-        num *= base
-        num += get(i).code
+inline fun <reified I : SlimefunItem> Block.checkBlock(): Block? = location.checkBlock<I>()
+
+inline fun <K, V> Map<K, V>.mergeMaps(other: Map<K, V>, merge: (V, V) -> V): Map<K, V> {
+    val result = this.toMutableMap()
+    for ((k, v) in other) {
+        val thisVal = this[k]
+        result[k] = if (thisVal != null) merge(thisVal, v) else v
     }
-    return num
+    return result
 }
+
+operator fun TextColor.plus(s: String): TextComponent = Component.text().color(this).content(s).build()
+
+val Double.years: Duration
+    get() = (this * 365.25).days
+
+val Int.years: Duration
+    get() = (this * 365.25).days

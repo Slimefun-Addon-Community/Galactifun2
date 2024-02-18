@@ -2,9 +2,9 @@ package io.github.addoncommunity.galactifun.scripting.dsl
 
 import io.github.addoncommunity.galactifun.api.objects.planet.gen.WorldGenerator
 import io.github.addoncommunity.galactifun.scripting.PlanetDsl
-import io.github.addoncommunity.galactifun.scripting.RequiredProperty
 import io.github.addoncommunity.galactifun.scripting.dsl.gen.GeneratorBuilder
 import io.github.addoncommunity.galactifun.scripting.dsl.gen.GeneratorBuilderProvider
+import io.github.addoncommunity.galactifun.util.RequiredProperty
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.util.*
