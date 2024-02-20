@@ -2,18 +2,19 @@ package io.github.addoncommunity.galactifun.api.objects.planet
 
 import io.github.addoncommunity.galactifun.api.objects.UniversalObject
 import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
-import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.api.objects.properties.OrbitPosition
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
 import io.github.addoncommunity.galactifun.core.managers.PlanetManager
 import io.github.addoncommunity.galactifun.util.Constants
 import io.github.addoncommunity.galactifun.util.units.Distance
+import io.github.addoncommunity.galactifun.util.units.Distance.Companion.lightYears
 import io.github.seggan.kfun.location.plus
-import org.apache.commons.lang3.ObjectUtils.max
-import org.apache.commons.lang3.ObjectUtils.min
 import org.bukkit.Location
 import org.bukkit.inventory.ItemStack
-import kotlin.math.*
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 abstract class PlanetaryObject(name: String, baseItem: ItemStack) : UniversalObject(name, baseItem) {
 
@@ -51,34 +52,7 @@ abstract class PlanetaryObject(name: String, baseItem: ItemStack) : UniversalObj
             val otherClosestSibling = otherParents[otherParents.indexOf(closestParent) - 1] as PlanetaryObject
             val otherClosestOrbit = otherClosestSibling.orbit
 
-            // Perform a binary search to find the most efficient transfer we can get
-            // I *could* use Newton's method for better efficiency, but my brain is
-            // wrecked by all the math I've done today and I don't want to think about it
-            var min = min(thisClosestOrbit.semimajorAxis, otherClosestOrbit.semimajorAxis)
-            var max = max(thisClosestOrbit.semimajorAxis, otherClosestOrbit.semimajorAxis) * 4
-            var iterations = 0
-            var minDiff: OrbitalParameters
-            do {
-                val testAxis = (max + min) / 2
-                minDiff = anomalyDifference(testAxis, thisClosestOrbit, otherClosestOrbit)
-                if (minDiff.anomalyDiff > 0) {
-                    min = testAxis
-                } else {
-                    max = testAxis
-                }
-            } while (abs(minDiff.anomalyDiff) > PI / 16 && iterations++ < 64)
-
-            val phi = atan(
-                minDiff.eccentricity * sin(minDiff.trueAnomaly) /
-                        (1 + minDiff.eccentricity * cos(minDiff.trueAnomaly))
-            )
-            val vfb = visViva(otherClosestSibling.mu, otherClosestOrbit.semimajorAxis, otherClosestOrbit.semimajorAxis)
-            val vtxb = visViva(otherClosestSibling.mu, otherClosestOrbit.semimajorAxis, minDiff.semimajorAxis)
-            val deltaVb = sqrt(vtxb * vtxb + vfb * vfb - 2 * vtxb * vfb * cos(phi))
-            val via = visViva(thisClosestSibling.mu, thisClosestOrbit.semimajorAxis, thisClosestOrbit.semimajorAxis)
-            val vtxa = visViva(thisClosestSibling.mu, thisClosestOrbit.semimajorAxis, minDiff.semimajorAxis)
-            val deltaVa = vtxa - via
-            return deltaVa + deltaVb + getDeltaVForTransferTo(thisClosestSibling) + other.getDeltaVForTransferTo(otherClosestSibling)
+            TODO()
         }
     }
 }
@@ -95,17 +69,30 @@ private fun hohmannTransfer(mu: Double, parkingR: Distance, targetR: Distance): 
     return firstManeuver + secondManeuver
 }
 
-private fun anomalyDifference(transferA: Distance, source: Orbit, target: Orbit): OrbitalParameters {
-    val e = 1 - source.semimajorAxis.kilometers / transferA.kilometers
-    val trueAnomaly = acos(
-        (transferA.kilometers * (1 - e * e) / target.semimajorAxis.kilometers - 1) / e
-    )
-    return OrbitalParameters(transferA, e, trueAnomaly, trueAnomaly - target.trueAnomaly)
+// https://math.stackexchange.com/a/407425/1291722
+// https://www.desmos.com/calculator/mdifr3y167
+private fun oneTangentTransferOrbit(
+    parkingR: Distance,
+    parkingTheta: Double,
+    targetR: Distance,
+    targetTheta: Double
+): Distance? {
+    // Rotate the coordinate system so that the parking orbit is on the x-axis
+    val v = parkingR.lightYears
+    val p = targetR.lightYears * cos(targetTheta - parkingTheta)
+    val q = targetR.lightYears * sin(targetTheta - parkingTheta)
+
+    // Calculate the transfer orbit's semimajor axis
+    val a = v * (v - p) / (2 * v - p - sqrt(p * p + q * q))
+    if (a <= 0) {
+        // The transfer orbit is either parabolic or hyperbolic
+        return null
+    }
+    return a.lightYears
 }
 
-private data class OrbitalParameters(
-    val semimajorAxis: Distance,
-    val eccentricity: Double,
-    val trueAnomaly: Double,
-    val anomalyDiff: Double
-)
+private fun brachistochroneTransfer(
+    distance: Distance
+): Double {
+    return 2 * Constants.EARTH_GRAVITY * sqrt(distance.kilometers / Constants.EARTH_GRAVITY)
+}

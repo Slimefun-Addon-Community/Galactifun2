@@ -12,4 +12,15 @@ class StarSystem(
     override val orbit: Orbit,
     override val mass: Mass,
     override val radius: Distance
-) : UniversalObject(name, ItemStack(Material.SUNFLOWER))
+) : UniversalObject(name, ItemStack(Material.SUNFLOWER)) {
+
+    override fun distanceTo(other: UniversalObject): Distance {
+        return if (orbitLevel > other.orbitLevel) {
+            other.orbit.semimajorAxis + distanceTo(other.orbiting!!)
+        } else if (orbitLevel == other.orbitLevel) {
+            this.orbit.semimajorAxis - other.orbit.semimajorAxis
+        } else {
+            super.distanceTo(other)
+        }
+    }
+}
