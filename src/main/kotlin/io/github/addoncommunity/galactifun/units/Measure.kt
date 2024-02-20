@@ -6,45 +6,19 @@ import java.text.NumberFormat
 
 @JvmInline
 value class Measure<Q : Quantity> internal constructor(internal val value: Double) : Comparable<Measure<Q>> {
-    override fun compareTo(other: Measure<Q>): Int {
-        return value.compareTo(other.value)
-    }
+    override fun compareTo(other: Measure<Q>): Int = value.compareTo(other.value)
+    operator fun plus(other: Measure<Q>): Measure<Q> = Measure(value + other.value)
+    operator fun minus(other: Measure<Q>): Measure<Q> = Measure(value - other.value)
+    operator fun times(scalar: Double): Measure<Q> = Measure(value * scalar)
+    operator fun times(scalar: Int): Measure<Q> = times(scalar.toDouble())
+    operator fun div(scalar: Double): Measure<Q> = Measure(value / scalar)
+    operator fun div(scalar: Int): Measure<Q> = div(scalar.toDouble())
+    operator fun rem(scalar: Double): Measure<Q> = Measure(value % scalar)
+    operator fun rem(scalar: Int): Measure<Q> = rem(scalar.toDouble())
+    operator fun unaryMinus(): Measure<Q> = Measure(-value)
+    operator fun unaryPlus(): Measure<Q> = this
 
-    operator fun plus(other: Measure<Q>): Measure<Q> {
-        return Measure(value + other.value)
-    }
-
-    operator fun minus(other: Measure<Q>): Measure<Q> {
-        return Measure(value - other.value)
-    }
-
-    operator fun times(scalar: Double): Measure<Q> {
-        return Measure(value * scalar)
-    }
-
-    operator fun times(scalar: Int): Measure<Q> {
-        return Measure(value * scalar)
-    }
-
-    operator fun div(scalar: Double): Measure<Q> {
-        return Measure(value / scalar)
-    }
-
-    operator fun div(scalar: Int): Measure<Q> {
-        return Measure(value / scalar)
-    }
-
-    operator fun unaryMinus(): Measure<Q> {
-        return Measure(-value)
-    }
-
-    operator fun unaryPlus(): Measure<Q> {
-        return this
-    }
-
-    fun inUnit(unit: Q): Double {
-        return value / unit.ratio
-    }
+    fun inUnit(unit: Q): Double = value / unit.ratio
 
     fun toString(unit: Q, short: Boolean = false, formatter: NumberFormat = NumberFormat.getNumberInstance()): String {
         val value = inUnit(unit)

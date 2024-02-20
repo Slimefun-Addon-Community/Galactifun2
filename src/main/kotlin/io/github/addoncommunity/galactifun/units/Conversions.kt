@@ -1,6 +1,7 @@
 package io.github.addoncommunity.galactifun.units
 
 import io.github.addoncommunity.galactifun.units.quantities.*
+import kotlin.math.sign
 
 //@formatter:off
 
@@ -114,6 +115,36 @@ operator fun <A: Quantity, B: Quantity> Measure<Ratio<Product<A, A>, Product<B, 
 operator fun <A: Quantity, B: Quantity, C: Quantity> Measure<Ratio<Product<A, A>, Product<B, C>>>.div(other: A): Measure<Ratio<A, Product<B, C>>> = Measure(value / other.ratio)
 operator fun <A: Quantity, B: Quantity, C: Quantity, D: Quantity> Measure<Ratio<Product<A, B>, Product<C, D>>>.div(other: A): Measure<Ratio<B, Product<C, D>>> = Measure(value / other.ratio)
 operator fun <A: Quantity, B: Quantity> Measure<A>.div(other: Ratio<A, B>): Measure<B> = Measure(value / other.ratio)
+//</editor-fold>
+
+//<editor-fold desc="sqrt" defaultstate="collapsed">
+fun <A: Quantity> sqrt(quantity: Square<A>): A = quantity.first
+fun <A: Quantity> sqrt(quantity: Inverse<Square<A>>): Inverse<A> = Inverse(quantity.quantity.first)
+fun <A: Quantity, B: Quantity> sqrt(quantity: Product<Square<A>, Square<B>>): Product<A, B> = quantity.first.first * quantity.second.first
+fun <A: Quantity, B: Quantity> sqrt(quantity: Ratio<Square<A>, Square<B>>): Ratio<A, B> = quantity.numerator.first / quantity.denominator.first
+
+fun <A: Quantity> sqrt(measure: Measure<Square<A>>): Measure<A> = Measure(kotlin.math.sqrt(measure.value))
+fun <A: Quantity> sqrt(measure: Measure<Inverse<Square<A>>>): Measure<Inverse<A>> = Measure(kotlin.math.sqrt(measure.value))
+fun <A: Quantity, B: Quantity> sqrt(measure: Measure<Product<Square<A>, Square<B>>>): Measure<Product<A, B>> = Measure(kotlin.math.sqrt(measure.value))
+fun <A: Quantity, B: Quantity> sqrt(measure: Measure<Ratio<Square<A>, Square<B>>>): Measure<Ratio<A, B>> = Measure(kotlin.math.sqrt(measure.value))
+//</editor-fold>
+
+//<editor-fold desc="other" defaultstate="collapsed">
+fun <A: Quantity> abs(measure: Measure<A>): Measure<A> = Measure(kotlin.math.abs(measure.value))
+fun <A : Quantity> round(measure: Measure<A>): Measure<A> = Measure(kotlin.math.round(measure.value))
+fun <A : Quantity> floor(measure: Measure<A>): Measure<A> = Measure(kotlin.math.floor(measure.value))
+fun <A : Quantity> ceil(measure: Measure<A>): Measure<A> = Measure(kotlin.math.ceil(measure.value))
+fun <A : Quantity> round(measure: Measure<A>, toNearest: Measure<A>): Measure<A> {
+    val value = measure.value
+    if (value == 0.0) return measure
+    val nearest = toNearest.value
+    return Measure(kotlin.math.round(value / nearest) * nearest)
+}
+
+val <A : Quantity> Measure<A>.reciprocal: Measure<Inverse<A>> get() = Measure(1 / value)
+val <A : Quantity> Measure<A>.square: Measure<Square<A>> get() = Measure(value * value)
+inline val <A : Quantity> Measure<A>.absoluteValue: Measure<A> get() = abs(this)
+val Measure<*>.sign: Int get() = value.sign.toInt()
 //</editor-fold>
 
 //@formatter:on

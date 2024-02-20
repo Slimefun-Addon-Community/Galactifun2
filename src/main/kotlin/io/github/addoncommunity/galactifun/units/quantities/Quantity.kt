@@ -78,7 +78,7 @@ val celsius = Temperature("celsius", "°C", 1.0, 273.15)
 val fahrenheit = Temperature("fahrenheit", "°F", 5.0 / 9.0, 255.37222222222223)
 
 typealias Velocity = Ratio<Length, Time>
-typealias Acceleration = Ratio<Length, Product<Time, Time>>
+typealias Acceleration = Ratio<Length, Square<Time>>
 typealias Force = Product<Mass, Acceleration>
 
 val newton: Force = Product(kilogram, meter / (second * second))
@@ -92,6 +92,9 @@ typealias Power = Ratio<Energy, Time>
 val watt: Power = joule / second
 
 typealias Pressure = Ratio<Force, Product<Length, Length>>
+
+val pascal: Pressure = newton / (meter * meter)
+
 typealias Density = Ratio<Mass, Product<Length, Length>>
 typealias Volume = Product<Length, Product<Length, Length>>
 typealias Area = Product<Length, Length>
