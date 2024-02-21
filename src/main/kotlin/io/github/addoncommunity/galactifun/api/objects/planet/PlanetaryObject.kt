@@ -7,7 +7,7 @@ import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atm
 import io.github.addoncommunity.galactifun.core.managers.PlanetManager
 import io.github.addoncommunity.galactifun.util.Constants
 import io.github.addoncommunity.galactifun.util.units.Distance
-import io.github.addoncommunity.galactifun.util.units.Distance.Companion.lightYears
+import io.github.addoncommunity.galactifun.util.units.Distance.Companion.meters
 import io.github.seggan.kfun.location.plus
 import org.bukkit.Location
 import org.bukkit.inventory.ItemStack
@@ -15,6 +15,8 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 abstract class PlanetaryObject(name: String, baseItem: ItemStack) : UniversalObject(name, baseItem) {
 
@@ -60,7 +62,7 @@ abstract class PlanetaryObject(name: String, baseItem: ItemStack) : UniversalObj
 // These formulas came from http://www.braeunig.us/space/
 
 private fun visViva(mu: Double, r: Distance, a: Distance): Double =
-    sqrt(mu * (2 / r.kilometers - 1 / a.kilometers))
+    sqrt(mu * (2 / r.meters - 1 / a.meters))
 
 private fun hohmannTransfer(mu: Double, parkingR: Distance, targetR: Distance): Double {
     val transferA = (parkingR + targetR) / 2
@@ -78,9 +80,9 @@ private fun oneTangentTransferOrbit(
     targetTheta: Double
 ): Distance? {
     // Rotate the coordinate system so that the parking orbit is on the x-axis
-    val v = parkingR.lightYears
-    val p = targetR.lightYears * cos(targetTheta - parkingTheta)
-    val q = targetR.lightYears * sin(targetTheta - parkingTheta)
+    val v = parkingR.meters
+    val p = targetR.meters * cos(targetTheta - parkingTheta)
+    val q = targetR.meters * sin(targetTheta - parkingTheta)
 
     // Calculate the transfer orbit's semimajor axis
     val a = v * (v - p) / (2 * v - p - sqrt(p * p + q * q))
@@ -88,11 +90,19 @@ private fun oneTangentTransferOrbit(
         // The transfer orbit is either parabolic or hyperbolic
         return null
     }
-    return a.lightYears
+    return a.meters
 }
 
 private fun brachistochroneTransfer(
-    distance: Distance
-): Double {
-    return 2 * Constants.EARTH_GRAVITY * sqrt(distance.kilometers / Constants.EARTH_GRAVITY)
+    distance: Distance,
+
+): BrachistochroneTransfer {
+    val time = 2 * sqrt(distance.meters / Constants.EARTH_GRAVITY)
+    val dV = Constants.EARTH_GRAVITY * time
+    return BrachistochroneTransfer(dV, time.seconds)
 }
+
+data class BrachistochroneTransfer(
+    val deltaV: Double,
+    val time: Duration
+)
