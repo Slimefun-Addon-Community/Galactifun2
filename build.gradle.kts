@@ -16,6 +16,7 @@ repositories {
 dependencies {
     library(kotlin("stdlib"))
     library("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC2")
+    library("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
 
     library(kotlin("scripting-common"))
     library(kotlin("scripting-jvm"))
@@ -34,6 +35,8 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation("io.kotest:kotest-assertions-core:5.8.0")
     testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.9.0")
+
+    testImplementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
 }
 
 group = "io.github.addoncommunity.galactifun"

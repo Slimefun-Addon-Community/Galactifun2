@@ -11,7 +11,15 @@ object Constants {
     const val GRAVITATIONAL_CONSTANT = 6.674e-11
     const val EARTH_GRAVITY = 9.81
 
+    /**
+     * The maximum radix for the [Int.toString] and [String.toInt] functions.
+     */
     const val MAX_RADIX = 36
+
+    /**
+     * How much faster time is concerning orbital mechanics than in real life.
+     */
+    const val ORBIT_TIME_SCALE = 12.0
 
     fun locationZero(world: World?): Location {
         return Location(world, 0.0, 0.0, 0.0)

@@ -16,7 +16,7 @@ import io.github.addoncommunity.galactifun.scripting.evalScript
 import io.github.addoncommunity.galactifun.util.units.Distance.Companion.au
 import io.github.addoncommunity.galactifun.util.units.Distance.Companion.kilometers
 import io.github.addoncommunity.galactifun.util.units.Mass.Companion.kilograms
-import io.github.addoncommunity.galactifun.util.years
+import io.github.addoncommunity.galactifun.util.units.years
 import io.github.seggan.kfun.AbstractAddon
 import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun

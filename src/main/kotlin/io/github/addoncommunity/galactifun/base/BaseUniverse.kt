@@ -9,7 +9,7 @@ import io.github.addoncommunity.galactifun.base.objects.earth.Moon
 import io.github.addoncommunity.galactifun.util.units.Distance.Companion.kilometers
 import io.github.addoncommunity.galactifun.util.units.Distance.Companion.lightYears
 import io.github.addoncommunity.galactifun.util.units.Mass.Companion.kilograms
-import io.github.addoncommunity.galactifun.util.years
+import io.github.addoncommunity.galactifun.util.units.years
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 

@@ -14,8 +14,6 @@ import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.metadata.FixedMetadataValue
 import java.util.*
 import java.util.concurrent.CompletableFuture
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.days
 
 fun String.key(): NamespacedKey = NamespacedKey(pluginInstance, this)
 
@@ -90,9 +88,3 @@ inline fun <K, V> Map<K, V>.mergeMaps(other: Map<K, V>, merge: (V, V) -> V): Map
 }
 
 operator fun TextColor.plus(s: String): TextComponent = Component.text().color(this).content(s).build()
-
-val Double.years: Duration
-    get() = (this * 365.25).days
-
-val Int.years: Duration
-    get() = (this * 365.25).days

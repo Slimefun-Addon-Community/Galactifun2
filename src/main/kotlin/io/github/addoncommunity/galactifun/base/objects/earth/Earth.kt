@@ -8,7 +8,7 @@ import io.github.addoncommunity.galactifun.base.BaseUniverse
 import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.util.units.Distance.Companion.kilometers
 import io.github.addoncommunity.galactifun.util.units.Mass.Companion.kilograms
-import io.github.addoncommunity.galactifun.util.years
+import io.github.addoncommunity.galactifun.util.units.years
 import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.WorldCreator

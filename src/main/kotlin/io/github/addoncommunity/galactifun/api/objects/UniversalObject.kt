@@ -2,11 +2,13 @@ package io.github.addoncommunity.galactifun.api.objects
 
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.util.Constants
+import io.github.addoncommunity.galactifun.util.LazyDouble
 import io.github.addoncommunity.galactifun.util.units.Distance
-import io.github.addoncommunity.galactifun.util.units.Distance.Companion.lightYears
+import io.github.addoncommunity.galactifun.util.units.Distance.Companion.meters
 import io.github.addoncommunity.galactifun.util.units.Mass
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack
 import io.github.thebusybiscuit.slimefun4.utils.ChatUtils
+import kotlinx.datetime.Instant
 import org.bukkit.inventory.ItemStack
 import kotlin.math.cos
 import kotlin.math.sqrt
@@ -18,20 +20,24 @@ abstract class UniversalObject protected constructor(name: String, baseItem: Ite
 
     val item = CustomItemStack(baseItem, name)
 
-    abstract val orbiting: UniversalObject?
     abstract val orbit: Orbit
     abstract val mass: Mass
     abstract val radius: Distance
 
-    val mu: Double
-        get() = Constants.GRAVITATIONAL_CONSTANT * mass.kilograms
-    val escapeVelocity: Double
-        get() = sqrt(2 * Constants.GRAVITATIONAL_CONSTANT * mass.kilograms / radius.kilometers)
-    val parkingOrbit: Distance
-        get() = radius / 10
+    val gravitationalParameter by LazyDouble { Constants.GRAVITATIONAL_CONSTANT * mass.kilograms }
+    val escapeVelocity by LazyDouble { sqrt(2 * Constants.GRAVITATIONAL_CONSTANT * mass.kilograms / radius.kilometers) }
+    val parkingOrbit: Orbit by lazy {
+        Orbit(
+            parent = this,
+            semimajorAxis = radius / 10,
+            eccentricity = 0.0,
+            argumentOfPeriapsis = 0.0,
+            timeOfPeriapsis = Instant.fromEpochMilliseconds(0)
+        )
+    }
 
     val orbitLevel: Int
-        get() = if (orbiting == null) 0 else orbiting!!.orbitLevel + 1
+        get() = if (this is TheUniverse) 0 else orbit.parent.orbitLevel + 1
 
     private val _orbiters = mutableListOf<UniversalObject>()
     val orbiters: List<UniversalObject> = _orbiters
@@ -40,17 +46,17 @@ abstract class UniversalObject protected constructor(name: String, baseItem: Ite
         _orbiters.add(orbiter)
     }
 
-    open fun distanceTo(other: UniversalObject): Distance {
+    open fun distanceTo(other: UniversalObject, time: Instant): Distance {
         if (orbitLevel == 0 || orbitLevel < other.orbitLevel) {
-            return other.orbit.semimajorAxis + distanceTo(other.orbiting!!)
+            return other.orbit.semimajorAxis + distanceTo(other.orbit.parent, time)
         }
-        if (orbiting == other.orbiting) {
-            val thisDist = orbit.semimajorAxis.lightYears
-            val otherDist = other.orbit.semimajorAxis.lightYears
-            val cosAngle = cos(orbit.trueAnomaly - other.orbit.trueAnomaly)
-            return sqrt(thisDist * thisDist + otherDist * otherDist - 2 * thisDist * otherDist * cosAngle).lightYears
+        if (orbit.parent == other.orbit.parent) {
+            val thisDist = orbit.radius(time).meters
+            val otherDist = other.orbit.radius(time).meters
+            val cosAngle = cos(orbit.trueAnomaly(time) - other.orbit.trueAnomaly(time))
+            return sqrt(thisDist * thisDist + otherDist * otherDist - 2 * thisDist * otherDist * cosAngle).meters
         }
-        return orbit.semimajorAxis + orbiting!!.distanceTo(other)
+        return orbit.semimajorAxis + orbit.parent.distanceTo(other, time)
     }
 
     override fun equals(other: Any?): Boolean {

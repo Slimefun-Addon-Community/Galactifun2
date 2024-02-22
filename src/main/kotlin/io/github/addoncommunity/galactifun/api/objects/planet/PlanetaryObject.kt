@@ -2,6 +2,7 @@ package io.github.addoncommunity.galactifun.api.objects.planet
 
 import io.github.addoncommunity.galactifun.api.objects.UniversalObject
 import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
+import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.api.objects.properties.OrbitPosition
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
 import io.github.addoncommunity.galactifun.core.managers.PlanetManager
@@ -9,6 +10,7 @@ import io.github.addoncommunity.galactifun.util.Constants
 import io.github.addoncommunity.galactifun.util.units.Distance
 import io.github.addoncommunity.galactifun.util.units.Distance.Companion.meters
 import io.github.seggan.kfun.location.plus
+import kotlinx.datetime.Instant
 import org.bukkit.Location
 import org.bukkit.inventory.ItemStack
 import kotlin.math.abs
@@ -30,22 +32,26 @@ abstract class PlanetaryObject(name: String, baseItem: ItemStack) : UniversalObj
         return orbitPosition.centerLocation + location
     }
 
-    fun getDeltaVForTransferTo(other: PlanetaryObject): Double {
+    fun getDeltaVForTransferTo(other: PlanetaryObject, time: Instant): Double {
         if (this == other) return 0.0
-        val thisParents = generateSequence(this as UniversalObject) { it.orbiting }.toList()
+        val thisParents = generateSequence(this as UniversalObject) {
+            if (it.orbitLevel == 0) null else it.orbit.parent
+        }.toList()
         if (other in thisParents) {
-            return other.getDeltaVForTransferTo(this)
+            return other.getDeltaVForTransferTo(this, time)
         }
-        val otherParents = generateSequence(other as UniversalObject) { it.orbiting }.toList()
+        val otherParents = generateSequence(other as UniversalObject) {
+            if (it.orbitLevel == 0) null else it.orbit.parent
+        }.toList()
         if (this in otherParents) {
             var height = other.parkingOrbit
             var dV = 0.0
             for (obj in otherParents) {
                 if (obj == this) break
-                dV += abs(obj.escapeVelocity - visViva(obj.mu, height, height))
-                height = obj.orbit.semimajorAxis
+                dV += abs(obj.escapeVelocity - visViva(obj.gravitationalParameter, height.radius(time), height.semimajorAxis))
+                height = obj.orbit
             }
-            dV += hohmannTransfer(mass.kilograms * Constants.GRAVITATIONAL_CONSTANT, height, parkingOrbit)
+            dV += hohmannTransfer(height, parkingOrbit, time)
             return dV
         } else {
             val closestParent = thisParents.first { it in otherParents }
@@ -64,10 +70,13 @@ abstract class PlanetaryObject(name: String, baseItem: ItemStack) : UniversalObj
 private fun visViva(mu: Double, r: Distance, a: Distance): Double =
     sqrt(mu * (2 / r.meters - 1 / a.meters))
 
-private fun hohmannTransfer(mu: Double, parkingR: Distance, targetR: Distance): Double {
+private fun hohmannTransfer(parking: Orbit, target: Orbit, time: Instant): Double {
+    val parkingR = parking.radius(time)
+    val targetR = target.radius(time)
     val transferA = (parkingR + targetR) / 2
-    val firstManeuver = abs(visViva(mu, parkingR, transferA) - visViva(mu, parkingR, parkingR))
-    val secondManeuver = abs(visViva(mu, targetR, targetR) - visViva(mu, targetR, transferA))
+    val mu = parking.parent.gravitationalParameter
+    val firstManeuver = abs(visViva(mu, parkingR, transferA) - visViva(mu, parkingR, parking.semimajorAxis))
+    val secondManeuver = abs(visViva(mu, targetR, target.semimajorAxis) - visViva(mu, targetR, transferA))
     return firstManeuver + secondManeuver
 }
 
@@ -102,7 +111,7 @@ private fun brachistochroneTransfer(
     return BrachistochroneTransfer(dV, time.seconds)
 }
 
-data class BrachistochroneTransfer(
+private data class BrachistochroneTransfer(
     val deltaV: Double,
     val time: Duration
 )
