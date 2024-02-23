@@ -2,11 +2,12 @@ package io.github.addoncommunity.galactifun.core
 
 import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
-import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryObject
+import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.core.managers.PlanetManager
 import io.github.addoncommunity.galactifun.util.galactifunTeleport
 import io.github.seggan.kfun.location.plusAssign
+import kotlinx.datetime.Clock
 import org.bukkit.Location
 import org.bukkit.entity.Player
 
@@ -41,7 +42,7 @@ object Gf2Command : BaseCommand() {
     @Description("Get distance to a planet")
     fun distance(player: Player, planet: PlanetaryObject) {
         val start = PlanetManager.getByWorld(player.world) ?: return
-        val distance = start.getDeltaVForTransferTo(planet)
+        val distance = start.getDeltaVForTransferTo(planet, Clock.System.now())
         player.sendMessage("The delta-v required to transfer to ${planet.name} is $distance m/s")
     }
 }

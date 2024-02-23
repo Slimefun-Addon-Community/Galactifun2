@@ -13,18 +13,28 @@ repositories {
     maven(url = "https://hub.jeff-media.com/nexus/repository/jeff-media-public/")
 }
 
+fun DependencyHandlerScope.libraryAndTest(dependency: Any) {
+    library(dependency)
+    testImplementation(dependency)
+}
+
+fun DependencyHandlerScope.compileOnlyAndTest(dependency: Any) {
+    compileOnly(dependency)
+    testImplementation(dependency)
+}
+
 dependencies {
     library(kotlin("stdlib"))
-    library("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC2")
-    library("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+    libraryAndTest("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC2")
+    libraryAndTest("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
 
-    library(kotlin("scripting-common"))
-    library(kotlin("scripting-jvm"))
-    library(kotlin("scripting-jvm-host"))
-    library(kotlin("script-runtime"))
+    libraryAndTest(kotlin("scripting-common"))
+    libraryAndTest(kotlin("scripting-jvm"))
+    libraryAndTest(kotlin("scripting-jvm-host"))
+    libraryAndTest(kotlin("script-runtime"))
 
     compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
-    compileOnly("com.github.Slimefun:Slimefun4:RC-36")
+    compileOnlyAndTest("com.github.Slimefun:Slimefun4:206a9d6")
 
     implementation("org.bstats:bstats-bukkit:3.0.2")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
@@ -34,9 +44,8 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation("io.kotest:kotest-assertions-core:5.8.0")
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.9.0")
-
-    testImplementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+    // Need MockBukkit for unimplemented entities
+    compileOnlyAndTest("com.github.seeseemelk:MockBukkit-v1.20:3.74.0")
 }
 
 group = "io.github.addoncommunity.galactifun"
@@ -50,8 +59,12 @@ tasks.compileKotlin {
     kotlinOptions.javaParameters = true
 }
 
-tasks.withType<Test>().configureEach {
+tasks.test {
     useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+        showStandardStreams = true
+    }
 }
 
 tasks.shadowJar {

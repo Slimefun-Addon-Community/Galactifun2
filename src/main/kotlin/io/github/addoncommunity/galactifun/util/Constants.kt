@@ -6,6 +6,7 @@ import org.bukkit.World
 object Constants {
 
     const val KM_PER_LY = 9.461e12
+    const val KM_PER_PC = 3.086e13
     const val KM_PER_AU = 1.496e8
 
     const val GRAVITATIONAL_CONSTANT = 6.674e-11
@@ -15,11 +16,6 @@ object Constants {
      * The maximum radix for the [Int.toString] and [String.toInt] functions.
      */
     const val MAX_RADIX = 36
-
-    /**
-     * How much faster time is concerning orbital mechanics than in real life.
-     */
-    const val ORBIT_TIME_SCALE = 12.0
 
     fun locationZero(world: World?): Location {
         return Location(world, 0.0, 0.0, 0.0)

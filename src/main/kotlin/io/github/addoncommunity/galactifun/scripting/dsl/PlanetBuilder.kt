@@ -1,8 +1,8 @@
 package io.github.addoncommunity.galactifun.scripting.dsl
 
-import io.github.addoncommunity.galactifun.api.objects.UniversalObject
+import io.github.addoncommunity.galactifun.api.objects.CelestialObject
+import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.AlienWorld
-import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
@@ -10,9 +10,9 @@ import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atm
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.AtmosphereBuilder
 import io.github.addoncommunity.galactifun.scripting.PlanetDsl
 import io.github.addoncommunity.galactifun.scripting.PlanetScript
+import io.github.addoncommunity.galactifun.units.Distance
+import io.github.addoncommunity.galactifun.units.Mass
 import io.github.addoncommunity.galactifun.util.RequiredProperty
-import io.github.addoncommunity.galactifun.util.units.Distance
-import io.github.addoncommunity.galactifun.util.units.Mass
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.World
@@ -24,7 +24,7 @@ class PlanetBuilder {
 
     var name: String by RequiredProperty()
     var item: Material by RequiredProperty()
-    var orbiting: UniversalObject by RequiredProperty()
+    var orbiting: CelestialObject by RequiredProperty()
     var orbit: Orbit by RequiredProperty()
     var mass: Mass by RequiredProperty()
     var radius: Distance by RequiredProperty()
@@ -41,7 +41,6 @@ class PlanetBuilder {
             if (world != null) {
                 return object : PlanetaryWorld(name, ItemStack(item)) {
                     override val dayCycle = this@PlanetBuilder.dayCycle
-                    override val orbiting = this@PlanetBuilder.orbiting
                     override val orbit = this@PlanetBuilder.orbit
                     override val mass = this@PlanetBuilder.mass
                     override val radius = this@PlanetBuilder.radius
@@ -52,7 +51,6 @@ class PlanetBuilder {
             } else {
                 return object : AlienWorld(name, ItemStack(item)) {
                     override val dayCycle = this@PlanetBuilder.dayCycle
-                    override val orbiting = this@PlanetBuilder.orbiting
                     override val orbit = this@PlanetBuilder.orbit
                     override val mass = this@PlanetBuilder.mass
                     override val radius = this@PlanetBuilder.radius
@@ -69,7 +67,6 @@ class PlanetBuilder {
         } else {
             return object : PlanetaryObject(name, ItemStack(item)) {
                 override val dayCycle = this@PlanetBuilder.dayCycle
-                override val orbiting = this@PlanetBuilder.orbiting
                 override val orbit = this@PlanetBuilder.orbit
                 override val mass = this@PlanetBuilder.mass
                 override val radius = this@PlanetBuilder.radius

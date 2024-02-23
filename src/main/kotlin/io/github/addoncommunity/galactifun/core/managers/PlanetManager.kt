@@ -1,7 +1,7 @@
 package io.github.addoncommunity.galactifun.core.managers
 
 import com.jeff_media.morepersistentdatatypes.DataType
-import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryObject
+import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
 import io.github.addoncommunity.galactifun.api.objects.properties.OrbitPosition
@@ -20,6 +20,7 @@ import org.bukkit.GameRule
 import org.bukkit.World
 import org.bukkit.WorldCreator
 import org.bukkit.configuration.file.YamlConfiguration
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Marker
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -38,7 +39,7 @@ object PlanetManager : Listener {
         get() = planets
 
     val spaceWorld: World
-    private val spaceWorldMarker: Marker
+    private val spaceWorldMarker: Entity
 
     private val orbits: MutableMap<String, OrbitPosition>
     private val orbitsKey = "orbits".key()
@@ -66,10 +67,14 @@ object PlanetManager : Listener {
         Atmosphere.NONE.applyEffects(spaceWorld)
         spaceWorld.setGameRule(GameRule.DO_MOB_SPAWNING, false)
 
-        spaceWorldMarker = spaceWorld.getNearbyEntitiesByType<Marker>(
-            Constants.locationZero(spaceWorld),
-            0.1
-        ).firstOrNull() ?: spaceWorld.spawn<Marker>(Constants.locationZero(spaceWorld))
+        if (pluginInstance.isTest) {
+            spaceWorldMarker =
+        } else {
+            spaceWorldMarker = spaceWorld.getNearbyEntitiesByType<Marker>(
+                Constants.locationZero(spaceWorld),
+                0.1
+            ).firstOrNull() ?: spaceWorld.spawn<Marker>(Constants.locationZero(spaceWorld))
+        }
 
         orbits = spaceWorldMarker.persistentDataContainer.getOrDefault(orbitsKey, orbitsPdt, mutableMapOf())
 

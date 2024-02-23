@@ -1,7 +1,7 @@
 package io.github.addoncommunity.galactifun
 
 import co.aikar.commands.PaperCommandManager
-import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryObject
+import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.composition
@@ -13,14 +13,15 @@ import io.github.addoncommunity.galactifun.scripting.PlanetScript
 import io.github.addoncommunity.galactifun.scripting.dsl.*
 import io.github.addoncommunity.galactifun.scripting.dsl.gen.*
 import io.github.addoncommunity.galactifun.scripting.evalScript
-import io.github.addoncommunity.galactifun.util.units.Distance.Companion.au
-import io.github.addoncommunity.galactifun.util.units.Distance.Companion.kilometers
-import io.github.addoncommunity.galactifun.util.units.Mass.Companion.kilograms
-import io.github.addoncommunity.galactifun.util.units.years
+import io.github.addoncommunity.galactifun.units.Angle.Companion.degrees
+import io.github.addoncommunity.galactifun.units.Distance.Companion.au
+import io.github.addoncommunity.galactifun.units.Distance.Companion.kilometers
+import io.github.addoncommunity.galactifun.units.Mass.Companion.kilograms
 import io.github.seggan.kfun.AbstractAddon
 import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun
 import io.github.thebusybiscuit.slimefun4.libraries.paperlib.PaperLib
+import kotlinx.datetime.Instant
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -34,20 +35,24 @@ import kotlin.script.experimental.host.toScriptSource
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
-class Galactifun2 : AbstractAddon() {
+open class Galactifun2 : AbstractAddon() {
 
     lateinit var manager: PaperCommandManager
         private set
 
+    var isTest = classLoader.javaClass.packageName.startsWith("be.seeseemelk.mockbukkit")
+
     override fun onLoad() {
-        Bukkit.spigot().config["world-settings.default.verbose"] = false
+        if (!isTest) {
+            Bukkit.spigot().config["world-settings.default.verbose"] = false
+        }
     }
 
     override fun onEnable() {
         instance = this
 
         var shouldDisable = false
-        if (!PaperLib.isPaper()) {
+        if (!PaperLib.isPaper() && !isTest) {
             log(Level.SEVERE, "Galactifun2 only supports Paper and its forks (e.x. Airplane and Purpur)")
             log(Level.SEVERE, "Please use Paper or a fork of Paper")
             shouldDisable = true
@@ -73,7 +78,9 @@ class Galactifun2 : AbstractAddon() {
             return
         }
 
-        Metrics(this, 11613)
+        if (!isTest) {
+            Metrics(this, 11613)
+        }
 
         manager = PaperCommandManager(this)
         manager.enableUnstableAPI("help")
@@ -159,10 +166,12 @@ class Galactifun2 : AbstractAddon() {
         script.planet {
             name = "Mars"
             item = Material.RED_CONCRETE
-            orbiting = BaseUniverse.solarSystem
             orbit {
-                distance = 1.52.au
-                yearLength = 1.88.years
+                parent = BaseUniverse.sun
+                semimajorAxis = 1.524.au
+                eccentricity = 0.0934
+                argumentOfPeriapsis = 336.04.degrees
+                timeOfPeriapsis = Instant.parse("2022-05-21T15:00:00Z")
             }
             mass = 6.417e23.kilograms
             radius = 3389.5.kilometers

@@ -54,13 +54,13 @@ class Atmosphere private constructor(
 
         if (world.environment == World.Environment.THE_END) {
             // Prevents ender dragon spawn using portal, surrounds portal with bedrock
-            world[0, 0, 0] = Material.END_PORTAL
-            world[0, 1, 0] = Material.BEDROCK
-            world[0, -1, 0] = Material.BEDROCK
-            world[1, 0, 0] = Material.BEDROCK
-            world[-1, 0, 0] = Material.BEDROCK
-            world[0, 0, 1] = Material.BEDROCK
-            world[0, 0, -1] = Material.BEDROCK
+            world[0, 1, 0] = Material.END_PORTAL
+            world[0, 2, 0] = Material.BEDROCK
+            world[0, 0, 0] = Material.BEDROCK
+            world[1, 1, 0] = Material.BEDROCK
+            world[-1, 1, 0] = Material.BEDROCK
+            world[0, 1, 1] = Material.BEDROCK
+            world[0, 1, -1] = Material.BEDROCK
         }
     }
 

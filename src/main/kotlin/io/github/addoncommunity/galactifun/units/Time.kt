@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.util.units
+package io.github.addoncommunity.galactifun.units
 
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days

@@ -1,14 +1,15 @@
-package io.github.addoncommunity.galactifun.api.objects.planet
+package io.github.addoncommunity.galactifun.api.objects
 
-import io.github.addoncommunity.galactifun.api.objects.UniversalObject
 import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.api.objects.properties.OrbitPosition
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
+import io.github.addoncommunity.galactifun.api.objects.properties.visVivaEquation
 import io.github.addoncommunity.galactifun.core.managers.PlanetManager
+import io.github.addoncommunity.galactifun.units.Distance
+import io.github.addoncommunity.galactifun.units.Distance.Companion.meters
+import io.github.addoncommunity.galactifun.units.cos
 import io.github.addoncommunity.galactifun.util.Constants
-import io.github.addoncommunity.galactifun.util.units.Distance
-import io.github.addoncommunity.galactifun.util.units.Distance.Companion.meters
 import io.github.seggan.kfun.location.plus
 import kotlinx.datetime.Instant
 import org.bukkit.Location
@@ -20,10 +21,16 @@ import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-abstract class PlanetaryObject(name: String, baseItem: ItemStack) : UniversalObject(name, baseItem) {
+abstract class PlanetaryObject(name: String, baseItem: ItemStack) : CelestialObject(name, baseItem) {
 
     abstract val dayCycle: DayCycle
     abstract val atmosphere: Atmosphere
+    abstract val orbit: Orbit
+
+    val star: Star by lazy {
+        val parent = orbit.parent
+        if (parent is Star) parent else (parent as PlanetaryObject).star
+    }
 
     val orbitPosition: OrbitPosition
         get() = PlanetManager.getOrbit(this)
@@ -32,51 +39,74 @@ abstract class PlanetaryObject(name: String, baseItem: ItemStack) : UniversalObj
         return orbitPosition.centerLocation + location
     }
 
+    override fun distanceTo(other: CelestialObject, time: Instant): Distance {
+        if (other == this) return 0.0.meters
+        if (other is Star) {
+            if (star == other) {
+                var dist = orbit.radius(time)
+                if (orbit.parent != other) {
+                    dist += orbit.parent.distanceTo(other, time)
+                }
+                return dist
+            } else {
+                return star.distanceTo(other, time) + distanceTo(star, time)
+            }
+        }
+
+        require(other is PlanetaryObject)
+        if (star == other.star) {
+            if (orbit.parent == other.orbit.parent) {
+                val thisDist = orbit.radius(time).meters
+                val otherDist = other.orbit.radius(time).meters
+                val cosAngle = cos(orbit.trueAnomaly(time) - other.orbit.trueAnomaly(time))
+                return sqrt(thisDist * thisDist + otherDist * otherDist - 2 * thisDist * otherDist * cosAngle).meters
+            }
+            return orbit.radius(time) + orbit.parent.distanceTo(other, time)
+        } else {
+            return other.distanceTo(star, time) + distanceTo(star, time)
+        }
+    }
+
     fun getDeltaVForTransferTo(other: PlanetaryObject, time: Instant): Double {
         if (this == other) return 0.0
-        val thisParents = generateSequence(this as UniversalObject) {
-            if (it.orbitLevel == 0) null else it.orbit.parent
+        val thisParents = generateSequence(this as CelestialObject) {
+            if (it is PlanetaryObject) it.orbit.parent else null
         }.toList()
         if (other in thisParents) {
             return other.getDeltaVForTransferTo(this, time)
         }
-        val otherParents = generateSequence(other as UniversalObject) {
-            if (it.orbitLevel == 0) null else it.orbit.parent
+        val otherParents = generateSequence(other as CelestialObject) {
+            if (it is PlanetaryObject) it.orbit.parent else null
         }.toList()
         if (this in otherParents) {
             var height = other.parkingOrbit
             var dV = 0.0
             for (obj in otherParents) {
                 if (obj == this) break
-                dV += abs(obj.escapeVelocity - visViva(obj.gravitationalParameter, height.radius(time), height.semimajorAxis))
-                height = obj.orbit
+                dV += abs(
+                    obj.escapeVelocity - visVivaEquation(
+                        obj.gravitationalParameter,
+                        height.radius(time),
+                        height.semimajorAxis
+                    )
+                )
+                height = (obj as PlanetaryObject).orbit
             }
             dV += hohmannTransfer(height, parkingOrbit, time)
             return dV
         } else {
-            val closestParent = thisParents.first { it in otherParents }
-            val thisClosestSibling = thisParents[thisParents.indexOf(closestParent) - 1] as PlanetaryObject
-            val thisClosestOrbit = thisClosestSibling.orbit
-            val otherClosestSibling = otherParents[otherParents.indexOf(closestParent) - 1] as PlanetaryObject
-            val otherClosestOrbit = otherClosestSibling.orbit
-
             TODO()
         }
     }
 }
 
-// These formulas came from http://www.braeunig.us/space/
-
-private fun visViva(mu: Double, r: Distance, a: Distance): Double =
-    sqrt(mu * (2 / r.meters - 1 / a.meters))
-
 private fun hohmannTransfer(parking: Orbit, target: Orbit, time: Instant): Double {
     val parkingR = parking.radius(time)
     val targetR = target.radius(time)
-    val transferA = (parkingR + targetR) / 2
+    val transferA = (parkingR + targetR) / 2.0
     val mu = parking.parent.gravitationalParameter
-    val firstManeuver = abs(visViva(mu, parkingR, transferA) - visViva(mu, parkingR, parking.semimajorAxis))
-    val secondManeuver = abs(visViva(mu, targetR, target.semimajorAxis) - visViva(mu, targetR, transferA))
+    val firstManeuver = abs(visVivaEquation(mu, parkingR, transferA) - visVivaEquation(mu, parkingR, parking.semimajorAxis))
+    val secondManeuver = abs(visVivaEquation(mu, targetR, target.semimajorAxis) - visVivaEquation(mu, targetR, transferA))
     return firstManeuver + secondManeuver
 }
 
@@ -105,7 +135,7 @@ private fun oneTangentTransferOrbit(
 private fun brachistochroneTransfer(
     distance: Distance,
 
-): BrachistochroneTransfer {
+    ): BrachistochroneTransfer {
     val time = 2 * sqrt(distance.meters / Constants.EARTH_GRAVITY)
     val dV = Constants.EARTH_GRAVITY * time
     return BrachistochroneTransfer(dV, time.seconds)

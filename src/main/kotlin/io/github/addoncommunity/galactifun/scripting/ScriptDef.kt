@@ -1,7 +1,7 @@
 package io.github.addoncommunity.galactifun.scripting
 
-import io.github.addoncommunity.galactifun.api.objects.TheUniverse
-import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryObject
+import io.github.addoncommunity.galactifun.api.objects.MilkyWay
+import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
@@ -50,7 +50,7 @@ object PlanetScriptConfig : ScriptCompilationConfiguration({
         Biome::class,
 
         BaseUniverse::class,
-        TheUniverse::class,
+        MilkyWay::class,
         Atmosphere::class,
         Gas::class,
     )

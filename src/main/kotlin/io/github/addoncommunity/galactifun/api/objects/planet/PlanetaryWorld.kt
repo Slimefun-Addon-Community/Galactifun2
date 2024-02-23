@@ -1,5 +1,6 @@
 package io.github.addoncommunity.galactifun.api.objects.planet
 
+import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.core.managers.PlanetManager
 import org.bukkit.World
 import org.bukkit.inventory.ItemStack
