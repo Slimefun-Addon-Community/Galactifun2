@@ -1,6 +1,7 @@
 package io.github.addoncommunity.galactifun.core.managers
 
 import com.jeff_media.morepersistentdatatypes.DataType
+import io.github.addoncommunity.galactifun.Constants
 import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
@@ -11,7 +12,6 @@ import io.github.addoncommunity.galactifun.core.space.SpaceGenerator
 import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.runOnNextTick
 import io.github.addoncommunity.galactifun.test.MarkerMock
-import io.github.addoncommunity.galactifun.util.Constants
 import io.github.addoncommunity.galactifun.util.getNearbyEntitiesByType
 import io.github.addoncommunity.galactifun.util.key
 import io.github.addoncommunity.galactifun.util.spawn

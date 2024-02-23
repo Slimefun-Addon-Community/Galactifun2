@@ -1,6 +1,6 @@
 package io.github.addoncommunity.galactifun.serial
 
-import io.github.addoncommunity.galactifun.util.Constants
+import io.github.addoncommunity.galactifun.Constants
 import io.github.seggan.kfun.serial.BlockStorageDataType
 
 abstract class CollectionBlockStorageDataType<E, C : Collection<E>>(

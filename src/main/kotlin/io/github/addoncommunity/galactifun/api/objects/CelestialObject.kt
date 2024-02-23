@@ -1,10 +1,10 @@
 package io.github.addoncommunity.galactifun.api.objects
 
+import io.github.addoncommunity.galactifun.Constants
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.units.Angle.Companion.degrees
 import io.github.addoncommunity.galactifun.units.Distance
 import io.github.addoncommunity.galactifun.units.Mass
-import io.github.addoncommunity.galactifun.util.Constants
 import io.github.addoncommunity.galactifun.util.LazyDouble
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack
 import io.github.thebusybiscuit.slimefun4.utils.ChatUtils

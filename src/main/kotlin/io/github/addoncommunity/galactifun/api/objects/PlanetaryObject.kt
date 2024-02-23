@@ -1,5 +1,6 @@
 package io.github.addoncommunity.galactifun.api.objects
 
+import io.github.addoncommunity.galactifun.Constants
 import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.api.objects.properties.OrbitPosition
@@ -9,7 +10,6 @@ import io.github.addoncommunity.galactifun.core.managers.PlanetManager
 import io.github.addoncommunity.galactifun.units.Distance
 import io.github.addoncommunity.galactifun.units.Distance.Companion.meters
 import io.github.addoncommunity.galactifun.units.cos
-import io.github.addoncommunity.galactifun.util.Constants
 import io.github.seggan.kfun.location.plus
 import kotlinx.datetime.Instant
 import org.bukkit.Location

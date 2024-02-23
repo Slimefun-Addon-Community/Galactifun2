@@ -4,12 +4,15 @@ import io.github.addoncommunity.galactifun.api.objects.CelestialObject
 import io.github.addoncommunity.galactifun.units.*
 import io.github.addoncommunity.galactifun.units.Angle.Companion.radians
 import io.github.addoncommunity.galactifun.units.Distance.Companion.meters
+import io.github.addoncommunity.galactifun.units.coordiantes.CartesianVector
+import io.github.addoncommunity.galactifun.units.coordiantes.PolarVector
 import io.github.addoncommunity.galactifun.util.LazyDouble
 import kotlinx.datetime.Instant
-import org.joml.Vector2d
 import java.util.*
-import kotlin.math.acos
+import kotlin.math.atan2
 import kotlin.math.sqrt
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 data class Orbit(
     val parent: CelestialObject,
@@ -24,6 +27,11 @@ data class Orbit(
     init {
         require(eccentricity > 0) { "Eccentricity must be positive, use TINY_ECCENTRICITY for circular orbits" }
         require(eccentricity < 1) { "Eccentricity must be less than 1" }
+    }
+
+    val period: Duration by lazy {
+        val a = semimajorAxis.meters
+        (2 * Math.PI * sqrt(a * a * a / parent.gravitationalParameter)).seconds
     }
 
     val meanMotion by LazyDouble {
@@ -42,9 +50,11 @@ data class Orbit(
         return eccentricAnomalyCache.getOrPut(time) { kelpersEquation(meanAnomaly(time), eccentricity) }
     }
 
+    private val beta by LazyDouble { eccentricity / (1 + sqrt(1 - eccentricity * eccentricity)) }
+
     fun trueAnomaly(time: Instant): Angle {
-        val cosE = cos(eccentricAnomaly(time))
-        return acos((cosE - eccentricity) / (1 - eccentricity * cosE)).radians
+        val e = eccentricAnomaly(time)
+        return atan2(beta * sin(e), 1 - beta * cos(e)).radians * 2.0 + e
     }
 
     fun radius(time: Instant): Distance {
@@ -53,24 +63,18 @@ data class Orbit(
         return (a * (1 - eccentricity * cos(e))).meters
     }
 
-    val sinOmega by LazyDouble { sin(argumentOfPeriapsis) }
-    val cosOmega by LazyDouble { cos(argumentOfPeriapsis) }
+    fun position(time: Instant): PolarVector = PolarVector(radius(time), trueAnomaly(time))
 
-    fun velocityVectorAt(time: Instant): Vector2d {
-        val p = semimajorAxis.meters * (1 - eccentricity * eccentricity)
-        val h = sqrt(parent.gravitationalParameter * p)
-        val r = radius(time).meters
-        val nu = trueAnomaly(time)
-        val sinOmegaNu = sin(argumentOfPeriapsis + nu)
-        val cosOmegaNu = cos(argumentOfPeriapsis + nu)
+    private val deltaTimeForVelocity: Duration by lazy { period / 1e6 }
 
-        val x = r * (cosOmega * cosOmegaNu - sinOmega * sinOmegaNu)
-        val y = r * (sinOmega * cosOmegaNu + cosOmega * sinOmegaNu)
-
-        val magic = (h * eccentricity) / (r * p) * sin(nu)
-        val vx = x * magic - h / r * (cosOmega * sinOmegaNu + sinOmega * cosOmegaNu)
-        val vy = y * magic - h / r * (sinOmega * sinOmegaNu - cosOmega * cosOmegaNu)
-        return Vector2d(vx, vy)
+    fun velocity(time: Instant): CartesianVector {
+        // Do a tiny bit of calculus to find the velocity vector
+        val deltaTime = time + deltaTimeForVelocity
+        val pos1 = position(time)
+        val pos2 = position(deltaTime)
+        val w = eccentricAnomaly(time).degrees to eccentricAnomaly(deltaTime).degrees
+        val z = trueAnomaly(time).degrees to trueAnomaly(deltaTime).degrees
+        return (pos2.cartesian - pos1.cartesian) / deltaTimeForVelocity.doubleSeconds
     }
 
     companion object {
@@ -78,7 +82,7 @@ data class Orbit(
          * How much faster time is concerning orbital mechanics than in real life.
          * Minecraft is 72 times faster than real life, and a year is 12 times shorter than in real life.
          */
-        const val TIME_SCALE = 72.0 * 12.0
+        var TIME_SCALE = 72.0 * 12.0
 
         /**
          * A tiny eccentricity to use for otherwise circular orbits in order to avoid maths problems.

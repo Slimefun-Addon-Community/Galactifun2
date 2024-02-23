@@ -1,7 +1,6 @@
 package io.github.addoncommunity.galactifun.units
 
-import io.github.addoncommunity.galactifun.util.Constants
-import kotlin.math.abs
+import io.github.addoncommunity.galactifun.Constants
 
 @JvmInline
 value class Distance private constructor(val meters: Double) : Comparable<Distance> {
@@ -30,12 +29,8 @@ value class Distance private constructor(val meters: Double) : Comparable<Distan
         }
     }
 
-    init {
-        require(meters >= 0) { "Distance must be positive" }
-    }
-
     operator fun plus(other: Distance): Distance = Distance(meters + other.meters)
-    operator fun minus(other: Distance): Distance = Distance(abs(meters - other.meters))
+    operator fun minus(other: Distance): Distance = Distance(meters - other.meters)
     operator fun times(scalar: Double): Distance = Distance(meters * scalar)
     operator fun div(scalar: Double): Distance = Distance(meters / scalar)
     operator fun rem(scalar: Double): Distance = Distance(meters % scalar)

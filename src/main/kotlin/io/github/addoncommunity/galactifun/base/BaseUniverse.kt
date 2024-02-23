@@ -7,7 +7,7 @@ import io.github.addoncommunity.galactifun.units.Angle.Companion.radians
 import io.github.addoncommunity.galactifun.units.Distance.Companion.kilometers
 import io.github.addoncommunity.galactifun.units.Distance.Companion.meters
 import io.github.addoncommunity.galactifun.units.Mass.Companion.kilograms
-import io.github.addoncommunity.galactifun.units.SphericalPosition
+import io.github.addoncommunity.galactifun.units.coordiantes.SphericalVector
 
 object BaseUniverse {
 
@@ -16,7 +16,7 @@ object BaseUniverse {
         mass = 1.989e30.kilograms,
         radius = 695700.0.kilometers,
         // The sun is at the center of the universe, yay!
-        position = SphericalPosition(0.0.radians, 0.0.radians, 0.0.meters)
+        position = SphericalVector(0.0.radians, 0.0.radians, 0.0.meters)
     )
 
     val earth = Earth()

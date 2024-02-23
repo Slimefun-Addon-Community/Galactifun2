@@ -17,6 +17,9 @@ value class Angle private constructor(val radians: Double) : Comparable<Angle> {
     val milliarcseconds: Double
         get() = arcseconds * 1000
 
+    val standardForm: Angle
+        get() = Angle((radians % (2 * PI) + 2 * PI) % (2 * PI))
+
     companion object {
         const val DEGREES_PER_RADIAN = 180 / Math.PI
 
