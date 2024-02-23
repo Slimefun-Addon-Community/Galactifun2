@@ -47,7 +47,6 @@ class OrbitTest : CommonTest() {
     fun testVelocity() {
         fun testVelocityAt(time: Instant, expectedAngle: Angle) {
             val vel = orbit.velocity(time)
-            println(vel)
             vel.length.meters shouldBeRoughly visVivaEquation(
                 orbit.parent.gravitationalParameter,
                 orbit.radius(orbit.timeOfPeriapsis),

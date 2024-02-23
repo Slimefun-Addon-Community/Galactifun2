@@ -72,8 +72,6 @@ data class Orbit(
         val deltaTime = time + deltaTimeForVelocity
         val pos1 = position(time)
         val pos2 = position(deltaTime)
-        val w = eccentricAnomaly(time).degrees to eccentricAnomaly(deltaTime).degrees
-        val z = trueAnomaly(time).degrees to trueAnomaly(deltaTime).degrees
         return (pos2.cartesian - pos1.cartesian) / deltaTimeForVelocity.doubleSeconds
     }
 
