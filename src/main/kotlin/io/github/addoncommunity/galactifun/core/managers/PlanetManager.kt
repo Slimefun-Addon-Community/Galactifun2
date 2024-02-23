@@ -10,6 +10,7 @@ import io.github.addoncommunity.galactifun.core.Permissions
 import io.github.addoncommunity.galactifun.core.space.SpaceGenerator
 import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.runOnNextTick
+import io.github.addoncommunity.galactifun.test.MarkerMock
 import io.github.addoncommunity.galactifun.util.Constants
 import io.github.addoncommunity.galactifun.util.getNearbyEntitiesByType
 import io.github.addoncommunity.galactifun.util.key
@@ -67,10 +68,10 @@ object PlanetManager : Listener {
         Atmosphere.NONE.applyEffects(spaceWorld)
         spaceWorld.setGameRule(GameRule.DO_MOB_SPAWNING, false)
 
-        if (pluginInstance.isTest) {
-            spaceWorldMarker =
+        spaceWorldMarker = if (pluginInstance.isTest) {
+            MarkerMock()
         } else {
-            spaceWorldMarker = spaceWorld.getNearbyEntitiesByType<Marker>(
+            spaceWorld.getNearbyEntitiesByType<Marker>(
                 Constants.locationZero(spaceWorld),
                 0.1
             ).firstOrNull() ?: spaceWorld.spawn<Marker>(Constants.locationZero(spaceWorld))

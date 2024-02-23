@@ -3,6 +3,7 @@ package io.github.addoncommunity.galactifun.base.items
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.api.rockets.RocketInfo
 import io.github.addoncommunity.galactifun.core.managers.RocketManager
+import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.util.floodSearch
 import io.github.addoncommunity.galactifun.util.items.TickingBlock
 import io.github.addoncommunity.galactifun.util.mergeMaps
@@ -84,7 +85,7 @@ class CommandComputer(
         addAll(Tag.DIRT.values)
         addAll(Tag.SAND.values)
         add(Material.GRAVEL)
-        addAll(Tag.CONCRETE_POWDER.values)
+        if (!pluginInstance.isTest) addAll(Tag.CONCRETE_POWDER.values) // idk why
         add(Material.AIR)
         add(Material.WATER)
         add(Material.LAVA)

@@ -1,13 +1,15 @@
-package io.github.addoncommunity.galactifun.serial
+package io.github.addoncommunity.test.serial
 
-import be.seeseemelk.mockbukkit.MockBukkit
+import io.github.addoncommunity.galactifun.serial.ListBlockStorageDataType
+import io.github.addoncommunity.galactifun.serial.MapBlockStorageDataType
+import io.github.addoncommunity.galactifun.serial.SetBlockStorageDataType
+import io.github.addoncommunity.test.CommonTest
 import io.github.seggan.kfun.serial.BlockStorageDataType
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
-import org.junit.jupiter.api.BeforeAll
 import kotlin.test.Test
 
-class SerialTest {
+class SerialTest : CommonTest() {
 
     @Test
     fun testList() {
@@ -34,13 +36,5 @@ class SerialTest {
         val serialized = serializer.serialize(set)
         val deserialized = serializer.deserialize(serialized)
         deserialized.shouldNotBeNull() shouldBeEqual set
-    }
-
-    companion object {
-        @JvmStatic
-        @BeforeAll
-        fun setUp() {
-            MockBukkit.mock()
-        }
     }
 }
