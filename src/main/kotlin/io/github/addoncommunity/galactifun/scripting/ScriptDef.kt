@@ -1,8 +1,8 @@
 package io.github.addoncommunity.galactifun.scripting
 
+import io.github.addoncommunity.galactifun.Galactifun2
 import io.github.addoncommunity.galactifun.api.objects.MilkyWay
 import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
-import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.base.BaseUniverse
@@ -27,9 +27,6 @@ import kotlin.script.experimental.jvmhost.createJvmEvaluationConfigurationFromTe
     evaluationConfiguration = PlanetScriptEval::class
 )
 abstract class PlanetScript {
-    val eternalDay = DayCycle.ETERNAL_DAY
-    val eternalNight = DayCycle.ETERNAL_NIGHT
-
     val toRegister = mutableListOf<PlanetaryObject>()
 }
 
@@ -56,14 +53,14 @@ object PlanetScriptConfig : ScriptCompilationConfiguration({
     )
     compilerOptions.append("-Xadd-modules=ALL-MODULE-PATH")
     jvm {
-        dependenciesFromClassloader(classLoader = pluginInstance::class.java.classLoader, wholeClasspath = true)
+        dependenciesFromClassloader(classLoader = Galactifun2::class.java.classLoader, wholeClasspath = true)
         jvmTarget("17")
     }
 })
 
 object PlanetScriptEval : ScriptEvaluationConfiguration({
     jvm {
-        baseClassLoader(pluginInstance::class.java.classLoader)
+        baseClassLoader(Galactifun2::class.java.classLoader)
     }
 })
 
