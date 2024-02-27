@@ -135,17 +135,14 @@ data class Orbit(
                 targetTime += timeDelta
                 target = targetOrbit.position(targetTime)
             }
-            println(minDiff)
         } while (iterations++ != MAX_ITERATIONS && minDiff.radians > 1e-3)
 
-        println("Iterations: $iterations")
         if (iterations == MAX_ITERATIONS + 1) {
             pluginInstance.logger.warning("Failed to find a transfer orbit after $iterations iterations")
         }
 
         return when (val transfer = transfers.minBy { it.key }.value) {
             is Either.Left -> {
-                println("Transfer orbit: ${transfer.value}")
                 val transferOrbit = transfer.value
                 val transferVel = transferOrbit.velocity(targetTime)
                 val targetVel = targetOrbit.velocity(targetTime)
@@ -159,10 +156,7 @@ data class Orbit(
                 burn1 + burn2
             }
 
-            is Either.Right -> {
-                println("Brachistochrone transfer: ${transfer.value}")
-                transfer.value.deltaV
-            }
+            is Either.Right -> transfer.value.deltaV
         }
     }
 

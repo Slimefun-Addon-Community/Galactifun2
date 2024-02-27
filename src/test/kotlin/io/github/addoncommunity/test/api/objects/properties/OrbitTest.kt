@@ -3,7 +3,6 @@ package io.github.addoncommunity.test.api.objects.properties
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.api.objects.properties.visVivaEquation
 import io.github.addoncommunity.galactifun.base.BaseUniverse
-import io.github.addoncommunity.galactifun.core.managers.PlanetManager
 import io.github.addoncommunity.galactifun.units.Angle
 import io.github.addoncommunity.galactifun.units.Angle.Companion.degrees
 import io.github.addoncommunity.galactifun.units.Angle.Companion.radians
@@ -36,10 +35,6 @@ class OrbitTest : CommonTest() {
     @Test
     fun testPeriod() {
         orbit.period.toDouble(DurationUnit.DAYS) shouldBeRoughly 365.26
-        println(BaseUniverse.earth.orbit.arbitraryTransfer(
-            PlanetManager.getByName("mars")!!.orbit,
-            Instant.parse("2020-03-15T00:00:00Z")
-        ))
     }
 
     @Test
