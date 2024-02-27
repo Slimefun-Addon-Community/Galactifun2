@@ -11,7 +11,6 @@ import io.github.addoncommunity.galactifun.core.Permissions
 import io.github.addoncommunity.galactifun.core.space.SpaceGenerator
 import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.runOnNextTick
-import io.github.addoncommunity.galactifun.test.MarkerMock
 import io.github.addoncommunity.galactifun.util.getNearbyEntitiesByType
 import io.github.addoncommunity.galactifun.util.key
 import io.github.addoncommunity.galactifun.util.spawn
@@ -68,14 +67,10 @@ object PlanetManager : Listener {
         Atmosphere.NONE.applyEffects(spaceWorld)
         spaceWorld.setGameRule(GameRule.DO_MOB_SPAWNING, false)
 
-        spaceWorldMarker = if (pluginInstance.isTest) {
-            MarkerMock()
-        } else {
-            spaceWorld.getNearbyEntitiesByType<Marker>(
-                Constants.locationZero(spaceWorld),
-                0.1
-            ).firstOrNull() ?: spaceWorld.spawn<Marker>(Constants.locationZero(spaceWorld))
-        }
+        spaceWorldMarker = spaceWorld.getNearbyEntitiesByType<Marker>(
+            Constants.locationZero(spaceWorld),
+            0.1
+        ).firstOrNull() ?: spaceWorld.spawn<Marker>(Constants.locationZero(spaceWorld))
 
         orbits = spaceWorldMarker.persistentDataContainer.getOrDefault(orbitsKey, orbitsPdt, mutableMapOf())
 

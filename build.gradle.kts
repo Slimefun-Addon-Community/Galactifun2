@@ -44,8 +44,7 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation("io.kotest:kotest-assertions-core:5.8.0")
-    // Need MockBukkit for unimplemented entities
-    compileOnlyAndTest("com.github.seeseemelk:MockBukkit-v1.20:3.74.0")
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.78.0")
 }
 
 group = "io.github.addoncommunity.galactifun"
