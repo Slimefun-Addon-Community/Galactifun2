@@ -17,6 +17,7 @@ import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.sqrt
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
 data class Orbit(
@@ -83,14 +84,14 @@ data class Orbit(
 
     fun position(time: Instant): PolarVector = PolarVector(radius(time), trueAnomaly(time))
 
-    private val deltaTimeForVelocity: Duration by lazy { period / 1e6 }
+    private val dt: Duration by lazy { period / 1e6 }
 
     fun velocity(time: Instant): CartesianVector {
         // Do a tiny bit of calculus to find the velocity vector
-        val deltaTime = time + deltaTimeForVelocity
+        val deltaTime = time + dt
         val pos1 = position(time)
         val pos2 = position(deltaTime)
-        return (pos2.cartesian - pos1.cartesian) / deltaTimeForVelocity.doubleSeconds
+        return (pos2.cartesian - pos1.cartesian) / dt.doubleSeconds
     }
 
     fun timeOfFlight(meanAnomalyA: Angle, meanAnomalyB: Angle): Duration {
@@ -114,25 +115,26 @@ data class Orbit(
         val parking = position(time)
         var targetTime = time
         var target = targetOrbit.position(targetTime)
-        var transfer: Either<Orbit, BrachistochroneTransfer>
+        val transfers = mutableMapOf<Angle, Either<Orbit, BrachistochroneTransfer>>()
 
         var iterations = 0
         do {
             val intersectLongitude = target.angle + targetOrbit.longitudeOfPeriapsis
             val transfer1 = computeTransfer(parking, target, targetTime, intersectLongitude)
-            val transfer2 = computeTransfer(parking, target, targetTime, intersectLongitude)
+            val transfer2 = computeTransfer(parking, target, targetTime + 1.days, intersectLongitude)
             val diff1 = getAnomalyDifference(transfer1, time, targetOrbit, intersectLongitude)
             val diff2 = getAnomalyDifference(transfer2, time, targetOrbit, intersectLongitude)
+            val minDiff = minOf(diff1, diff2).standardForm
+            val timeDelta = 1.days * minDiff.radians
             if (diff1 < diff2) {
-                transfer = transfer1.method
-                targetTime = time + transfer1.tof
+                transfers[diff1] = transfer1.method
+                targetTime -= timeDelta
                 target = targetOrbit.position(targetTime)
             } else {
-                transfer = transfer2.method
-                targetTime = time + transfer2.tof
+                transfers[diff2] = transfer2.method
+                targetTime += timeDelta
                 target = targetOrbit.position(targetTime)
             }
-            val minDiff = minOf(diff1, diff2).standardForm
             println(minDiff)
         } while (iterations++ != MAX_ITERATIONS && minDiff.radians > 1e-3)
 
@@ -141,7 +143,7 @@ data class Orbit(
             pluginInstance.logger.warning("Failed to find a transfer orbit after $iterations iterations")
         }
 
-        return when (transfer) {
+        return when (val transfer = transfers.minBy { it.key }.value) {
             is Either.Left -> {
                 println("Transfer orbit: ${transfer.value}")
                 val transferOrbit = transfer.value
@@ -229,7 +231,7 @@ private fun oneTangentTransferOrbit(
 
 private fun brachistochroneTransfer(
     distance: Distance,
-    acceleration: Double = Constants.EARTH_GRAVITY
+    acceleration: Double = Constants.EARTH_GRAVITY / 16
 ): BrachistochroneTransfer {
     val time = 2 * sqrt(distance.meters / acceleration)
     return BrachistochroneTransfer(acceleration * time, time.seconds)

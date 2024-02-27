@@ -38,7 +38,7 @@ class OrbitTest : CommonTest() {
         orbit.period.toDouble(DurationUnit.DAYS) shouldBeRoughly 365.26
         println(BaseUniverse.earth.orbit.arbitraryTransfer(
             PlanetManager.getByName("mars")!!.orbit,
-            Instant.parse("2022-04-13T00:00:00Z")
+            Instant.parse("2020-03-15T00:00:00Z")
         ))
     }
 
