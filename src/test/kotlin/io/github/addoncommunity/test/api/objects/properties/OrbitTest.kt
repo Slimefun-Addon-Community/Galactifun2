@@ -3,8 +3,10 @@ package io.github.addoncommunity.test.api.objects.properties
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.api.objects.properties.visVivaEquation
 import io.github.addoncommunity.galactifun.base.BaseUniverse
+import io.github.addoncommunity.galactifun.core.managers.PlanetManager
 import io.github.addoncommunity.galactifun.units.Angle
 import io.github.addoncommunity.galactifun.units.Angle.Companion.degrees
+import io.github.addoncommunity.galactifun.units.Angle.Companion.radians
 import io.github.addoncommunity.galactifun.units.Distance.Companion.au
 import io.github.addoncommunity.test.CommonTest
 import io.kotest.matchers.doubles.percent
@@ -25,8 +27,8 @@ class OrbitTest : CommonTest() {
             parent = BaseUniverse.sun,
             semimajorAxis = 1.0.au,
             eccentricity = Orbit.TINY_ECCENTRICITY,
-            argumentOfPeriapsis = 0.0.degrees,
-            timeOfPeriapsis = Instant.parse("1970-01-01T12:00:00Z")
+            longitudeOfPeriapsis = 0.0.degrees,
+            timeOfPeriapsis = EPOCH
         )
         Orbit.TIME_SCALE = 1.0
     }
@@ -34,6 +36,10 @@ class OrbitTest : CommonTest() {
     @Test
     fun testPeriod() {
         orbit.period.toDouble(DurationUnit.DAYS) shouldBeRoughly 365.26
+        println(BaseUniverse.earth.orbit.arbitraryTransfer(
+            PlanetManager.getByName("mars")!!.orbit,
+            Instant.parse("2022-04-13T00:00:00Z")
+        ))
     }
 
     @Test
@@ -60,6 +66,18 @@ class OrbitTest : CommonTest() {
         testVelocityAt(orbit.timeOfPeriapsis + orbit.period / 2, 270.0.degrees)
         testVelocityAt(orbit.timeOfPeriapsis + orbit.period / 4, 180.0.degrees)
     }
+
+    @Test
+    fun testTimeOfFlight() {
+        val time = orbit.timeOfPeriapsis
+        val timeOfFlight = orbit.timeOfFlight(
+            0.0.radians,
+            orbit.meanAnomaly(time + orbit.period / 4)
+        )
+        timeOfFlight.inWholeDays shouldBe 91
+    }
 }
 
-infix fun Double.shouldBeRoughly(expected: Double) = this shouldBe expected.plusOrMinus(1.percent)
+infix fun Double.shouldBeRoughly(expected: Double) = this shouldBe expected.plusOrMinus(0.1.percent)
+
+val EPOCH = Instant.parse("1970-01-01T00:00:00Z")

@@ -110,6 +110,10 @@ object PlanetManager : Listener {
         return planetaryWorlds[world]
     }
 
+    fun getByName(name: String): PlanetaryObject? {
+        return planets.firstOrNull { it.name.equals(name, ignoreCase = true) }
+    }
+
     //<editor-fold desc="Orbit barrier handlers" defaultstate="collapsed">
     @EventHandler
     private fun onEntityMoveInSpace(e: EntityMoveEvent) {

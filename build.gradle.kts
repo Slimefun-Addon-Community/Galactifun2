@@ -26,7 +26,7 @@ fun DependencyHandlerScope.compileOnlyAndTest(dependency: Any) {
 dependencies {
     library(kotlin("stdlib"))
     libraryAndTest("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC2")
-    libraryAndTest("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0") // For some reason libraryloader doesn't like this
 
     libraryAndTest(kotlin("scripting-common"))
     libraryAndTest(kotlin("scripting-jvm"))
@@ -74,9 +74,13 @@ tasks.shadowJar {
     relocate("co.aikar.commands", "io.github.addoncommunity.galactifun.acf")
     relocate("co.aikar.locales", "io.github.addoncommunity.galactifun.acf.locales")
     relocate("com.jeff_media.morepersistentdatatypes", "io.github.addoncommunity.galactifun.pdts")
+    relocate("org.jetbrains.kotlinx", "io.github.addoncommunity.galactifun.kotlinx")
 
     dependencies {
         exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk7"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-common"))
     }
 }
 

@@ -22,7 +22,7 @@ class Earth : PlanetaryWorld("Earth", ItemStack(Material.GRASS_BLOCK)) {
         parent = BaseUniverse.sun,
         semimajorAxis = 1.0.au,
         eccentricity = 0.0167,
-        argumentOfPeriapsis = 288.1.degrees,
+        longitudeOfPeriapsis = 288.1.degrees,
         timeOfPeriapsis = Instant.parse("2024-01-01T00:00:00Z")
     )
     override val mass = 5.972e24.kilograms

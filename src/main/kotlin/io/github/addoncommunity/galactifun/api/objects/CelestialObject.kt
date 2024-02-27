@@ -27,13 +27,13 @@ sealed class CelestialObject(name: String, baseItem: ItemStack) {
     abstract val radius: Distance
 
     val gravitationalParameter by LazyDouble { Constants.GRAVITATIONAL_CONSTANT * mass.kilograms }
-    val escapeVelocity by LazyDouble { sqrt(2 * Constants.GRAVITATIONAL_CONSTANT * mass.kilograms / radius.kilometers) }
+    val escapeVelocity by LazyDouble { sqrt(2 * Constants.GRAVITATIONAL_CONSTANT * mass.kilograms / radius.meters) }
     val parkingOrbit: Orbit by lazy {
         Orbit(
             parent = this,
             semimajorAxis = radius * 1.1,
-            eccentricity = 0.0,
-            argumentOfPeriapsis = 0.0.degrees,
+            eccentricity = Orbit.TINY_ECCENTRICITY,
+            longitudeOfPeriapsis = 0.0.degrees,
             timeOfPeriapsis = Instant.fromEpochMilliseconds(0)
         )
     }

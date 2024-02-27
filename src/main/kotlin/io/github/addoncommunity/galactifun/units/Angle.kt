@@ -1,5 +1,6 @@
 package io.github.addoncommunity.galactifun.units
 
+import io.github.addoncommunity.galactifun.units.Angle.Companion.radians
 import kotlin.math.*
 
 @JvmInline
@@ -48,6 +49,13 @@ value class Angle private constructor(val radians: Double) : Comparable<Angle> {
     operator fun unaryPlus() = this
 
     override fun compareTo(other: Angle): Int = radians.compareTo(other.radians)
+
+    override fun toString(): String {
+        val degrees = standardForm.degrees
+        val minutes = (degrees % 1) * 60
+        val seconds = (minutes % 1) * 60
+        return "${degrees.toInt()}° ${minutes.toInt()}' ${seconds.toInt()}\""
+    }
 }
 
 fun sin(angle: Angle): Double = sin(angle.radians)
@@ -56,3 +64,5 @@ fun tan(angle: Angle): Double = tan(angle.radians)
 fun sinh(angle: Angle): Double = sinh(angle.radians)
 fun cosh(angle: Angle): Double = cosh(angle.radians)
 fun tanh(angle: Angle): Double = tanh(angle.radians)
+
+fun abs(angle: Angle): Angle = abs(angle.radians).radians
