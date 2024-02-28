@@ -3,11 +3,7 @@ plugins {
 }
 
 group = "io.github.seggan"
-version = "0.1-SNAPSHOT"
-
-dependencies {
-    implementation(kotlin("stdlib"))
-}
+version = "unspecified"
 
 kotlin {
     jvmToolchain(17)
