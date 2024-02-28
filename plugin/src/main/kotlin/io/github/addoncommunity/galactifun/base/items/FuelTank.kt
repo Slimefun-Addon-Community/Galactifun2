@@ -20,11 +20,11 @@ import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 
 class FuelTank(
-    private val capacity: Double,
     itemGroup: ItemGroup,
     item: SlimefunItemStack,
     recipeType: RecipeType,
-    recipe: Array<out ItemStack?>
+    recipe: Array<out ItemStack?>,
+    private val capacity: Double
 ) : TickingBlock(itemGroup, item, recipeType, recipe) {
 
     private companion object {

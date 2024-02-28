@@ -4,7 +4,6 @@ import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.base.items.CommandComputer
 import io.github.addoncommunity.galactifun.base.items.FuelTank
 import io.github.addoncommunity.galactifun.pluginInstance
-import io.github.addoncommunity.galactifun.util.curry
 import io.github.addoncommunity.galactifun.util.items.MaterialType
 import io.github.addoncommunity.galactifun.util.items.buildSlimefunItem
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType
@@ -12,7 +11,7 @@ import org.bukkit.Material
 
 object GalactifunItems {
 
-    val COMMAND_COMPUTER = buildSlimefunItem(::CommandComputer) {
+    val COMMAND_COMPUTER = buildSlimefunItem<CommandComputer> {
         category = GalactifunCategories.ROCKET_COMPONENTS
         id = "COMMAND_COMPUTER"
         name = "&fCommand Computer"
@@ -21,7 +20,7 @@ object GalactifunItems {
         recipe = emptyArray()
     }
 
-    val FUEL_TANK_I = buildSlimefunItem(::FuelTank.curry(1000.0)) {
+    val FUEL_TANK_I = buildSlimefunItem<FuelTank>(1000.0) {
         category = GalactifunCategories.ROCKET_COMPONENTS
         id = "FUEL_TANK_I"
         name = "&fFuel Tank I"
