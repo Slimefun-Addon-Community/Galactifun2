@@ -3,6 +3,8 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("net.minecrell.plugin-yml.bukkit") version "0.5.3"
     id("xyz.jpenilla.run-paper") version "2.2.0"
+
+    id("com.google.devtools.ksp") version "1.9.22-1.0.17"
 }
 
 repositories {
@@ -40,6 +42,9 @@ dependencies {
     implementation("com.jeff_media:MorePersistentDataTypes:2.4.0")
 
     implementation("com.github.Seggan:kfun:0.1.0")
+
+    implementation(project(":uom"))
+    ksp(project(":uom-processor"))
 
     testImplementation(kotlin("test"))
     testImplementation("io.kotest:kotest-assertions-core:5.8.0")
