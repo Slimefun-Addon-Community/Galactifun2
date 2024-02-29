@@ -13,13 +13,13 @@ import io.github.seggan.uom.MultipliesTo
 import kotlin.time.Duration
 
 @Measure(base = "meters")
-@AlternateUnit(name = "lightYears", ratio = Constants.KM_PER_LY * 1000)
-@AlternateUnit(name = "kilometers", ratio = 1000.0)
-@AlternateUnit(name = "au", ratio = Constants.KM_PER_AU * 1000)
+@AlternateUnit(unit = "lightYears", ratio = Constants.KM_PER_LY * 1000)
+@AlternateUnit(unit = "kilometers", ratio = 1000.0)
+@AlternateUnit(unit = "au", ratio = Constants.KM_PER_AU * 1000)
 private class ADistance
 
 @Measure(base = "kilograms")
-@AlternateUnit(name = "pounds", ratio = 2.20462)
+@AlternateUnit(unit = "pounds", ratio = 2.20462)
 private class AMass
 
 @Measure(base = "metersPerSecond")
@@ -34,5 +34,7 @@ operator fun Velocity.div(time: Duration): Acceleration = (metersPerSecond / tim
 operator fun Acceleration.times(time: Duration): Velocity = (metersPerSecondSquared * time.doubleSeconds).metersPerSecond
 
 @Measure(base = "newtons")
+@AlternateUnit(unit = "kilonewtons", ratio = 1000.0)
+@AlternateUnit(unit = "meganewtons", ratio = 1_000_000.0)
 @DividesTo(other = AAcceleration::class, quotient = AMass::class)
 private class AForce

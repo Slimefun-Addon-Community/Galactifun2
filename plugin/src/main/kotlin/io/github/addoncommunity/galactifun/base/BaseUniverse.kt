@@ -14,9 +14,9 @@ object BaseUniverse {
     val sun = Star(
         name = "Sun",
         mass = 1.989e30.kilograms,
-        radius = 695700.0.kilometers,
+        radius = 695700.kilometers,
         // The sun is at the center of the universe, yay!
-        position = SphericalVector(0.0.radians, 0.0.radians, 0.0.meters)
+        position = SphericalVector(0.radians, 0.radians, 0.meters)
     )
 
     val earth = Earth()

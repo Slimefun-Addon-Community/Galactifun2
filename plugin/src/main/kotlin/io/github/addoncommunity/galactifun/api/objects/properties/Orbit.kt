@@ -6,6 +6,7 @@ import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.units.*
 import io.github.addoncommunity.galactifun.units.Angle.Companion.radians
 import io.github.addoncommunity.galactifun.units.Distance.Companion.meters
+import io.github.addoncommunity.galactifun.units.Velocity.Companion.metersPerSecond
 import io.github.addoncommunity.galactifun.units.coordiantes.CartesianVector
 import io.github.addoncommunity.galactifun.units.coordiantes.PolarVector
 import io.github.addoncommunity.galactifun.util.Either
@@ -13,7 +14,6 @@ import io.github.addoncommunity.galactifun.util.LazyDouble
 import kotlinx.datetime.Instant
 import java.util.*
 import kotlin.math.PI
-import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.sqrt
 import kotlin.time.Duration
@@ -98,18 +98,23 @@ data class Orbit(
         return ((meanAnomalyB - meanAnomalyA).radians / meanMotion).seconds
     }
 
-    fun hohmannTransfer(target: Orbit, time: Instant): Double {
+    fun hohmannTransfer(target: Orbit, time: Instant): Velocity {
         val parkingR = radius(time)
         val targetR = target.radius(time)
         val transferA = (parkingR + targetR) / 2.0
         val mu = parent.gravitationalParameter
-        val firstManeuver = abs(visVivaEquation(mu, parkingR, transferA) - visVivaEquation(mu, parkingR, semimajorAxis))
-        val secondManeuver =
-            abs(visVivaEquation(mu, targetR, target.semimajorAxis) - visVivaEquation(mu, targetR, transferA))
+        val firstManeuver = abs(
+            visVivaEquation(mu, parkingR, transferA)
+                    - visVivaEquation(mu, parkingR, semimajorAxis)
+        )
+        val secondManeuver = abs(
+            visVivaEquation(mu, targetR, target.semimajorAxis) -
+                    visVivaEquation(mu, targetR, transferA)
+        )
         return firstManeuver + secondManeuver
     }
 
-    fun arbitraryTransfer(targetOrbit: Orbit, time: Instant): Double {
+    fun arbitraryTransfer(targetOrbit: Orbit, time: Instant): Velocity {
         require(parent == targetOrbit.parent) { "Both orbits must have the same parent" }
 
         val parking = position(time)
@@ -146,7 +151,7 @@ data class Orbit(
                 val transferOrbit = transfer.value
                 val transferVel = transferOrbit.velocity(targetTime)
                 val targetVel = targetOrbit.velocity(targetTime)
-                val burn2 = transferVel.distanceTo(targetVel).meters
+                val burn2 = transferVel.distanceTo(targetVel).meters.metersPerSecond
 
                 val burn1 = abs(
                     visVivaEquation(parent.gravitationalParameter, parking.radius, transferOrbit.semimajorAxis) -
@@ -177,7 +182,7 @@ data class Orbit(
             )
             val intersectTrueAnomaly = intersectLongitude - transferOrbit.longitudeOfPeriapsis
             val mean = meanAnomalyFromTrueAnomaly(transferOrbit.eccentricity, intersectTrueAnomaly)
-            return Transfer(Either.Left(transferOrbit), transferOrbit.timeOfFlight(0.0.radians, mean))
+            return Transfer(Either.Left(transferOrbit), transferOrbit.timeOfFlight(0.radians, mean))
         } else {
             val distance = parking.distanceTo(target)
             val transferBrachistochrone = brachistochroneTransfer(distance)
@@ -188,7 +193,12 @@ data class Orbit(
 
 private const val MAX_ITERATIONS = 512
 
-private fun getAnomalyDifference(transfer: Transfer, time: Instant, targetOrbit: Orbit, intersectLongitude: Angle): Angle {
+private fun getAnomalyDifference(
+    transfer: Transfer,
+    time: Instant,
+    targetOrbit: Orbit,
+    intersectLongitude: Angle
+): Angle {
     val targetTime = time + transfer.tof
     val target = targetOrbit.position(targetTime)
     return abs(target.angle + targetOrbit.longitudeOfPeriapsis - intersectLongitude).standardForm
@@ -199,8 +209,8 @@ private tailrec fun kelpersEquation(m: Angle, e: Double, guessE: Angle = m): Ang
     return if (abs(nextGuess - guessE).radians < 1e-6) nextGuess else kelpersEquation(m, e, nextGuess)
 }
 
-fun visVivaEquation(mu: Double, r: Distance, a: Distance): Double =
-    sqrt(mu * (2 / r.meters - 1 / a.meters))
+fun visVivaEquation(mu: Double, r: Distance, a: Distance): Velocity =
+    sqrt(mu * (2 / r.meters - 1 / a.meters)).metersPerSecond
 
 // https://math.stackexchange.com/a/407425/1291722
 // https://www.desmos.com/calculator/mdifr3y167
@@ -225,14 +235,14 @@ private fun oneTangentTransferOrbit(
 
 private fun brachistochroneTransfer(
     distance: Distance,
-    acceleration: Double = Constants.EARTH_GRAVITY / 16
+    acceleration: Acceleration = Constants.EARTH_GRAVITY / 16
 ): BrachistochroneTransfer {
-    val time = 2 * sqrt(distance.meters / acceleration)
-    return BrachistochroneTransfer(acceleration * time, time.seconds)
+    val time = 2.seconds * sqrt(distance.meters / acceleration.metersPerSecondSquared)
+    return BrachistochroneTransfer(acceleration * time, time)
 }
 
 private data class BrachistochroneTransfer(
-    val deltaV: Double,
+    val deltaV: Velocity,
     val time: Duration
 )
 

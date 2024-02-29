@@ -17,7 +17,7 @@ class Star(
 
     override fun distanceTo(other: CelestialObject, time: Instant): Distance {
         return when (other) {
-            this -> 0.0.meters
+            this -> 0.meters
             is Star -> position.distanceTo(other.position)
             else -> other.distanceTo(this, time)
         }

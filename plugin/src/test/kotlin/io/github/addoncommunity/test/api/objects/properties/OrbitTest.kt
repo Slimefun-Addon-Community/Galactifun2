@@ -25,9 +25,9 @@ class OrbitTest : CommonTest() {
     fun setUpOrbit() {
         orbit = Orbit(
             parent = BaseUniverse.sun,
-            semimajorAxis = 1.0.au,
+            semimajorAxis = 1.au,
             eccentricity = Orbit.TINY_ECCENTRICITY,
-            longitudeOfPeriapsis = 0.0.degrees,
+            longitudeOfPeriapsis = 0.degrees,
             timeOfPeriapsis = EPOCH
         )
         Orbit.TIME_SCALE = 1.0
@@ -53,21 +53,21 @@ class OrbitTest : CommonTest() {
                 orbit.parent.gravitationalParameter,
                 orbit.radius(orbit.timeOfPeriapsis),
                 orbit.semimajorAxis
-            )
+            ).metersPerSecond
             vel.polar.angle.standardForm.degrees shouldBeRoughly expectedAngle.degrees
         }
 
-        testVelocityAt(orbit.timeOfPeriapsis, 90.0.degrees)
-        testVelocityAt(orbit.timeOfPeriapsis + orbit.period, 90.0.degrees)
-        testVelocityAt(orbit.timeOfPeriapsis + orbit.period / 2, 270.0.degrees)
-        testVelocityAt(orbit.timeOfPeriapsis + orbit.period / 4, 180.0.degrees)
+        testVelocityAt(orbit.timeOfPeriapsis, 90.degrees)
+        testVelocityAt(orbit.timeOfPeriapsis + orbit.period, 90.degrees)
+        testVelocityAt(orbit.timeOfPeriapsis + orbit.period / 2, 270.degrees)
+        testVelocityAt(orbit.timeOfPeriapsis + orbit.period / 4, 180.degrees)
     }
 
     @Test
     fun testTimeOfFlight() {
         val time = orbit.timeOfPeriapsis
         val timeOfFlight = orbit.timeOfFlight(
-            0.0.radians,
+            0.radians,
             orbit.meanAnomaly(time + orbit.period / 4)
         )
         timeOfFlight.inWholeDays shouldBe 91

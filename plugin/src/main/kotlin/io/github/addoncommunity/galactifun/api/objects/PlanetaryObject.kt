@@ -8,12 +8,14 @@ import io.github.addoncommunity.galactifun.api.objects.properties.visVivaEquatio
 import io.github.addoncommunity.galactifun.core.managers.PlanetManager
 import io.github.addoncommunity.galactifun.units.Distance
 import io.github.addoncommunity.galactifun.units.Distance.Companion.meters
+import io.github.addoncommunity.galactifun.units.Velocity
+import io.github.addoncommunity.galactifun.units.Velocity.Companion.metersPerSecond
+import io.github.addoncommunity.galactifun.units.abs
 import io.github.addoncommunity.galactifun.units.cos
 import io.github.seggan.kfun.location.plus
 import kotlinx.datetime.Instant
 import org.bukkit.Location
 import org.bukkit.inventory.ItemStack
-import kotlin.math.abs
 import kotlin.math.sqrt
 
 abstract class PlanetaryObject(name: String, baseItem: ItemStack) : CelestialObject(name, baseItem) {
@@ -35,7 +37,7 @@ abstract class PlanetaryObject(name: String, baseItem: ItemStack) : CelestialObj
     }
 
     override fun distanceTo(other: CelestialObject, time: Instant): Distance {
-        if (other == this) return 0.0.meters
+        if (other == this) return 0.meters
         if (other is Star) {
             if (star == other) {
                 var dist = orbit.radius(time)
@@ -62,8 +64,8 @@ abstract class PlanetaryObject(name: String, baseItem: ItemStack) : CelestialObj
         }
     }
 
-    fun getDeltaVForTransferTo(other: PlanetaryObject, time: Instant): Double {
-        if (this == other) return 0.0
+    fun getDeltaVForTransferTo(other: PlanetaryObject, time: Instant): Velocity {
+        if (this == other) return 0.metersPerSecond
         val thisParents = generateSequence(this as CelestialObject) {
             if (it is PlanetaryObject) it.orbit.parent else null
         }.toList()
@@ -75,7 +77,7 @@ abstract class PlanetaryObject(name: String, baseItem: ItemStack) : CelestialObj
         }.toList()
         if (this in otherParents) {
             var height = other.parkingOrbit
-            var dV = 0.0
+            var dV = 0.metersPerSecond
             for (obj in otherParents) {
                 if (obj == this) break
                 dV += abs(
@@ -90,7 +92,8 @@ abstract class PlanetaryObject(name: String, baseItem: ItemStack) : CelestialObj
             dV += height.hohmannTransfer(parkingOrbit, time)
             return dV
         } else {
-            val commonParent = thisParents.firstOrNull { it in otherParents } ?: return Double.POSITIVE_INFINITY
+            val commonParent = thisParents.firstOrNull { it in otherParents }
+                ?: return Double.POSITIVE_INFINITY.metersPerSecond
             val thisSibling = thisParents[thisParents.indexOf(commonParent) - 1] as PlanetaryObject
             val otherSibling = otherParents[otherParents.indexOf(commonParent) - 1] as PlanetaryObject
             val thisDeltaV = abs(

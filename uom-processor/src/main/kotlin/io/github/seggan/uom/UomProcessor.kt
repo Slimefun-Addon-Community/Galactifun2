@@ -261,12 +261,15 @@ private fun TypeSpec.Builder.addScalarOperator(
     baseUnit: String,
     className: ClassName
 ): TypeSpec.Builder {
-    val operatorFun = FunSpec.builder(operator)
-        .addModifiers(KModifier.OPERATOR)
-        .addParameter("scalar", Double::class)
-        .returns(className)
-        .addStatement("return %T(%L %L scalar)", className, baseUnit, symbol)
-    return addFunction(operatorFun.build())
+    for (type in listOf(Double::class, Int::class)) {
+        val operatorFun = FunSpec.builder(operator)
+            .addModifiers(KModifier.OPERATOR)
+            .addParameter("scalar", type)
+            .returns(className)
+            .addStatement("return %T(%L %L scalar)", className, baseUnit, symbol)
+        addFunction(operatorFun.build())
+    }
+    return this
 }
 
 fun KSDeclaration.getBaseUnit(): String? {

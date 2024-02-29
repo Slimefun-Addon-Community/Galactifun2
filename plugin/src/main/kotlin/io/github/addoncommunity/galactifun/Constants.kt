@@ -1,5 +1,6 @@
 package io.github.addoncommunity.galactifun
 
+import io.github.addoncommunity.galactifun.units.Acceleration.Companion.metersPerSecondSquared
 import org.bukkit.Location
 import org.bukkit.World
 
@@ -10,7 +11,7 @@ object Constants {
     const val KM_PER_AU =  1.495978707e8
 
     const val GRAVITATIONAL_CONSTANT = 6.674e-11
-    const val EARTH_GRAVITY = 9.81
+    val EARTH_GRAVITY = 9.81.metersPerSecondSquared
 
     /**
      * The maximum radix for the [Int.toString] and [String.toInt] functions.

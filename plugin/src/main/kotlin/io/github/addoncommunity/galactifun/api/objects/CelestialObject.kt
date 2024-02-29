@@ -5,6 +5,7 @@ import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.units.Angle.Companion.degrees
 import io.github.addoncommunity.galactifun.units.Distance
 import io.github.addoncommunity.galactifun.units.Mass
+import io.github.addoncommunity.galactifun.units.Velocity.Companion.metersPerSecond
 import io.github.addoncommunity.galactifun.util.LazyDouble
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack
 import io.github.thebusybiscuit.slimefun4.utils.ChatUtils
@@ -22,18 +23,17 @@ sealed class CelestialObject(name: String, baseItem: ItemStack) {
     abstract fun distanceTo(other: CelestialObject, time: Instant): Distance
 
 
-
     abstract val mass: Mass
     abstract val radius: Distance
 
     val gravitationalParameter by LazyDouble { Constants.GRAVITATIONAL_CONSTANT * mass.kilograms }
-    val escapeVelocity by LazyDouble { sqrt(2 * Constants.GRAVITATIONAL_CONSTANT * mass.kilograms / radius.meters) }
+    val escapeVelocity by lazy { sqrt(2 * Constants.GRAVITATIONAL_CONSTANT * mass.kilograms / radius.meters).metersPerSecond }
     val parkingOrbit: Orbit by lazy {
         Orbit(
             parent = this,
             semimajorAxis = radius * 1.1,
             eccentricity = Orbit.TINY_ECCENTRICITY,
-            longitudeOfPeriapsis = 0.0.degrees,
+            longitudeOfPeriapsis = 0.degrees,
             timeOfPeriapsis = Instant.fromEpochMilliseconds(0)
         )
     }

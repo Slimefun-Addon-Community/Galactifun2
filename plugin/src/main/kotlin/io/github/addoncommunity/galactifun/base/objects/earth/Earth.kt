@@ -20,13 +20,13 @@ class Earth : PlanetaryWorld("Earth", ItemStack(Material.GRASS_BLOCK)) {
 
     override val orbit = Orbit(
         parent = BaseUniverse.sun,
-        semimajorAxis = 1.0.au,
+        semimajorAxis = 1.au,
         eccentricity = 0.0167,
         longitudeOfPeriapsis = 288.1.degrees,
         timeOfPeriapsis = Instant.parse("2024-01-01T00:00:00Z")
     )
     override val mass = 5.972e24.kilograms
-    override val radius = 6371.0.kilometers
+    override val radius = 6371.kilometers
     override val dayCycle = DayCycle.EARTH_LIKE
     override val atmosphere = Atmosphere.EARTH_LIKE
 
