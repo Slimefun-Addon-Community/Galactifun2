@@ -27,14 +27,16 @@ class UomProcessor(
     @Suppress("DuplicatedCode")
     inner class Visitor : KSVisitorVoid() {
         override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
-            val measureAnnotation = classDeclaration.annotations.find { it.shortName.asString() == "Measure" } ?: return
-            val baseUnit = measureAnnotation.getArgument("base") as? String ?: error("Base unit is required")
             var measure = classDeclaration.simpleName.asString()
             if (!measure.startsWith("A")) {
                 logger.error("Measure names must start with 'A'", classDeclaration)
                 return
             }
             measure = measure.substring(1)
+            val baseUnit = classDeclaration.getBaseUnit() ?: run {
+                logger.error("Base unit is required", classDeclaration)
+                return
+            }
             val pkg = classDeclaration.packageName.asString()
 
             val clazzName = ClassName(pkg, measure)
@@ -94,12 +96,8 @@ class UomProcessor(
 
             val unitAnnotations = classDeclaration.annotations.filter { it.shortName.asString() == "AlternateUnit" }
             for (unitAnnotation in unitAnnotations) {
-                val unit = unitAnnotation.getArgument("name") as? String
-                val ratio = unitAnnotation.getArgument("ratio") as? Double
-                if (unit == null || ratio == null) {
-                    logger.error("Name and ratio are required", classDeclaration)
-                    return
-                }
+                val unit = unitAnnotation.arguments[0].value as String
+                val ratio = unitAnnotation.arguments[1].value as Double
                 clazz.addProperty(
                     PropertySpec.builder(unit, Double::class)
                         .getter(
@@ -112,22 +110,31 @@ class UomProcessor(
                 companion.addConversionFrom(clazzName, unit, ratio)
             }
 
+            clazz.addType(companion.build())
+
+            val file = FileSpec.builder(
+                pkg,
+                "Uom$measure"
+            )
+                .addImport("$clazzName.Companion", baseUnit)
+                .addType(clazz.build())
+                .addFunction(
+                    FunSpec.builder("abs")
+                        .returns(clazzName)
+                        .addParameter("value", clazzName)
+                        .addStatement("return kotlin.math.abs(value.%L).%L", baseUnit, baseUnit)
+                        .build()
+                )
+
             val extraImports = mutableListOf<Pair<String, String>>()
             val mulAnnotations = classDeclaration.annotations.filter { it.shortName.asString() == "MultipliesTo" }
             for (mulAnnotation in mulAnnotations) {
-                val multiplicand = mulAnnotation.getArgument("multiplicand") as? KSTypeReference
-                val product = mulAnnotation.getArgument("product") as? KSTypeReference
-                if (multiplicand == null || product == null) {
-                    logger.error("Multiplicand and product are required", classDeclaration)
-                    return
-                }
-                val multiplicandClass = multiplicand.resolve().declaration
-                val productClass = product.resolve().declaration
-                val multiplicandBaseUnit = multiplicandClass.annotations
-                    .find { it.shortName.asString() == "Measure" }
-                    ?.getArgument("base") as? String
-                val productBaseUnit = productClass.annotations.find { it.shortName.asString() == "Measure" }
-                    ?.getArgument("base") as? String
+                val multiplicand = mulAnnotation.arguments[0].value as KSType
+                val product = mulAnnotation.arguments[1].value as KSType
+                val multiplicandClass = multiplicand.declaration
+                val productClass = product.declaration
+                val multiplicandBaseUnit = multiplicandClass.getBaseUnit()
+                val productBaseUnit = productClass.getBaseUnit()
                 if (multiplicandBaseUnit == null || productBaseUnit == null) {
                     logger.error("Multiplicand and product must be measures", classDeclaration)
                     return
@@ -141,34 +148,37 @@ class UomProcessor(
                     productClass.packageName.asString(),
                     productClass.simpleName.asString().substring(1)
                 )
+                extraImports.add("$multiplicandType.Companion" to multiplicandBaseUnit)
                 extraImports.add("$productType.Companion" to productBaseUnit)
 
-                clazz.addFunction(
+                file.addFunction(
                     FunSpec.builder("times")
                         .addModifiers(KModifier.OPERATOR)
+                        .receiver(clazzName)
                         .addParameter("other", multiplicandType)
                         .returns(productType)
                         .addStatement("return (%L * other.%L).%L", baseUnit, multiplicandBaseUnit, productBaseUnit)
+                        .build()
+                )
+                file.addFunction(
+                    FunSpec.builder("times")
+                        .addModifiers(KModifier.OPERATOR)
+                        .receiver(multiplicandType)
+                        .addParameter("other", clazzName)
+                        .returns(productType)
+                        .addStatement("return (%L * other.%L).%L", multiplicandBaseUnit, baseUnit, productBaseUnit)
                         .build()
                 )
             }
 
             val divAnnotations = classDeclaration.annotations.filter { it.shortName.asString() == "DividesTo" }
             for (divAnnotation in divAnnotations) {
-                val divisor = divAnnotation.getArgument("divisor") as? KSTypeReference
-                val quotient = divAnnotation.getArgument("quotient") as? KSTypeReference
-                if (divisor == null || quotient == null) {
-                    logger.error("Divisor and quotient are required", classDeclaration)
-                    return
-                }
-                val divisorClass = divisor.resolve().declaration
-                val quotientClass = quotient.resolve().declaration
-                val divisorBaseUnit = divisorClass.annotations
-                    .find { it.shortName.asString() == "Measure" }
-                    ?.getArgument("base") as? String
-                val quotientBaseUnit = quotientClass.annotations.
-                find { it.shortName.asString() == "Measure" }
-                    ?.getArgument("base") as? String
+                val divisor = divAnnotation.arguments[0].value as KSType
+                val quotient = divAnnotation.arguments[1].value as KSType
+                val divisorClass = divisor.declaration
+                val quotientClass = quotient.declaration
+                val divisorBaseUnit = divisorClass.getBaseUnit()
+                val quotientBaseUnit = quotientClass.getBaseUnit()
                 if (divisorBaseUnit == null || quotientBaseUnit == null) {
                     logger.error("Divisor and quotient must be measures", classDeclaration)
                     return
@@ -182,37 +192,33 @@ class UomProcessor(
                     quotientClass.packageName.asString(),
                     quotientClass.simpleName.asString().substring(1)
                 )
-                extraImports.add("$quotientType.Companion" to divisorBaseUnit)
+                extraImports.add("$divisorType.Companion" to divisorBaseUnit)
+                extraImports.add("$quotientType.Companion" to quotientBaseUnit)
 
-                clazz.addFunction(
+                file.addFunction(
                     FunSpec.builder("div")
                         .addModifiers(KModifier.OPERATOR)
+                        .receiver(clazzName)
                         .addParameter("other", divisorType)
                         .returns(quotientType)
                         .addStatement("return (%L / other.%L).%L", baseUnit, divisorBaseUnit, quotientBaseUnit)
                         .build()
                 )
-            }
-
-            clazz.addType(companion.build())
-
-            val fileSpec = FileSpec.builder(
-                pkg,
-                "Uom$measure"
-            )
-                .addType(clazz.build())
-                .addImport("$clazzName.Companion", baseUnit)
-                .addFunction(
-                    FunSpec.builder("abs")
-                        .returns(clazzName)
-                        .addParameter("value", clazzName)
-                        .addStatement("return kotlin.math.abs(value.%L).%L", baseUnit, baseUnit)
+                file.addFunction(
+                    FunSpec.builder("div")
+                        .addModifiers(KModifier.OPERATOR)
+                        .receiver(clazzName)
+                        .addParameter("other", quotientType)
+                        .returns(divisorType)
+                        .addStatement("return (%L / other.%L).%L", baseUnit, quotientBaseUnit, divisorBaseUnit)
                         .build()
                 )
-            for ((import, unit) in extraImports) {
-                fileSpec.addImport(import, unit)
             }
-            fileSpec.build().writeTo(generator, false)
+
+            for ((import, unit) in extraImports) {
+                file.addImport(import, unit)
+            }
+            file.build().writeTo(generator, false)
         }
     }
 }
@@ -263,6 +269,7 @@ private fun TypeSpec.Builder.addScalarOperator(
     return addFunction(operatorFun.build())
 }
 
-fun KSAnnotation.getArgument(name: String): Any? {
-    return arguments.find { it.name?.asString() == name }?.value
+fun KSDeclaration.getBaseUnit(): String? {
+    return annotations.find { it.shortName.asString() == "Measure" }
+        ?.arguments?.firstOrNull()?.value as? String
 }
