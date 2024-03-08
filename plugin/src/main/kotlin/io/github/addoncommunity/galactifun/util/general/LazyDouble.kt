@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.util
+package io.github.addoncommunity.galactifun.util.general
 
 import kotlin.reflect.KProperty
 

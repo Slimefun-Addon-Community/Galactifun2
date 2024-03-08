@@ -1,12 +1,12 @@
-package io.github.addoncommunity.galactifun.base.items
+package io.github.addoncommunity.galactifun.impl.items
 
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.api.rockets.RocketInfo
-import io.github.addoncommunity.galactifun.core.managers.RocketManager
-import io.github.addoncommunity.galactifun.pluginInstance
+import io.github.addoncommunity.galactifun.impl.managers.RocketManager
+import io.github.addoncommunity.galactifun.util.checkBlock
 import io.github.addoncommunity.galactifun.util.floodSearch
+import io.github.addoncommunity.galactifun.util.general.mergeMaps
 import io.github.addoncommunity.galactifun.util.items.TickingBlock
-import io.github.addoncommunity.galactifun.util.mergeMaps
 import io.github.addoncommunity.galactifun.util.plus
 import io.github.seggan.kfun.location.position
 import io.github.thebusybiscuit.slimefun4.api.events.PlayerRightClickEvent
@@ -14,15 +14,14 @@ import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType
+import io.github.thebusybiscuit.slimefun4.core.handlers.BlockPlaceHandler
 import io.github.thebusybiscuit.slimefun4.core.handlers.BlockUseHandler
 import io.github.thebusybiscuit.slimefun4.libraries.dough.blocks.BlockPosition
-import io.github.thebusybiscuit.slimefun4.utils.tags.SlimefunTag
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import me.mrCookieSlime.Slimefun.api.BlockStorage
 import net.kyori.adventure.text.format.NamedTextColor
-import org.bukkit.Material
-import org.bukkit.Tag
 import org.bukkit.block.Block
+import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.inventory.ItemStack
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
@@ -38,23 +37,29 @@ class CommandComputer(
 
     init {
         addItemHandler(BlockUseHandler(::onRightClick))
+        addItemHandler(object : BlockPlaceHandler(false) {
+            override fun onPlayerPlace(e: BlockPlaceEvent) {
+                rescanRocket(e.block.position)
+            }
+        })
     }
 
     override fun tick(b: Block) {
         val pos = b.position
         val counter = counters.mergeInt(pos, 1, Int::plus)
-        if (counter % 4 == 0) {
+        if (counter % 8 == 0) {
             rescanRocket(pos)
         }
     }
 
     private fun rescanRocket(pos: BlockPosition) {
-        val rocketBlocks = pos.floodSearch { it.type !in notAllowedBlocks }
+        val rocketBlocks = pos.floodSearch { it.checkBlock<RocketEngine>() != null }
         val detected = if (!rocketBlocks.exceededMax) rocketBlocks.found else emptySet()
         val blocks = detected.map(BlockPosition::getBlock)
         val fuel = blocks.processSlimefunBlocks(FuelTank::getFuelLevel)
             .fold(emptyMap<Gas, Double>()) { acc, map -> acc.mergeMaps(map, Double::plus) }
-        RocketManager.register(RocketInfo(pos, detected, fuel))
+        val engines = blocks.processSlimefunBlocks<RocketEngine, _> { this }
+        RocketManager.register(RocketInfo(pos, detected, fuel, engines))
     }
 
     private fun onRightClick(e: PlayerRightClickEvent) {
@@ -65,33 +70,7 @@ class CommandComputer(
             e.player.sendMessage(NamedTextColor.RED + "No rocket detected")
             return
         }
-        val infoString = buildString {
-            appendLine("Fuel:")
-            for ((gas, amount) in info.fuel) {
-                append(" ".repeat(4))
-                append(gas)
-                append(": ")
-                append("%.2f".format(amount))
-                append(" liters, ")
-                append("%.2f".format(amount * gas.liquidDensity))
-                append(" kg")
-                appendLine()
-            }
-        }
-        e.player.sendMessage(NamedTextColor.GOLD + infoString)
-    }
-
-    private val notAllowedBlocks = EnumSet.noneOf(Material::class.java).apply {
-        addAll(Tag.DIRT.values)
-        addAll(Tag.SAND.values)
-        add(Material.GRAVEL)
-        if (!pluginInstance.isTest) addAll(Tag.CONCRETE_POWDER.values) // idk why
-        add(Material.AIR)
-        add(Material.WATER)
-        add(Material.LAVA)
-        add(Material.FIRE)
-        addAll(SlimefunTag.FLUID_SENSITIVE_MATERIALS.values)
-        addAll(SlimefunTag.UNBREAKABLE_MATERIALS.values)
+        e.player.sendMessage(NamedTextColor.GOLD + info.info)
     }
 }
 

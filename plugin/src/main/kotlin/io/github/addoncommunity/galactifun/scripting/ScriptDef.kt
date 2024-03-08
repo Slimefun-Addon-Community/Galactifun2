@@ -5,7 +5,7 @@ import io.github.addoncommunity.galactifun.api.objects.MilkyWay
 import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
-import io.github.addoncommunity.galactifun.base.BaseUniverse
+import io.github.addoncommunity.galactifun.impl.BaseUniverse
 import io.github.addoncommunity.galactifun.pluginInstance
 import org.bukkit.Material
 import org.bukkit.World

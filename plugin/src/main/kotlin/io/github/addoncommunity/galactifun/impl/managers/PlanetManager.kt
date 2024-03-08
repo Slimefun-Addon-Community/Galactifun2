@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.core.managers
+package io.github.addoncommunity.galactifun.impl.managers
 
 import com.jeff_media.morepersistentdatatypes.DataType
 import io.github.addoncommunity.galactifun.Constants
@@ -7,8 +7,8 @@ import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
 import io.github.addoncommunity.galactifun.api.objects.properties.OrbitPosition
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
-import io.github.addoncommunity.galactifun.core.Permissions
-import io.github.addoncommunity.galactifun.core.space.SpaceGenerator
+import io.github.addoncommunity.galactifun.impl.Permissions
+import io.github.addoncommunity.galactifun.impl.space.SpaceGenerator
 import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.runOnNextTick
 import io.github.addoncommunity.galactifun.util.getNearbyEntitiesByType

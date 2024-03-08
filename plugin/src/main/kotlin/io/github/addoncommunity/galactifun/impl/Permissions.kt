@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.core
+package io.github.addoncommunity.galactifun.impl
 
 object Permissions {
 

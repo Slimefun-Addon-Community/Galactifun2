@@ -5,7 +5,7 @@ import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.scripting.PlanetDsl
 import io.github.addoncommunity.galactifun.units.Angle
 import io.github.addoncommunity.galactifun.units.Distance
-import io.github.addoncommunity.galactifun.util.RequiredProperty
+import io.github.addoncommunity.galactifun.util.general.RequiredProperty
 import kotlinx.datetime.Instant
 
 @PlanetDsl

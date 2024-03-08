@@ -1,6 +1,6 @@
 package io.github.addoncommunity.galactifun.scripting.dsl.gen
 
-import io.github.addoncommunity.galactifun.util.gen.DoubleChunkGrid
+import io.github.addoncommunity.galactifun.util.worldgen.DoubleChunkGrid
 import org.bukkit.util.noise.OctaveGenerator
 import org.bukkit.util.noise.SimplexOctaveGenerator
 

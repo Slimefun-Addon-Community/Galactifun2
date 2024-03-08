@@ -1,10 +1,10 @@
-package io.github.addoncommunity.galactifun.core
+package io.github.addoncommunity.galactifun.impl
 
 import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
 import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
-import io.github.addoncommunity.galactifun.core.managers.PlanetManager
+import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
 import io.github.addoncommunity.galactifun.util.galactifunTeleport
 import io.github.seggan.kfun.location.plusAssign
 import kotlinx.datetime.Clock

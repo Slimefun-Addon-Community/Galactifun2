@@ -6,7 +6,7 @@ import io.github.seggan.uom.Measure
 import kotlin.math.PI
 
 @Measure(base = "radians")
-@AlternateUnit(unit = "degrees", ratio = 180.0 / Math.PI)
+@AlternateUnit(unit = "degrees", ratio = Math.PI / 180)
 private class AAngle
 
 val Angle.standardForm: Angle

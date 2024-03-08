@@ -12,7 +12,7 @@ import io.github.addoncommunity.galactifun.scripting.PlanetDsl
 import io.github.addoncommunity.galactifun.scripting.PlanetScript
 import io.github.addoncommunity.galactifun.units.Distance
 import io.github.addoncommunity.galactifun.units.Mass
-import io.github.addoncommunity.galactifun.util.RequiredProperty
+import io.github.addoncommunity.galactifun.util.general.RequiredProperty
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.World

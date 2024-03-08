@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.base
+package io.github.addoncommunity.galactifun.impl
 
 import io.github.addoncommunity.galactifun.util.key
 import io.github.thebusybiscuit.slimefun4.api.items.groups.NestedItemGroup

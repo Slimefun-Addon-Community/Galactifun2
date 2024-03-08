@@ -1,8 +1,8 @@
-package io.github.addoncommunity.galactifun.base
+package io.github.addoncommunity.galactifun.impl
 
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
-import io.github.addoncommunity.galactifun.base.items.CommandComputer
-import io.github.addoncommunity.galactifun.base.items.FuelTank
+import io.github.addoncommunity.galactifun.impl.items.CommandComputer
+import io.github.addoncommunity.galactifun.impl.items.FuelTank
 import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.util.items.MaterialType
 import io.github.addoncommunity.galactifun.util.items.buildSlimefunItem

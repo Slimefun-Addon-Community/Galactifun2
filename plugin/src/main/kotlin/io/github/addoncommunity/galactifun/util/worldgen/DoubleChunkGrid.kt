@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.util.gen
+package io.github.addoncommunity.galactifun.util.worldgen
 
 import com.google.common.util.concurrent.AtomicDoubleArray
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap

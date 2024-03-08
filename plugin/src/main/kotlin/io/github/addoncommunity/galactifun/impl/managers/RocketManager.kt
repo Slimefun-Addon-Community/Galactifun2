@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.core.managers
+package io.github.addoncommunity.galactifun.impl.managers
 
 import io.github.addoncommunity.galactifun.api.rockets.RocketInfo
 import io.github.thebusybiscuit.slimefun4.libraries.dough.blocks.BlockPosition

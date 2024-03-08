@@ -9,8 +9,8 @@ import io.github.addoncommunity.galactifun.units.Distance.Companion.meters
 import io.github.addoncommunity.galactifun.units.Velocity.Companion.metersPerSecond
 import io.github.addoncommunity.galactifun.units.coordiantes.CartesianVector
 import io.github.addoncommunity.galactifun.units.coordiantes.PolarVector
-import io.github.addoncommunity.galactifun.util.Either
-import io.github.addoncommunity.galactifun.util.LazyDouble
+import io.github.addoncommunity.galactifun.util.general.Either
+import io.github.addoncommunity.galactifun.util.general.LazyDouble
 import kotlinx.datetime.Instant
 import java.util.*
 import kotlin.math.PI

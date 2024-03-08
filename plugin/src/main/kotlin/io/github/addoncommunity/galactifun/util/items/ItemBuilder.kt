@@ -1,7 +1,7 @@
 package io.github.addoncommunity.galactifun.util.items
 
 import io.github.addoncommunity.galactifun.pluginInstance
-import io.github.addoncommunity.galactifun.util.RequiredProperty
+import io.github.addoncommunity.galactifun.util.general.RequiredProperty
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
@@ -37,7 +37,7 @@ class ItemBuilder {
             SlimefunItemStack::class.java,
             RecipeType::class.java,
             Array<out ItemStack?>::class.java,
-            *otherArgs.map { it!!::class.java }.toTypedArray()
+            *otherArgs.map { it!!::class.javaPrimitiveType ?: it::class.java }.toTypedArray()
         )
         constructor.newInstance(category, sfi, recipeType, recipe, *otherArgs).register(pluginInstance)
         return sfi

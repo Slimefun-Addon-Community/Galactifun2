@@ -5,10 +5,10 @@ import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.composition
-import io.github.addoncommunity.galactifun.base.BaseUniverse
-import io.github.addoncommunity.galactifun.base.GalactifunItems
-import io.github.addoncommunity.galactifun.core.Gf2Command
-import io.github.addoncommunity.galactifun.core.managers.PlanetManager
+import io.github.addoncommunity.galactifun.impl.BaseUniverse
+import io.github.addoncommunity.galactifun.impl.GalactifunItems
+import io.github.addoncommunity.galactifun.impl.Gf2Command
+import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
 import io.github.addoncommunity.galactifun.scripting.PlanetScript
 import io.github.addoncommunity.galactifun.scripting.dsl.*
 import io.github.addoncommunity.galactifun.scripting.dsl.gen.*

@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.core.space
+package io.github.addoncommunity.galactifun.impl.space
 
 import org.bukkit.World
 import org.bukkit.block.Biome

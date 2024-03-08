@@ -1,6 +1,6 @@
 package io.github.addoncommunity.galactifun.api.objects.properties
 
-import io.github.addoncommunity.galactifun.core.managers.PlanetManager
+import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
 import org.bukkit.Location
 import org.bukkit.persistence.PersistentDataAdapterContext
 import org.bukkit.persistence.PersistentDataType

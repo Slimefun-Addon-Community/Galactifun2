@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.core.space
+package io.github.addoncommunity.galactifun.impl.space
 
 import io.github.addoncommunity.galactifun.util.adjacentFaces
 import io.github.addoncommunity.galactifun.util.buildRandomizedSet

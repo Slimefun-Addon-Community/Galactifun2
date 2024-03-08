@@ -1,10 +1,10 @@
-package io.github.addoncommunity.galactifun.base.objects.earth
+package io.github.addoncommunity.galactifun.impl.objects.earth
 
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
-import io.github.addoncommunity.galactifun.base.BaseUniverse
+import io.github.addoncommunity.galactifun.impl.BaseUniverse
 import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.units.Angle.Companion.degrees
 import io.github.addoncommunity.galactifun.units.Distance.Companion.au

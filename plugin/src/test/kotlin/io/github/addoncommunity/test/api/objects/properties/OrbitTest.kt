@@ -2,7 +2,7 @@ package io.github.addoncommunity.test.api.objects.properties
 
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.api.objects.properties.visVivaEquation
-import io.github.addoncommunity.galactifun.base.BaseUniverse
+import io.github.addoncommunity.galactifun.impl.BaseUniverse
 import io.github.addoncommunity.galactifun.units.Angle
 import io.github.addoncommunity.galactifun.units.Angle.Companion.degrees
 import io.github.addoncommunity.galactifun.units.Angle.Companion.radians

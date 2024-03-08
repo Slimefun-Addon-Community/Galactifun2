@@ -1,7 +1,7 @@
-package io.github.addoncommunity.galactifun.base.objects.earth
+package io.github.addoncommunity.galactifun.impl.objects.earth
 
 import io.github.addoncommunity.galactifun.api.objects.planet.gen.WorldGenerator
-import io.github.addoncommunity.galactifun.util.gen.DoubleChunkGrid
+import io.github.addoncommunity.galactifun.util.worldgen.DoubleChunkGrid
 import org.bukkit.Material
 import org.bukkit.block.Biome
 import org.bukkit.generator.BiomeProvider

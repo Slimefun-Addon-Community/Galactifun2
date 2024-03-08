@@ -1,8 +1,8 @@
-package io.github.addoncommunity.galactifun.base
+package io.github.addoncommunity.galactifun.impl
 
 import io.github.addoncommunity.galactifun.api.objects.Star
-import io.github.addoncommunity.galactifun.base.objects.earth.Earth
-import io.github.addoncommunity.galactifun.base.objects.earth.Moon
+import io.github.addoncommunity.galactifun.impl.objects.earth.Earth
+import io.github.addoncommunity.galactifun.impl.objects.earth.Moon
 import io.github.addoncommunity.galactifun.units.Angle.Companion.radians
 import io.github.addoncommunity.galactifun.units.Distance.Companion.kilometers
 import io.github.addoncommunity.galactifun.units.Distance.Companion.meters

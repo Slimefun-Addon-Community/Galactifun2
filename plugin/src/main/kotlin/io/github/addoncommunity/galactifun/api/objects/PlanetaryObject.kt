@@ -5,7 +5,7 @@ import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.api.objects.properties.OrbitPosition
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
 import io.github.addoncommunity.galactifun.api.objects.properties.visVivaEquation
-import io.github.addoncommunity.galactifun.core.managers.PlanetManager
+import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
 import io.github.addoncommunity.galactifun.units.Distance
 import io.github.addoncommunity.galactifun.units.Distance.Companion.meters
 import io.github.addoncommunity.galactifun.units.Velocity

@@ -11,6 +11,7 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.jvm.jvmInline
 import com.squareup.kotlinpoet.ksp.addOriginatingKSFile
 import com.squareup.kotlinpoet.ksp.writeTo
+import java.math.BigDecimal
 
 class UomProcessor(
     private val generator: CodeGenerator,
@@ -62,6 +63,14 @@ class UomProcessor(
                 .addOperator("minus", "-", baseUnit, clazzName)
                 .addScalarOperator("times", "*", baseUnit, clazzName)
                 .addScalarOperator("div", "/", baseUnit, clazzName)
+                .addFunction(
+                    FunSpec.builder("div")
+                        .addModifiers(KModifier.OPERATOR)
+                        .addParameter("other", clazzName)
+                        .returns(Double::class)
+                        .addStatement("return %L / other.%L", baseUnit, baseUnit)
+                        .build()
+                )
                 .addScalarOperator("rem", "%", baseUnit, clazzName)
                 .addFunction(
                     FunSpec.builder("unaryMinus")
@@ -83,6 +92,18 @@ class UomProcessor(
                         .addParameter("other", clazzName)
                         .returns(Int::class)
                         .addStatement("return %L.compareTo(other.%L)", baseUnit, baseUnit)
+                        .build()
+                )
+                .addFunction(
+                    FunSpec.builder("toString")
+                        .addModifiers(KModifier.OVERRIDE)
+                        .returns(String::class)
+                        .addStatement(
+                            "return %T(%L.toString()).toPlainString() + %S",
+                            BigDecimal::class.java,
+                            baseUnit,
+                            " $baseUnit"
+                        )
                         .build()
                 )
 
@@ -272,7 +293,7 @@ private fun TypeSpec.Builder.addScalarOperator(
     return this
 }
 
-fun KSDeclaration.getBaseUnit(): String? {
+private fun KSDeclaration.getBaseUnit(): String? {
     return annotations.find { it.shortName.asString() == "Measure" }
         ?.arguments?.firstOrNull()?.value as? String
 }

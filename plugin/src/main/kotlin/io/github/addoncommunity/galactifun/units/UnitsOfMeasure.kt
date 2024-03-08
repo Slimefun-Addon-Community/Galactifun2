@@ -19,7 +19,7 @@ import kotlin.time.Duration
 private class ADistance
 
 @Measure(base = "kilograms")
-@AlternateUnit(unit = "pounds", ratio = 2.20462)
+@AlternateUnit(unit = "tons", ratio = 1000.0)
 private class AMass
 
 @Measure(base = "metersPerSecond")

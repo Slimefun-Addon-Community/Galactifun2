@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.util
+package io.github.addoncommunity.galactifun.util.general
 
 sealed interface Either<A, B> {
 
