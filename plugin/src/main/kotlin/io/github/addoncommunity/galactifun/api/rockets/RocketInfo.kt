@@ -13,11 +13,10 @@ import io.github.thebusybiscuit.slimefun4.libraries.dough.blocks.BlockPosition
 data class RocketInfo(
     val commandComputer: BlockPosition,
     val blocks: Set<BlockPosition>,
-    val fuel: Map<Gas, Double>,
-    val engines: List<RocketEngine>
+    val engines: List<Pair<RocketEngine, Set<BlockPosition>>>
 ) {
     val thrust: Force
-        get() = engines.fold(Force.ZERO) { acc, engine -> acc + engine.thrust }
+        get() = engines.fold(Force.ZERO) { acc, engine -> acc + engine.first.thrust }
     val mass: Mass
         get() = blocks.fold(Mass.ZERO) { acc, block -> acc + block.block.mass }
 
@@ -26,6 +25,11 @@ data class RocketInfo(
         return thrust / (mass * gravity)
     }
 
+    val fuel: List<Pair<List<RocketEngine>, Map<Gas, Double>>>
+        get() {
+            TODO()
+        }
+
     val info: String
         get() = buildString {
             val planet = PlanetManager.getByWorld(commandComputer.world) ?: error("Planet not found")
@@ -33,7 +37,7 @@ data class RocketInfo(
             for ((gas, amount) in fuel) {
                 append(" ".repeat(4))
                 append(gas)
-                appendLine(": %.2f l, %.2f kg".format(amount, amount * gas.liquidDensity))
+                //appendLine(": %.2f l, %.2f kg".format(amount, amount * gas.liquidDensity))
             }
             appendLine("Thrust: %.2f kN".format(thrust.kilonewtons))
             appendLine("Mass: %.2f kg".format(mass.kilograms))

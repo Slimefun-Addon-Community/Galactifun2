@@ -1,5 +1,6 @@
 package io.github.addoncommunity.galactifun.impl.managers
 
+import com.github.shynixn.mccoroutine.bukkit.launch
 import com.jeff_media.morepersistentdatatypes.DataType
 import io.github.addoncommunity.galactifun.Constants
 import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
@@ -10,7 +11,6 @@ import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atm
 import io.github.addoncommunity.galactifun.impl.Permissions
 import io.github.addoncommunity.galactifun.impl.space.SpaceGenerator
 import io.github.addoncommunity.galactifun.pluginInstance
-import io.github.addoncommunity.galactifun.runOnNextTick
 import io.github.addoncommunity.galactifun.util.getNearbyEntitiesByType
 import io.github.addoncommunity.galactifun.util.key
 import io.github.addoncommunity.galactifun.util.spawn
@@ -53,7 +53,7 @@ object PlanetManager : Listener {
             config.load(configFile)
         }
 
-        pluginInstance.runOnNextTick {
+        pluginInstance.launch {
             config.options().copyDefaults(true)
             config.save(configFile)
         }

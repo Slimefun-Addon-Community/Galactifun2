@@ -86,10 +86,12 @@ tasks.shadowJar {
         exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk7"))
         exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-common"))
     }
+
+    archiveBaseName.set("galactifun2")
 }
 
 bukkit {
-    name = project.name
+    name = rootProject.name
     main = "io.github.addoncommunity.galactifun.Galactifun2"
     version = project.version.toString()
     author = "Seggan"

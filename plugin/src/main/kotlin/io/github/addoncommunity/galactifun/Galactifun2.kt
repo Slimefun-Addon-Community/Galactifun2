@@ -1,6 +1,8 @@
 package io.github.addoncommunity.galactifun
 
 import co.aikar.commands.PaperCommandManager
+import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
+import com.github.shynixn.mccoroutine.bukkit.launch
 import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
@@ -21,6 +23,9 @@ import io.github.seggan.sf4k.AbstractAddon
 import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun
 import io.github.thebusybiscuit.slimefun4.libraries.paperlib.PaperLib
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
@@ -28,6 +33,7 @@ import org.bukkit.Material
 import org.bukkit.block.Biome
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.logging.Level
+import kotlin.coroutines.CoroutineContext
 import kotlin.script.experimental.api.ResultValue
 import kotlin.script.experimental.api.ScriptDiagnostic
 import kotlin.script.experimental.api.valueOrThrow
@@ -137,7 +143,7 @@ open class Galactifun2 : AbstractAddon() {
 
         GalactifunItems // Trigger static init
 
-        runOnNextTick {
+        launch {
             log(
                 Level.INFO,
                 "################# Galactifun2 $pluginVersion #################",
@@ -236,10 +242,9 @@ fun JavaPlugin.log(level: Level, vararg messages: String) {
 
 fun JavaPlugin.log(vararg messages: String) = log(Level.INFO, *messages)
 
-fun JavaPlugin.runOnNextTick(runnable: Runnable) {
-    server.scheduler.runTask(this, runnable)
-}
-
-fun JavaPlugin.runTaskRepeat(period: Long, delay: Long = 0, runnable: Runnable) {
-    server.scheduler.runTaskTimer(this, runnable, delay, period)
+fun JavaPlugin.launchAsync(
+    context: CoroutineContext = asyncDispatcher,
+    block: suspend CoroutineScope.() -> Unit
+): Job = pluginInstance.launch {
+    withContext(context, block)
 }
