@@ -6,7 +6,7 @@ import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
 import io.github.addoncommunity.galactifun.util.galactifunTeleport
-import io.github.seggan.kfun.location.plusAssign
+import io.github.seggan.sf4k.location.plusAssign
 import kotlinx.datetime.Clock
 import org.bukkit.Location
 import org.bukkit.entity.Player

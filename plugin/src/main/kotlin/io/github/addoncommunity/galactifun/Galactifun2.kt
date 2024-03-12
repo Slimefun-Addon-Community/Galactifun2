@@ -17,7 +17,7 @@ import io.github.addoncommunity.galactifun.units.Angle.Companion.degrees
 import io.github.addoncommunity.galactifun.units.Distance.Companion.au
 import io.github.addoncommunity.galactifun.units.Distance.Companion.kilometers
 import io.github.addoncommunity.galactifun.units.Mass.Companion.kilograms
-import io.github.seggan.kfun.AbstractAddon
+import io.github.seggan.sf4k.AbstractAddon
 import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun
 import io.github.thebusybiscuit.slimefun4.libraries.paperlib.PaperLib
@@ -42,13 +42,13 @@ open class Galactifun2 : AbstractAddon() {
 
     var isTest = classLoader.javaClass.packageName.startsWith("be.seeseemelk.mockbukkit")
 
-    override fun onLoad() {
+    override suspend fun onLoadAsync() {
         if (!isTest) {
             Bukkit.spigot().config["world-settings.default.verbose"] = false
         }
     }
 
-    override fun onEnable() {
+    override suspend fun onEnableAsync() {
         instance = this
 
         var shouldDisable = false
@@ -152,7 +152,7 @@ open class Galactifun2 : AbstractAddon() {
         doTestingStuff()
     }
 
-    override fun onDisable() {
+    override suspend fun onDisableAsync() {
         instance = null
     }
 

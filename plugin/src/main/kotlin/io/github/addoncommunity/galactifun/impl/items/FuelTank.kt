@@ -1,17 +1,13 @@
 package io.github.addoncommunity.galactifun.impl.items
 
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
-import io.github.addoncommunity.galactifun.serial.EnumBlockStorageDataType
-import io.github.addoncommunity.galactifun.serial.MapBlockStorageDataType
 import io.github.addoncommunity.galactifun.util.adjacentFaces
 import io.github.addoncommunity.galactifun.util.checkBlock
 import io.github.addoncommunity.galactifun.util.general.enumMapOf
 import io.github.addoncommunity.galactifun.util.general.mergeMaps
 import io.github.addoncommunity.galactifun.util.items.TickingBlock
 import io.github.addoncommunity.galactifun.util.items.buildMenu
-import io.github.seggan.kfun.serial.BlockStorageDataType
-import io.github.seggan.kfun.serial.getBlockStorage
-import io.github.seggan.kfun.serial.setBlockStorage
+import io.github.seggan.sf4k.serial.*
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType

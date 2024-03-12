@@ -11,4 +11,4 @@ launch.cmd
 /paper/
 .gradle/
 build/
-/run
+run/

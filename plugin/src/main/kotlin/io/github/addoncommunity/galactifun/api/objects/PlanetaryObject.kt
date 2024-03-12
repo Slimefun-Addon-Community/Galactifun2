@@ -12,7 +12,7 @@ import io.github.addoncommunity.galactifun.units.Velocity
 import io.github.addoncommunity.galactifun.units.Velocity.Companion.metersPerSecond
 import io.github.addoncommunity.galactifun.units.abs
 import io.github.addoncommunity.galactifun.units.cos
-import io.github.seggan.kfun.location.plus
+import io.github.seggan.sf4k.location.plus
 import kotlinx.datetime.Instant
 import org.bukkit.Location
 import org.bukkit.inventory.ItemStack

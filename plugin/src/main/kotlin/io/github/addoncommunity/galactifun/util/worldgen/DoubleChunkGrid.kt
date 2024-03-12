@@ -1,9 +1,12 @@
 package io.github.addoncommunity.galactifun.util.worldgen
 
+import com.github.shynixn.mccoroutine.bukkit.launch
 import com.google.common.util.concurrent.AtomicDoubleArray
+import io.github.addoncommunity.galactifun.pluginInstance
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import java.lang.ref.WeakReference
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
@@ -21,7 +24,7 @@ class DoubleChunkGrid {
 
     init {
         val ref = WeakReference(this)
-        coroScope.launch {
+        pluginInstance.launch(Dispatchers.IO) {
             while (true) {
                 val time = System.currentTimeMillis()
                 val grid = ref.get() ?: break
@@ -92,11 +95,6 @@ class DoubleChunkGrid {
 
     fun getOrSet(x: Int, y: Int, value: () -> Double) =
         getOrSet(x shr 4, y shr 4, x and 15, y and 15, value)
-
-    companion object {
-        @OptIn(DelicateCoroutinesApi::class)
-        private val coroScope = CoroutineScope(newFixedThreadPoolContext(4, "Galactifun2-DoubleChunkGrid"))
-    }
 }
 
 private infix fun Int.pack(other: Int) = (this.toLong() shl 32) or (other.toLong() and 0xFFFFFFFFL)

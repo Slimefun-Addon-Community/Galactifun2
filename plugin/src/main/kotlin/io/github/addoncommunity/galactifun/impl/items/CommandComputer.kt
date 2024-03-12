@@ -1,14 +1,12 @@
 package io.github.addoncommunity.galactifun.impl.items
 
-import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.api.rockets.RocketInfo
 import io.github.addoncommunity.galactifun.impl.managers.RocketManager
 import io.github.addoncommunity.galactifun.util.checkBlock
 import io.github.addoncommunity.galactifun.util.floodSearch
-import io.github.addoncommunity.galactifun.util.general.mergeMaps
 import io.github.addoncommunity.galactifun.util.items.TickingBlock
 import io.github.addoncommunity.galactifun.util.plus
-import io.github.seggan.kfun.location.position
+import io.github.seggan.sf4k.location.position
 import io.github.thebusybiscuit.slimefun4.api.events.PlayerRightClickEvent
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem
@@ -53,13 +51,13 @@ class CommandComputer(
     }
 
     private fun rescanRocket(pos: BlockPosition) {
-        val rocketBlocks = pos.floodSearch { it.checkBlock<RocketEngine>() != null }
+        val rocketBlocks = pos.floodSearch { this.checkBlock<RocketEngine>() != null }
         val detected = if (!rocketBlocks.exceededMax) rocketBlocks.found else emptySet()
         val blocks = detected.map(BlockPosition::getBlock)
-        val fuel = blocks.processSlimefunBlocks(FuelTank::getFuelLevel)
-            .fold(emptyMap<Gas, Double>()) { acc, map -> acc.mergeMaps(map, Double::plus) }
-        val engines = blocks.processSlimefunBlocks<RocketEngine, _> { this }
-        RocketManager.register(RocketInfo(pos, detected, fuel, engines))
+        val engines = blocks.processSlimefunBlocks<RocketEngine, _> {
+            this to it.position.floodSearch { this.checkBlock<FuelTank>() != null }.found
+        }
+        RocketManager.register(RocketInfo(pos, detected, engines))
     }
 
     private fun onRightClick(e: PlayerRightClickEvent) {
