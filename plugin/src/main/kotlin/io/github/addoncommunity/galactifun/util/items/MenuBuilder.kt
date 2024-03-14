@@ -1,12 +1,12 @@
 package io.github.addoncommunity.galactifun.util.items
 
+import io.github.addoncommunity.galactifun.util.general.IntPair
+import io.github.addoncommunity.galactifun.util.general.with
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils
-import it.unimi.dsi.fastutil.ints.IntArrayList
-import it.unimi.dsi.fastutil.ints.IntList
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.MenuClickHandler
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset
@@ -18,10 +18,10 @@ import org.bukkit.inventory.ItemStack
 
 class MenuBuilder {
 
-    private val inputBorder = IntArrayList()
-    private val outputBorder = IntArrayList()
-    private val inputs = IntArrayList()
-    private val outputs = IntArrayList()
+    private val inputBorder = mutableListOf<IntPair>()
+    private val outputBorder = mutableListOf<IntPair>()
+    private val inputs = mutableListOf<IntPair>()
+    private val outputs = mutableListOf<IntPair>()
 
     private val otherItems = mutableListOf<MenuItem>()
 
@@ -33,34 +33,41 @@ class MenuBuilder {
             field = value.coerceIn(1, 6)
         }
 
-    fun item(x: Int, y: Int, item: ItemStack, onClick: MenuClickHandler = ChestMenuUtils.getEmptyClickHandler()) {
-        otherItems.add(MenuItem(coordsToSlot(x, y), item, onClick))
+    fun item(coords: IntPair, item: ItemStack, onClick: MenuClickHandler = ChestMenuUtils.getEmptyClickHandler()) {
+        otherItems.add(MenuItem(coordsToSlot(coords), item, onClick))
     }
 
-    fun inputBorder(vararg points: Int) = inputBorder.addAll(points)
+    fun inputBorder(vararg points: IntPair) {
+        inputBorder.addAll(points)
+    }
 
-    fun outputBorder(vararg points: Int) = outputBorder.addAll(points)
+    fun outputBorder(vararg points: IntPair) {
+        outputBorder.addAll(points)
+    }
 
-    fun input(vararg points: Int): MaybeBorder {
+    fun input(vararg points: IntPair): MaybeBorder {
         inputs.addAll(points)
         return MaybeBorder(points, inputBorder)
     }
 
-    fun output(vararg points: Int): MaybeBorder {
+    fun output(vararg points: IntPair): MaybeBorder {
         outputs.addAll(points)
         return MaybeBorder(points, outputBorder)
     }
 
-    inner class MaybeBorder internal constructor(private val points: IntArray, private val borderList: IntList) {
+    inner class MaybeBorder internal constructor(
+        private val points: Array<out IntPair>,
+        private val borderList: MutableList<IntPair>
+    ) {
         fun addBorder() {
-            var i = 0
-            while (i < points.size) {
-                val cx = points[i++]
-                val cy = points[i++]
+            for (point in points) {
                 for (x in -1..1) {
                     for (y in -1..1) {
-                        val result = coordsToSlot(cx + x, cy + y)
-                        if (result !in inputs && result !in outputs && result in 0 until numRows * 9) {
+                        val result = point.first + x with point.second + y
+                        if (result !in inputs
+                            && result !in outputs
+                            && coordsToSlot(result) in 0 until numRows * 9
+                        ) {
                             borderList.add(result)
                         }
                     }
@@ -71,10 +78,10 @@ class MenuBuilder {
 
     fun applyOn(sfItem: SlimefunItem) {
         val lastIndex = numRows * 9
-        val ins = inputs.toIntArray()
-        val outs = outputs.toIntArray()
-        val inBorder = inputBorder.toIntArray()
-        val outBorder = outputBorder.toIntArray()
+        val ins = inputs.mapToIntArray(::coordsToSlot)
+        val outs = outputs.mapToIntArray(::coordsToSlot)
+        val inBorder = inputBorder.mapToIntArray(::coordsToSlot)
+        val outBorder = outputBorder.mapToIntArray(::coordsToSlot)
 
         val bg = IntOpenHashSet(IntArray(lastIndex) { it })
         ins.forEach(bg::remove)
@@ -116,12 +123,17 @@ class MenuBuilder {
     }
 }
 
-private fun coordsToSlot(x: Int, y: Int): Int {
-    return x + y * 9
+private fun coordsToSlot(coords: IntPair): Int {
+    return coords.first + coords.second * 9
 }
 
-private fun IntList.addAll(array: IntArray) {
-    array.forEach(this::add)
+private fun <T> Collection<T>.mapToIntArray(transform: (T) -> Int): IntArray {
+    val array = IntArray(size)
+    var index = 0
+    for (element in this) {
+        array[index++] = transform(element)
+    }
+    return array
 }
 
 private data class MenuItem(val slot: Int, val item: ItemStack, val handler: MenuClickHandler)

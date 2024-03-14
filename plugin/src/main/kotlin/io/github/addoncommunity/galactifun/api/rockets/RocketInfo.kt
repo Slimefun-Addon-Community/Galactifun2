@@ -54,7 +54,7 @@ class RocketInfo(
             appendLine("  Stage ${stageNum++}: ")
             appendLine("    Fuel:")
             for ((gas, volume) in stage.fuel) {
-                appendLine("      $gas: %.2f liters, %.2s".format(volume.liters, volume * gas.liquidDensity))
+                appendLine("      $gas: %.2s, %.2s".format(volume, volume * gas.liquidDensity))
             }
             appendLine("    Engines:")
             var engineNum = 1

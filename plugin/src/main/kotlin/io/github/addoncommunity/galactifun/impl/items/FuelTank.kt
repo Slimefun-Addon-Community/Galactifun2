@@ -12,13 +12,18 @@ import io.github.addoncommunity.galactifun.util.adjacentFaces
 import io.github.addoncommunity.galactifun.util.checkBlock
 import io.github.addoncommunity.galactifun.util.general.enumMapOf
 import io.github.addoncommunity.galactifun.util.general.mergeMaps
+import io.github.addoncommunity.galactifun.util.general.with
 import io.github.addoncommunity.galactifun.util.items.TickingBlock
 import io.github.addoncommunity.galactifun.util.items.buildMenu
 import io.github.seggan.sf4k.serial.*
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType
+import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack
 import me.mrCookieSlime.Slimefun.api.BlockStorage
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 
@@ -35,7 +40,8 @@ class FuelTank(
 
         private val menu = buildMenu {
             numRows = 1
-            input(INPUT, 0).addBorder()
+            input(INPUT with 0).addBorder()
+            item(0 with 0, CustomItemStack(Material.WATER_BUCKET, "&fContents"))
         }
 
         private val fuelDataType = MapBlockStorageDataType(
@@ -95,6 +101,17 @@ class FuelTank(
             if (distributable <= 0) break
             setFuelLevel(block, toAdd)
         }
+
+        val contentsItem = menu.getItemInSlot(0)
+        val currentFuel = getFuelLevel(b)
+        val lore = mutableListOf<Component>()
+        for ((gas, amount) in currentFuel) {
+            lore += Component.text()
+                .color(NamedTextColor.BLUE)
+                .content("$gas: %.2s, %.2s".format(amount, amount * gas.liquidDensity))
+                .build()
+        }
+        contentsItem.lore(lore)
     }
 
     fun getFuelLevel(block: Block): Map<Gas, Volume> {

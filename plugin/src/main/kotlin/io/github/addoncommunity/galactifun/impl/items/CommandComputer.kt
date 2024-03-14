@@ -70,5 +70,6 @@ class CommandComputer(
             return
         }
         e.player.sendMessage(NamedTextColor.GOLD + info.info)
+        e.cancel()
     }
 }
