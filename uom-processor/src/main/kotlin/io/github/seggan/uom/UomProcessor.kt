@@ -12,6 +12,8 @@ import com.squareup.kotlinpoet.jvm.jvmInline
 import com.squareup.kotlinpoet.ksp.addOriginatingKSFile
 import com.squareup.kotlinpoet.ksp.writeTo
 import java.math.BigDecimal
+import java.util.*
+import kotlin.experimental.ExperimentalTypeInference
 
 class UomProcessor(
     private val generator: CodeGenerator,
@@ -46,6 +48,7 @@ class UomProcessor(
                 .addModifiers(KModifier.VALUE)
                 .jvmInline()
                 .addSuperinterface(COMPARABLE.parameterizedBy(clazzName))
+                .addSuperinterface(Formattable::class)
 
                 .primaryConstructor(
                     FunSpec.constructorBuilder()
@@ -106,6 +109,21 @@ class UomProcessor(
                         )
                         .build()
                 )
+                .addFunction(
+                    FunSpec.builder("formatTo")
+                        .addModifiers(KModifier.OVERRIDE)
+                        .addParameter("formatter", Formatter::class)
+                        .addParameter("flags", Int::class)
+                        .addParameter("width", Int::class)
+                        .addParameter("precision", Int::class)
+                        .addStatement(
+                            "formatter.format(%S + precision + %S, %N)",
+                            "%.",
+                            "f $baseUnit",
+                            baseUnit,
+                        )
+                        .build()
+                )
 
             val companion = TypeSpec.companionObjectBuilder()
                 .addProperty(
@@ -146,6 +164,33 @@ class UomProcessor(
                         .addStatement("return kotlin.math.abs(value.%L).%L", baseUnit, baseUnit)
                         .build()
                 )
+                .addFunction(
+                    FunSpec.builder("sum")
+                        .returns(clazzName)
+                        .receiver(ITERABLE.parameterizedBy(clazzName))
+                        .addStatement("return this.fold(%T.ZERO) { acc, value -> acc + value }", clazzName)
+                        .build()
+                )
+            val t = TypeVariableName("T")
+            @OptIn(ExperimentalTypeInference::class)
+            file.addFunction(
+                FunSpec.builder("sumBy")
+                    .addAnnotation(
+                        AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
+                            .addMember("%T::class", ClassName("kotlin.experimental", "ExperimentalTypeInference"))
+                            .build()
+                    )
+                    .addAnnotation(OverloadResolutionByLambdaReturnType::class)
+                    .addModifiers(KModifier.INLINE)
+                    .addTypeVariable(t)
+                    .returns(clazzName)
+                    .receiver(ITERABLE.parameterizedBy(t))
+                    .addParameter("selector", LambdaTypeName.get(null, t, returnType = clazzName))
+                    .addStatement("var sum = %T.ZERO", clazzName)
+                    .addStatement("for (element in this) sum += selector(element)")
+                    .addStatement("return sum")
+                    .build()
+            )
 
             val extraImports = mutableListOf<Pair<String, String>>()
             val mulAnnotations = classDeclaration.annotations.filter { it.shortName.asString() == "MultipliesTo" }

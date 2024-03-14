@@ -28,6 +28,7 @@ dependencies {
     library(kotlin("stdlib"))
     libraryAndTest("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC2")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0") // For some reason libraryloader doesn't like this
+    libraryAndTest(kotlin("reflect"))
 
     libraryAndTest(kotlin("scripting-common"))
     libraryAndTest(kotlin("scripting-jvm"))

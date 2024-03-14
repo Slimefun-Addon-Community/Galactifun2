@@ -17,7 +17,11 @@ val adjacentFaces = arrayOf(
     BlockFace.WEST
 )
 
-inline fun BlockPosition.floodSearch(searchLimit: Int = 1024, predicate: Block.(Block) -> Boolean): FloodSearchResult {
+inline fun BlockPosition.floodSearch(
+    searchLimit: Int = 1024,
+    ignoreAir: Boolean = true,
+    predicate: Block.(Block) -> Boolean
+): FloodSearchResult {
     var toSearch = mutableSetOf(this)
     var toSearchNext = mutableSetOf<BlockPosition>()
     val found = mutableSetOf<BlockPosition>()
@@ -36,7 +40,9 @@ inline fun BlockPosition.floodSearch(searchLimit: Int = 1024, predicate: Block.(
                 val next = pos.getFace(face)
                 if (next !in found && next !in toSearch && next !in toSearchNext) {
                     try {
-                        if (block.predicate(next.block)) {
+                        val nextBlock = next.block
+                        if (ignoreAir && nextBlock.type.isAir) continue
+                        if (block.predicate(nextBlock)) {
                             toSearchNext.add(next)
                         }
                     } catch (e: IllegalArgumentException) {

@@ -1,6 +1,13 @@
 package io.github.addoncommunity.galactifun.impl.items
 
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
+import io.github.addoncommunity.galactifun.blocks.CustomMass
+import io.github.addoncommunity.galactifun.units.Mass
+import io.github.addoncommunity.galactifun.units.Mass.Companion.kilograms
+import io.github.addoncommunity.galactifun.units.Volume
+import io.github.addoncommunity.galactifun.units.Volume.Companion.liters
+import io.github.addoncommunity.galactifun.units.sumBy
+import io.github.addoncommunity.galactifun.units.times
 import io.github.addoncommunity.galactifun.util.adjacentFaces
 import io.github.addoncommunity.galactifun.util.checkBlock
 import io.github.addoncommunity.galactifun.util.general.enumMapOf
@@ -20,8 +27,8 @@ class FuelTank(
     item: SlimefunItemStack,
     recipeType: RecipeType,
     recipe: Array<out ItemStack?>,
-    private val capacity: Double
-) : TickingBlock(itemGroup, item, recipeType, recipe) {
+    private val capacity: Volume
+) : TickingBlock(itemGroup, item, recipeType, recipe), CustomMass {
 
     private companion object {
         private const val INPUT = 4
@@ -45,7 +52,7 @@ class FuelTank(
             val consumed = item.amount.coerceAtMost(8)
             menu.consumeItem(INPUT, consumed)
             val fuel = getFuelLevel(b).toMutableMap()
-            fuel.merge(gasItem.gas, consumed.toDouble(), Double::plus)
+            fuel.merge(gasItem.gas, consumed.liters, Volume::plus)
             setFuelLevel(b, fuel)
         }
 
@@ -57,27 +64,27 @@ class FuelTank(
         var distributable = blocks.size
         val fuels = blocks
             .map(::getFuelLevel)
-            .reduce { acc, map -> acc.mergeMaps(map, Double::plus) }
+            .reduce { acc, map -> acc.mergeMaps(map, Volume::plus) }
             .mapValuesTo(enumMapOf()) { (_, amount) -> amount / distributable }
 
         for (block in blocks) {
             val tank = BlockStorage.check(block) as FuelTank
             val cap = tank.capacity
-            val toAdd = if (result.values.sum() > cap) {
+            val toAdd = if (result.values.sum() > cap.liters) {
                 distributable--
-                val stuffed = enumMapOf<Gas, Double>()
+                val stuffed = enumMapOf<Gas, Volume>()
                 for ((gas, amount) in fuels) {
-                    val space = cap - stuffed.values.sum()
+                    val space = cap - stuffed.values.sumOf { it.liters }.liters
                     val toAdd = amount.coerceAtMost(space)
-                    stuffed.merge(gas, toAdd, Double::plus)
+                    stuffed.merge(gas, toAdd, Volume::plus)
                 }
 
                 val notStuffed = fuels
-                    .mapValues { (gas, amount) -> amount - stuffed.getOrDefault(gas, 0.0) }
-                    .filterValues { it > 0 }
+                    .mapValues { (gas, amount) -> amount - stuffed.getOrDefault(gas, Volume.ZERO) }
+                    .filterValues { it > Volume.ZERO }
                     .mapValues { (_, amount) -> amount / distributable }
                 for ((gas, amount) in notStuffed) {
-                    fuels.merge(gas, amount, Double::plus)
+                    fuels.merge(gas, amount, Volume::plus)
                 }
 
                 stuffed
@@ -90,12 +97,20 @@ class FuelTank(
         }
     }
 
-    fun getFuelLevel(block: Block): Map<Gas, Double> {
-        return block.getBlockStorage("fuel", fuelDataType) ?: emptyMap()
+    fun getFuelLevel(block: Block): Map<Gas, Volume> {
+        return block.getBlockStorage("fuel", fuelDataType)?.mapValues { it.value.liters } ?: emptyMap()
     }
 
-    fun setFuelLevel(block: Block, fuel: Map<Gas, Double>) {
-        block.setBlockStorage("fuel", fuel, fuelDataType)
+    fun setFuelLevel(block: Block, fuel: Map<Gas, Volume>) {
+        block.setBlockStorage("fuel", fuel.mapValues { it.value.liters }, fuelDataType)
+    }
+
+    override fun getMass(block: Block): Mass = 729.kilograms // based on a 1 m^3 tank with 0.5 m thick walls of aluminum
+
+    override fun getWetMass(block: Block): Mass {
+        val fuelMass = getFuelLevel(block).toList()
+            .sumBy { (gas, amount) -> gas.liquidDensity * amount }
+        return getMass(block) + fuelMass
     }
 
     override fun preRegister() {

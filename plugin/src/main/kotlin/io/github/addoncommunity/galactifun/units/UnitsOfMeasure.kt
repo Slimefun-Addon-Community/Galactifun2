@@ -20,6 +20,7 @@ private class ADistance
 
 @Measure(base = "kilograms")
 @AlternateUnit(unit = "tons", ratio = 1000.0)
+@DividesTo(other = AVolume::class, quotient = ADensity::class)
 private class AMass
 
 @Measure(base = "metersPerSecond")
@@ -38,3 +39,11 @@ operator fun Acceleration.times(time: Duration): Velocity = (metersPerSecondSqua
 @AlternateUnit(unit = "meganewtons", ratio = 1_000_000.0)
 @DividesTo(other = AAcceleration::class, quotient = AMass::class)
 private class AForce
+
+@Measure(base = "liters")
+@AlternateUnit(unit = "cubicMeters", ratio = 1000.0)
+private class AVolume
+
+@Measure(base = "kilogramsPerLiter")
+@MultipliesTo(other = AVolume::class, product = AMass::class)
+private class ADensity
