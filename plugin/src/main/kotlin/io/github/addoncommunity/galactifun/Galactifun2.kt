@@ -19,6 +19,8 @@ import io.github.addoncommunity.galactifun.units.Angle.Companion.degrees
 import io.github.addoncommunity.galactifun.units.Distance.Companion.au
 import io.github.addoncommunity.galactifun.units.Distance.Companion.kilometers
 import io.github.addoncommunity.galactifun.units.Mass.Companion.kilograms
+import io.github.addoncommunity.galactifun.util.general.log
+import io.github.addoncommunity.galactifun.util.plus
 import io.github.seggan.sf4k.AbstractAddon
 import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun
@@ -27,6 +29,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -59,23 +62,23 @@ open class Galactifun2 : AbstractAddon() {
 
         var shouldDisable = false
         if (!PaperLib.isPaper() && !isTest) {
-            log(Level.SEVERE, "Galactifun2 only supports Paper and its forks (e.x. Airplane and Purpur)")
-            log(Level.SEVERE, "Please use Paper or a fork of Paper")
+            logger.log(Level.SEVERE, "Galactifun2 only supports Paper and its forks (e.x. Airplane and Purpur)")
+            logger.log(Level.SEVERE, "Please use Paper or a fork of Paper")
             shouldDisable = true
         }
         if (Slimefun.getMinecraftVersion().isBefore(MinecraftVersion.MINECRAFT_1_19)) {
-            log(Level.SEVERE, "Galactifun2 only supports Minecraft 1.19 and above")
-            log(Level.SEVERE, "Please use Minecraft 1.19 or above")
+            logger.log(Level.SEVERE, "Galactifun2 only supports Minecraft 1.19 and above")
+            logger.log(Level.SEVERE, "Please use Minecraft 1.19 or above")
             shouldDisable = true
         }
         if (Bukkit.getPluginManager().isPluginEnabled("ClayTech")) {
-            log(Level.SEVERE, "Galactifun2 will not work properly with ClayTech")
-            log(Level.SEVERE, "Please disable ClayTech")
+            logger.log(Level.SEVERE, "Galactifun2 will not work properly with ClayTech")
+            logger.log(Level.SEVERE, "Please disable ClayTech")
             shouldDisable = true
         }
         if (Bukkit.getPluginManager().isPluginEnabled("Galactifun")) {
-            log(Level.SEVERE, "Galactifun2 will not work properly with Galactifun")
-            log(Level.SEVERE, "Please remove Galactifun")
+            logger.log(Level.SEVERE, "Galactifun2 will not work properly with Galactifun")
+            logger.log(Level.SEVERE, "Please remove Galactifun")
             shouldDisable = true
         }
 
@@ -114,10 +117,10 @@ open class Galactifun2 : AbstractAddon() {
         }
         for (script in scriptsFolder.listFiles()!!) {
             if (script.isFile && script.name.endsWith(".planet.kts")) {
-                log("Loading planet script: ${script.name}")
+                logger.log("Loading planet script: ${script.name}")
                 val result = evalScript(script.toScriptSource())
                 for (diagnostic in result.reports) {
-                    log(
+                    logger.log(
                         when (diagnostic.severity) {
                             ScriptDiagnostic.Severity.ERROR, ScriptDiagnostic.Severity.FATAL -> Level.SEVERE
                             ScriptDiagnostic.Severity.WARNING -> Level.WARNING
@@ -135,7 +138,7 @@ open class Galactifun2 : AbstractAddon() {
                         if (planet is PlanetaryWorld) {
                             planet.register()
                         }
-                        log("Registered planet: ${planet.name}")
+                        logger.log("Registered planet: ${planet.name}")
                     }
                 }
             }
@@ -144,14 +147,13 @@ open class Galactifun2 : AbstractAddon() {
         GalactifunItems // Trigger static init
 
         launch {
-            log(
-                Level.INFO,
-                "################# Galactifun2 $pluginVersion #################",
-                "",
-                "Galactifun2 is open source, you can contribute or report bugs at $bugTrackerURL",
-                "Join the Slimefun Addon Community Discord: discord.gg/SqD3gg5SAU",
-                "",
-                "###################################################"
+            Bukkit.getConsoleSender().sendMessage(
+                NamedTextColor.GREEN + """################# Galactifun2 $pluginVersion #################
+                
+                Galactifun2 is open source, you can contribute or report bugs at $bugTrackerURL
+                Join the Slimefun Addon Community Discord: discord.gg/SqD3gg5SAU
+                
+                ###################################################""".trimIndent()
             )
         }
 
@@ -159,7 +161,10 @@ open class Galactifun2 : AbstractAddon() {
     }
 
     override suspend fun onDisableAsync() {
-        instance = null
+        Bukkit.getConsoleSender().sendMessage(
+            NamedTextColor.GREEN +
+                    "YOU MAY SAFELY IGNORE THE COROUTINE CANCELLATION EXCEPTION BELOW, I HAVE NO IDEA HOW TO FIX IT"
+        )
     }
 
     override fun getJavaPlugin(): JavaPlugin = this
@@ -224,7 +229,7 @@ open class Galactifun2 : AbstractAddon() {
             if (planet is PlanetaryWorld) {
                 planet.register()
             }
-            log("Registered planet: ${planet.name}")
+            logger.log("Registered planet: ${planet.name}")
         }
     }
 }
@@ -233,14 +238,6 @@ private var instance: Galactifun2? = null
 
 val pluginInstance: Galactifun2
     get() = checkNotNull(instance) { "Plugin is not enabled" }
-
-fun JavaPlugin.log(level: Level, vararg messages: String) {
-    for (message in messages) {
-        logger.log(level, message)
-    }
-}
-
-fun JavaPlugin.log(vararg messages: String) = log(Level.INFO, *messages)
 
 fun JavaPlugin.launchAsync(
     context: CoroutineContext = asyncDispatcher,

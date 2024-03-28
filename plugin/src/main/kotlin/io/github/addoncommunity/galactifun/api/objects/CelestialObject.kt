@@ -1,6 +1,6 @@
 package io.github.addoncommunity.galactifun.api.objects
 
-import io.github.addoncommunity.galactifun.Constants
+import io.github.addoncommunity.galactifun.GRAVITATIONAL_CONSTANT
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.units.Acceleration.Companion.metersPerSecondSquared
 import io.github.addoncommunity.galactifun.units.Angle.Companion.degrees
@@ -21,18 +21,15 @@ sealed class CelestialObject(name: String, baseItem: ItemStack) {
 
     val item = CustomItemStack(baseItem, name)
 
-    abstract fun distanceTo(other: CelestialObject, time: Instant): Distance
-
-
     abstract val mass: Mass
     abstract val radius: Distance
 
     val gravity by lazy {
-        (Constants.GRAVITATIONAL_CONSTANT * mass.kilograms / (radius.meters * radius.meters)).metersPerSecondSquared
+        (GRAVITATIONAL_CONSTANT * mass.kilograms / (radius.meters * radius.meters)).metersPerSecondSquared
     }
 
-    val gravitationalParameter by LazyDouble { Constants.GRAVITATIONAL_CONSTANT * mass.kilograms }
-    val escapeVelocity by lazy { sqrt(2 * Constants.GRAVITATIONAL_CONSTANT * mass.kilograms / radius.meters).metersPerSecond }
+    val gravitationalParameter by LazyDouble { GRAVITATIONAL_CONSTANT * mass.kilograms }
+    val escapeVelocity by lazy { sqrt(2 * GRAVITATIONAL_CONSTANT * mass.kilograms / radius.meters).metersPerSecond }
     val parkingOrbit: Orbit by lazy {
         Orbit(
             parent = this,
@@ -49,6 +46,8 @@ sealed class CelestialObject(name: String, baseItem: ItemStack) {
     fun addOrbiter(orbiter: CelestialObject) {
         _orbiters.add(orbiter)
     }
+
+    abstract fun distanceTo(other: CelestialObject, time: Instant): Distance
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

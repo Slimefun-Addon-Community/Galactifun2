@@ -1,6 +1,7 @@
 package io.github.addoncommunity.galactifun.api.objects.properties
 
 import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
+import io.github.seggan.sf4k.location.plus
 import org.bukkit.Location
 import org.bukkit.persistence.PersistentDataAdapterContext
 import org.bukkit.persistence.PersistentDataType
@@ -23,6 +24,8 @@ data class OrbitPosition(val x: Int, val z: Int) {
             0.0,
             z * ORBIT_SIZE + ORBIT_SIZE / 2.0
         )
+
+    fun offset(location: Location): Location = centerLocation + location
 
     object DataType : PersistentDataType<IntArray, OrbitPosition> {
         override fun getPrimitiveType() = IntArray::class.java

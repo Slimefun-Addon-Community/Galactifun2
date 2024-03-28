@@ -21,6 +21,7 @@ abstract class PlanetaryWorld(
         private set
 
     fun register() {
+        orbit.parent.addOrbiter(this)
         world = loadWorld()
         PlanetManager.register(this)
     }

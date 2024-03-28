@@ -1,5 +1,6 @@
 package io.github.addoncommunity.galactifun.impl
 
+import io.github.addoncommunity.galactifun.api.objects.MilkyWay
 import io.github.addoncommunity.galactifun.api.objects.Star
 import io.github.addoncommunity.galactifun.impl.objects.earth.Earth
 import io.github.addoncommunity.galactifun.impl.objects.earth.Moon
@@ -23,6 +24,7 @@ object BaseUniverse {
     val moon = Moon()
 
     fun init() {
+        MilkyWay.addStar(sun)
         earth.register()
         moon.register()
     }

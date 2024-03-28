@@ -4,6 +4,7 @@ import io.github.addoncommunity.galactifun.pluginInstance
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.*
@@ -50,9 +51,17 @@ fun Entity.galactifunTeleport(
     }
 }
 
-operator fun TextColor.plus(s: String): TextComponent = Component.text().color(this).content(s).build()
+operator fun TextColor.plus(s: String): TextComponent = Component.text()
+    .color(this)
+    .decoration(TextDecoration.ITALIC, false)
+    .content(s)
+    .build()
 
 operator fun <T : Keyed> Tag<T>.contains(item: T): Boolean = isTagged(item)
 
 fun String.miniMessageToLegacy(): String =
     LegacyComponentSerializer.legacyAmpersand().serialize(MiniMessage.miniMessage().deserialize(this))
+
+fun locationZero(world: World?): Location {
+    return Location(world, 0.0, 0.0, 0.0)
+}

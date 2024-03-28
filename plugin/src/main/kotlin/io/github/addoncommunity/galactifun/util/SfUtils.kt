@@ -1,11 +1,16 @@
+@file:Suppress("DEPRECATION")
+
 package io.github.addoncommunity.galactifun.util
 
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem
 import io.github.thebusybiscuit.slimefun4.libraries.dough.blocks.BlockPosition
 import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.RandomizedSet
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.MenuClickHandler
 import me.mrCookieSlime.Slimefun.api.BlockStorage
 import org.bukkit.Location
 import org.bukkit.block.Block
+import org.bukkit.inventory.ItemStack
 
 /**
  * Checks if the block at the given location is a Slimefun item of the given type.
@@ -40,3 +45,11 @@ inline fun <reified S : SlimefunItem, T> Iterable<Block>.processSlimefunBlocks(
 inline fun <reified S : SlimefunItem, T> Iterable<BlockPosition>.processSlimefunBlocks(
     processor: S.(Block) -> T
 ): List<T> = map(BlockPosition::getBlock).processSlimefunBlocks(processor)
+
+operator fun ChestMenu.set(slot: Int, item: ItemStack) {
+    addItem(slot, item)
+}
+
+operator fun ChestMenu.set(slot: Int, handler: MenuClickHandler) {
+    addMenuClickHandler(slot, handler)
+}

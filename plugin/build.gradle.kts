@@ -8,23 +8,23 @@ plugins {
 }
 
 repositories {
-    maven(url = "https://papermc.io/repo/repository/maven-public/")
+    mavenCentral()
     maven(url = "https://jitpack.io/")
     maven(url = "https://repo.aikar.co/content/groups/aikar/")
     maven(url = "https://hub.jeff-media.com/nexus/repository/jeff-media-public/")
 }
 
-fun DependencyHandlerScope.libraryAndTest(dependency: Any) {
-    library(dependency)
-    testImplementation(dependency)
-}
-
-fun DependencyHandlerScope.compileOnlyAndTest(dependency: Any) {
-    compileOnly(dependency)
-    testImplementation(dependency)
-}
-
 dependencies {
+    fun DependencyHandlerScope.libraryAndTest(dependency: Any) {
+        library(dependency)
+        testImplementation(dependency)
+    }
+
+    fun DependencyHandlerScope.compileOnlyAndTest(dependency: Any) {
+        compileOnly(dependency)
+        testImplementation(dependency)
+    }
+
     library(kotlin("stdlib"))
     libraryAndTest("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC2")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0") // For some reason libraryloader doesn't like this
@@ -74,12 +74,18 @@ tasks.test {
 
 tasks.shadowJar {
     dependsOn(tasks.test)
-    relocate("io.github.seggan.kfun", "io.github.addoncommunity.galactifun.kfun")
-    relocate("org.bstats", "io.github.addoncommunity.galactifun.bstats")
-    relocate("co.aikar.commands", "io.github.addoncommunity.galactifun.acf")
-    relocate("co.aikar.locales", "io.github.addoncommunity.galactifun.acf.locales")
-    relocate("com.jeff_media.morepersistentdatatypes", "io.github.addoncommunity.galactifun.pdts")
-    relocate("org.jetbrains.kotlinx", "io.github.addoncommunity.galactifun.kotlinx")
+
+    fun doRelocate(from: String) {
+        val last = from.split(".").last()
+        relocate(from, "io.github.addoncommunity.galactifun.shadowlibs.$last")
+    }
+
+    doRelocate("io.github.seggan.kfun")
+    doRelocate("org.bstats")
+    doRelocate("co.aikar.commands")
+    doRelocate("co.aikar.locales")
+    doRelocate("com.jeff_media.morepersistentdatatypes")
+    doRelocate("org.jetbrains.kotlinx")
 
     dependencies {
         exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
@@ -88,7 +94,7 @@ tasks.shadowJar {
         exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-common"))
     }
 
-    archiveBaseName.set("galactifun2")
+    archiveBaseName = "galactifun2"
 }
 
 bukkit {

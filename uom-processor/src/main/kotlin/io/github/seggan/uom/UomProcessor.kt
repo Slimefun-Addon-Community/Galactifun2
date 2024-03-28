@@ -105,7 +105,7 @@ class UomProcessor(
                             "return %T(%L.toString()).toPlainString() + %S",
                             BigDecimal::class.java,
                             baseUnit,
-                            " $baseUnit"
+                            " ${baseUnit.camelToWords()}"
                         )
                         .build()
                 )
@@ -118,8 +118,8 @@ class UomProcessor(
                         .addParameter("precision", Int::class)
                         .addStatement(
                             "formatter.format(%S + precision + %S, %N)",
-                            "%.",
-                            "f $baseUnit",
+                            "%,.",
+                            "f ${baseUnit.camelToWords()}",
                             baseUnit,
                         )
                         .build()
@@ -341,4 +341,8 @@ private fun TypeSpec.Builder.addScalarOperator(
 private fun KSDeclaration.getBaseUnit(): String? {
     return annotations.find { it.shortName.asString() == "Measure" }
         ?.arguments?.firstOrNull()?.value as? String
+}
+
+private fun String.camelToWords(): String {
+    return replace(Regex("([a-z])([A-Z])")) { "${it.groupValues[1]} ${it.groupValues[2].lowercase()}" }
 }

@@ -1,6 +1,6 @@
 package io.github.addoncommunity.galactifun.api.rockets
 
-import io.github.addoncommunity.galactifun.Constants
+import io.github.addoncommunity.galactifun.EARTH_GRAVITY
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.impl.items.FuelTank
 import io.github.addoncommunity.galactifun.impl.items.RocketEngine
@@ -59,15 +59,15 @@ class RocketInfo(
             appendLine("    Engines:")
             var engineNum = 1
             for (engine in stage.engines) {
-                appendLine("      Engine ${engineNum++}: %.2f kilonewtons".format(engine.first.thrust.kilonewtons))
+                appendLine("      Engine ${engineNum++}: %,.2f kilonewtons".format(engine.first.thrust.kilonewtons))
             }
-            appendLine("    Delta-V: %.2f m/s".format(stage.deltaV.metersPerSecond))
+            appendLine("    Delta-V: %.2s".format(stage.deltaV))
         }
-        appendLine("Thrust: %.2f kilonewtons".format(thrust.kilonewtons))
+        appendLine("Thrust: %,.2f kilonewtons".format(thrust.kilonewtons))
         appendLine("Wet mass: %.2s".format(wetMass))
         appendLine("Dry mass: %.2s".format(dryMass))
         appendLine("TWR: %.2f".format(twr(planet.gravity)))
-        appendLine("Delta-V: %.2f m/s".format(deltaV(engines, wetMass, dryMass).metersPerSecond))
+        appendLine("Delta-V: %.2s".format(deltaV(engines, wetMass, dryMass)))
     }
 
     fun twr(gravity: Acceleration): Double {
@@ -97,5 +97,5 @@ private fun deltaV(engines: List<RocketEngine>, wetMass: Mass, dryMass: Mass): V
     val ispDenom = engines.sumOf { it.thrust.newtons / it.specificImpulse.doubleSeconds }
     val isp = (ispNeum / ispDenom).seconds
 
-    return Constants.EARTH_GRAVITY * isp * ln(wetMass / dryMass)
+    return EARTH_GRAVITY * isp * ln(wetMass / dryMass)
 }

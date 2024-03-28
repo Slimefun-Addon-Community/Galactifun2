@@ -1,6 +1,6 @@
 package io.github.addoncommunity.galactifun.api.objects.properties
 
-import io.github.addoncommunity.galactifun.Constants
+import io.github.addoncommunity.galactifun.EARTH_GRAVITY
 import io.github.addoncommunity.galactifun.api.objects.CelestialObject
 import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.units.*
@@ -235,7 +235,7 @@ private fun oneTangentTransferOrbit(
 
 private fun brachistochroneTransfer(
     distance: Distance,
-    acceleration: Acceleration = Constants.EARTH_GRAVITY / 16
+    acceleration: Acceleration = EARTH_GRAVITY / 16
 ): BrachistochroneTransfer {
     val time = 2.seconds * sqrt(distance.meters / acceleration.metersPerSecondSquared)
     return BrachistochroneTransfer(acceleration * time, time)

@@ -1,6 +1,8 @@
 package io.github.addoncommunity.galactifun.util.general
 
 import java.util.*
+import java.util.logging.Level
+import java.util.logging.Logger
 
 inline fun <K, V> Map<K, V>.mergeMaps(other: Map<K, V>, merge: (V, V) -> V): Map<K, V> {
     val result = this.toMutableMap()
@@ -26,3 +28,7 @@ inline fun <reified K : Enum<K>, V> enumMapOf(vararg pairs: Pair<K, V>): EnumMap
 inline fun <reified E : Enum<E>> enumSetOf(): EnumSet<E> = EnumSet.noneOf(E::class.java)
 
 inline fun <reified K : Enum<K>, V> enumMapOf(): EnumMap<K, V> = EnumMap(K::class.java)
+
+fun Logger.log(message: String) {
+    log(Level.INFO, message)
+}

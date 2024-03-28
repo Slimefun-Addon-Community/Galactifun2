@@ -1,20 +1,16 @@
 package io.github.addoncommunity.galactifun.api.objects
 
+import io.github.addoncommunity.galactifun.TAU
 import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.api.objects.properties.OrbitPosition
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
 import io.github.addoncommunity.galactifun.api.objects.properties.visVivaEquation
 import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
-import io.github.addoncommunity.galactifun.units.Distance
+import io.github.addoncommunity.galactifun.units.*
 import io.github.addoncommunity.galactifun.units.Distance.Companion.meters
-import io.github.addoncommunity.galactifun.units.Velocity
 import io.github.addoncommunity.galactifun.units.Velocity.Companion.metersPerSecond
-import io.github.addoncommunity.galactifun.units.abs
-import io.github.addoncommunity.galactifun.units.cos
-import io.github.seggan.sf4k.location.plus
 import kotlinx.datetime.Instant
-import org.bukkit.Location
 import org.bukkit.inventory.ItemStack
 import kotlin.math.sqrt
 
@@ -24,22 +20,28 @@ abstract class PlanetaryObject(name: String, baseItem: ItemStack) : CelestialObj
     abstract val atmosphere: Atmosphere
     abstract val orbit: Orbit
 
+    val surfaceToOrbitCost by lazy {
+        visVivaEquation(
+            gravitationalParameter,
+            parkingOrbit.semimajorAxis,
+            parkingOrbit.semimajorAxis
+        ) - (radius * TAU / dayCycle.duration) // surface velocity
+    }
+
     val star: Star by lazy {
-        val parent = orbit.parent
-        if (parent is Star) parent else (parent as PlanetaryObject).star
+        when (val parent = orbit.parent) {
+            is Star -> parent
+            is PlanetaryObject -> parent.star
+        }
     }
 
     val orbitPosition: OrbitPosition
         get() = PlanetManager.getOrbit(this)
 
-    fun getOrbitOffset(location: Location): Location {
-        return orbitPosition.centerLocation + location
-    }
-
     override fun distanceTo(other: CelestialObject, time: Instant): Distance {
         if (other == this) return 0.meters
-        if (other is Star) {
-            if (star == other) {
+        when (other) {
+            is Star -> if (star == other) {
                 var dist = orbit.radius(time)
                 if (orbit.parent != other) {
                     dist += orbit.parent.distanceTo(other, time)
@@ -48,19 +50,18 @@ abstract class PlanetaryObject(name: String, baseItem: ItemStack) : CelestialObj
             } else {
                 return star.distanceTo(other, time) + distanceTo(star, time)
             }
-        }
 
-        require(other is PlanetaryObject)
-        if (star == other.star) {
-            if (orbit.parent == other.orbit.parent) {
-                val thisDist = orbit.radius(time).meters
-                val otherDist = other.orbit.radius(time).meters
-                val cosAngle = cos(orbit.trueAnomaly(time) - other.orbit.trueAnomaly(time))
-                return sqrt(thisDist * thisDist + otherDist * otherDist - 2 * thisDist * otherDist * cosAngle).meters
+            is PlanetaryObject -> if (star == other.star) {
+                if (orbit.parent == other.orbit.parent) {
+                    val thisDist = orbit.radius(time).meters
+                    val otherDist = other.orbit.radius(time).meters
+                    val cosAngle = cos(orbit.trueAnomaly(time) - other.orbit.trueAnomaly(time))
+                    return sqrt(thisDist * thisDist + otherDist * otherDist - 2 * thisDist * otherDist * cosAngle).meters
+                }
+                return orbit.radius(time) + orbit.parent.distanceTo(other, time)
+            } else {
+                return other.distanceTo(star, time) + distanceTo(star, time)
             }
-            return orbit.radius(time) + orbit.parent.distanceTo(other, time)
-        } else {
-            return other.distanceTo(star, time) + distanceTo(star, time)
         }
     }
 

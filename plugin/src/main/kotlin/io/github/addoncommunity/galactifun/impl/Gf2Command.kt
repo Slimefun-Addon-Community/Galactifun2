@@ -5,6 +5,7 @@ import co.aikar.commands.annotation.*
 import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
+import io.github.addoncommunity.galactifun.util.PlanetMenu
 import io.github.addoncommunity.galactifun.util.galactifunTeleport
 import io.github.seggan.sf4k.location.plusAssign
 import kotlinx.datetime.Clock
@@ -44,5 +45,10 @@ object Gf2Command : BaseCommand() {
         val start = PlanetManager.getByWorld(player.world) ?: return
         val distance = start.getDeltaVForTransferTo(planet, Clock.System.now())
         player.sendMessage("The delta-v required to transfer to %s is %.2f m/s".format(planet.name, distance))
+    }
+
+    @Subcommand("selector")
+    fun selector(player: Player) {
+        PlanetMenu().open(player)
     }
 }

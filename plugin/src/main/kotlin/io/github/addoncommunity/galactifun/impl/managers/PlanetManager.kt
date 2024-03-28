@@ -2,10 +2,8 @@ package io.github.addoncommunity.galactifun.impl.managers
 
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.jeff_media.morepersistentdatatypes.DataType
-import io.github.addoncommunity.galactifun.Constants
 import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
-import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
 import io.github.addoncommunity.galactifun.api.objects.properties.OrbitPosition
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
 import io.github.addoncommunity.galactifun.impl.Permissions
@@ -13,6 +11,7 @@ import io.github.addoncommunity.galactifun.impl.space.SpaceGenerator
 import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.util.getNearbyEntitiesByType
 import io.github.addoncommunity.galactifun.util.key
+import io.github.addoncommunity.galactifun.util.locationZero
 import io.github.addoncommunity.galactifun.util.spawn
 import io.papermc.paper.event.entity.EntityMoveEvent
 import org.bukkit.Bukkit
@@ -63,14 +62,13 @@ object PlanetManager : Listener {
             .environment(World.Environment.THE_END)
             .createWorld() ?: error("Could not create world galactifun_space")
 
-        DayCycle.ETERNAL_NIGHT.applyEffects(spaceWorld)
         Atmosphere.NONE.applyEffects(spaceWorld)
         spaceWorld.setGameRule(GameRule.DO_MOB_SPAWNING, false)
 
         spaceWorldMarker = spaceWorld.getNearbyEntitiesByType<Marker>(
-            Constants.locationZero(spaceWorld),
+            locationZero(spaceWorld),
             0.1
-        ).firstOrNull() ?: spaceWorld.spawn<Marker>(Constants.locationZero(spaceWorld))
+        ).firstOrNull() ?: spaceWorld.spawn<Marker>(locationZero(spaceWorld))
 
         orbits = spaceWorldMarker.persistentDataContainer.getOrDefault(orbitsKey, orbitsPdt, mutableMapOf())
 

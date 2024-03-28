@@ -1,6 +1,6 @@
 package io.github.addoncommunity.galactifun.util.items
 
-import io.github.addoncommunity.galactifun.blocks.CustomMass
+import io.github.addoncommunity.galactifun.api.blocks.CustomMass
 import io.github.addoncommunity.galactifun.units.Mass
 import io.github.addoncommunity.galactifun.units.Mass.Companion.kilograms
 import io.github.addoncommunity.galactifun.units.Mass.Companion.tons

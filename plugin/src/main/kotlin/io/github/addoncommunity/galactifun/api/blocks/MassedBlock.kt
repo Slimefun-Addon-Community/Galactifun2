@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.blocks
+package io.github.addoncommunity.galactifun.api.blocks
 
 import io.github.addoncommunity.galactifun.units.Mass
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
