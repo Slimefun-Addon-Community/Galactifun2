@@ -44,7 +44,7 @@ object Gf2Command : BaseCommand() {
     fun distance(player: Player, planet: PlanetaryObject) {
         val start = PlanetManager.getByWorld(player.world) ?: return
         val distance = start.getDeltaVForTransferTo(planet, Clock.System.now())
-        player.sendMessage("The delta-v required to transfer to %s is %.2f m/s".format(planet.name, distance))
+        player.sendMessage("The delta-v required to transfer to %s is %.2f m/s".format(planet.name, distance.metersPerSecond))
     }
 
     @Subcommand("selector")

@@ -1,10 +1,11 @@
 plugins {
     kotlin("jvm")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.3"
-    id("xyz.jpenilla.run-paper") version "2.2.0"
+    kotlin("plugin.serialization") version "1.9.23"
+    id("com.google.devtools.ksp") version "1.9.23-1.0.20"
 
-    id("com.google.devtools.ksp") version "1.9.22-1.0.17"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
+    id("xyz.jpenilla.run-paper") version "2.2.0"
 }
 
 repositories {
@@ -42,14 +43,14 @@ dependencies {
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
     implementation("com.jeff_media:MorePersistentDataTypes:2.4.0")
 
-    implementation("io.github.seggan:sf4k:0.1.1")
+    implementation("io.github.seggan:sf4k:0.3.2")
 
     implementation(project(":uom"))
     ksp(project(":uom-processor"))
 
     testImplementation(kotlin("test"))
     testImplementation("io.kotest:kotest-assertions-core:5.8.0")
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.78.0")
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.80.0")
     testImplementation("com.github.shynixn.mccoroutine:mccoroutine-bukkit-test:2.14.0")
 }
 
@@ -85,7 +86,6 @@ tasks.shadowJar {
     doRelocate("co.aikar.commands")
     doRelocate("co.aikar.locales")
     doRelocate("com.jeff_media.morepersistentdatatypes")
-    doRelocate("org.jetbrains.kotlinx")
 
     dependencies {
         exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))

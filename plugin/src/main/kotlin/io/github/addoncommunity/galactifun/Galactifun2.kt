@@ -46,8 +46,7 @@ import kotlin.time.Duration.Companion.hours
 
 open class Galactifun2 : AbstractAddon() {
 
-    lateinit var manager: PaperCommandManager
-        private set
+    private lateinit var manager: PaperCommandManager
 
     var isTest = classLoader.javaClass.packageName.startsWith("be.seeseemelk.mockbukkit")
 

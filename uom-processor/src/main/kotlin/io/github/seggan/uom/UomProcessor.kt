@@ -47,6 +47,7 @@ class UomProcessor(
                 .addOriginatingKSFile(classDeclaration.containingFile!!)
                 .addModifiers(KModifier.VALUE)
                 .jvmInline()
+                .addAnnotation(ClassName("kotlinx.serialization", "Serializable"))
                 .addSuperinterface(COMPARABLE.parameterizedBy(clazzName))
                 .addSuperinterface(Formattable::class)
 

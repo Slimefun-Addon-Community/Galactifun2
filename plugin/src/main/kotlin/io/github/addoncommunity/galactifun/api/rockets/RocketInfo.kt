@@ -95,7 +95,7 @@ class RocketInfo(
 private fun deltaV(engines: List<RocketEngine>, wetMass: Mass, dryMass: Mass): Velocity {
     val ispNeum = engines.sumBy { it.thrust }.newtons
     val ispDenom = engines.sumOf { it.thrust.newtons / it.specificImpulse.doubleSeconds }
-    val isp = (ispNeum / ispDenom).seconds
+    val isp = if (ispDenom == 0.0) 0.seconds else (ispNeum / ispDenom).seconds
 
     return EARTH_GRAVITY * isp * ln(wetMass / dryMass)
 }

@@ -15,7 +15,8 @@ import io.github.addoncommunity.galactifun.util.general.mergeMaps
 import io.github.addoncommunity.galactifun.util.general.with
 import io.github.addoncommunity.galactifun.util.items.TickingBlock
 import io.github.addoncommunity.galactifun.util.items.buildMenu
-import io.github.seggan.sf4k.serial.*
+import io.github.seggan.sf4k.serial.blockstorage.getBlockStorage
+import io.github.seggan.sf4k.serial.blockstorage.setBlockStorage
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType
@@ -43,11 +44,6 @@ class FuelTank(
             input(INPUT with 0).addBorder()
             item(0 with 0, CustomItemStack(Material.WATER_BUCKET, "&fContents"))
         }
-
-        private val fuelDataType = MapBlockStorageDataType(
-            EnumBlockStorageDataType(Gas::class),
-            BlockStorageDataType.DOUBLE
-        )
     }
 
     override fun tick(b: Block) {
@@ -115,11 +111,11 @@ class FuelTank(
     }
 
     fun getFuelLevel(block: Block): Map<Gas, Volume> {
-        return block.getBlockStorage("fuel", fuelDataType)?.mapValues { it.value.liters } ?: emptyMap()
+        return block.getBlockStorage<Map<Gas, Volume>>("fuel") ?: emptyMap()
     }
 
     fun setFuelLevel(block: Block, fuel: Map<Gas, Volume>) {
-        block.setBlockStorage("fuel", fuel.mapValues { it.value.liters }, fuelDataType)
+        block.setBlockStorage("fuel", fuel)
     }
 
     override fun getMass(block: Block): Mass = 729.kilograms // based on a 1 m^3 tank with 0.5 m thick walls of aluminum
