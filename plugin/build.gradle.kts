@@ -37,7 +37,7 @@ dependencies {
     libraryAndTest(kotlin("script-runtime"))
 
     compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
-    compileOnlyAndTest("com.github.Slimefun:Slimefun4:206a9d6")
+    compileOnlyAndTest("com.github.Slimefun:Slimefun4:RC-37")
 
     implementation("org.bstats:bstats-bukkit:3.0.2")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
