@@ -12,8 +12,11 @@ import io.github.addoncommunity.galactifun.units.Mass.Companion.kilograms
 import kotlinx.datetime.Instant
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import org.metamechanists.displaymodellib.models.ModelBuilder
+import org.metamechanists.displaymodellib.models.components.ModelCuboid
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
+
 
 class Moon : AlienWorld("Moon", ItemStack(Material.END_STONE)) {
     override val atmosphere = Atmosphere.NONE
@@ -28,4 +31,48 @@ class Moon : AlienWorld("Moon", ItemStack(Material.END_STONE)) {
     override val mass = 7.346e22.kilograms
     override val radius = 1737.4.kilometers
     override val generator: WorldGenerator = MoonGenerator()
+
+    override val moon: ModelBuilder = ModelBuilder()
+        .add(
+            "water", ModelCuboid()
+                .material(Material.LAPIS_BLOCK)
+                .scale(16f, 1f, 16f)
+                .translate(8f, 0.5f, 8f)
+        )
+        .add(
+            "na", ModelCuboid()
+                .material(Material.GRASS_BLOCK)
+                .scale(8f, 1.0f, 6f)
+                .translate(11f, 0.6f, 3.1f)
+        )
+        .add(
+            "sa", ModelCuboid()
+                .material(Material.GRASS_BLOCK)
+                .scale(8f, 1.0f, 2f)
+                .translate(4f, 0.6f, 1.1f)
+        )
+        .add(
+            "af", ModelCuboid()
+                .material(Material.GRASS_BLOCK)
+                .scale(7f, 1.0f, 7f)
+                .translate(3.5f, 0.6f, 12.5f)
+        )
+        .add(
+            "eu", ModelCuboid()
+                .material(Material.GRASS_BLOCK)
+                .scale(6f, 1.0f, 8f)
+                .translate(11f, 0.6f, 12f)
+        )
+        .add(
+            "north_pole", ModelCuboid()
+                .material(Material.SNOW_BLOCK)
+                .scale(2f, 1.0f, 6f)
+                .translate(15f, 0.7f, 8f)
+        )
+        .add(
+            "south_pole", ModelCuboid()
+                .material(Material.SNOW_BLOCK)
+                .scale(2f, 1.0f, 6f)
+                .translate(1f, 0.7f, 8f)
+        )
 }

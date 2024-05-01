@@ -19,7 +19,7 @@ import kotlin.time.DurationUnit
 
 class OrbitTest : CommonTest() {
 
-    lateinit var orbit: Orbit
+    private lateinit var orbit: Orbit
 
     @BeforeEach
     fun setUpOrbit() {

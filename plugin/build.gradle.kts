@@ -10,9 +10,10 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven(url = "https://jitpack.io/")
-    maven(url = "https://repo.aikar.co/content/groups/aikar/")
-    maven(url = "https://hub.jeff-media.com/nexus/repository/jeff-media-public/")
+    maven("https://jitpack.io/")
+    maven("https://repo.aikar.co/content/groups/aikar/")
+    maven("https://hub.jeff-media.com/nexus/repository/jeff-media-public/")
+    maven("https://repo.metamechanists.org/releases/")
 }
 
 dependencies {
@@ -42,6 +43,8 @@ dependencies {
     implementation("org.bstats:bstats-bukkit:3.0.2")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
     implementation("com.jeff_media:MorePersistentDataTypes:2.4.0")
+
+    implementation("org.metamechanists:DisplayModelLib:23")
 
     implementation("io.github.seggan:sf4k:0.3.2")
 
@@ -86,6 +89,7 @@ tasks.shadowJar {
     doRelocate("co.aikar.commands")
     doRelocate("co.aikar.locales")
     doRelocate("com.jeff_media.morepersistentdatatypes")
+    doRelocate("org.metamechanists.displaymodellib")
 
     dependencies {
         exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
