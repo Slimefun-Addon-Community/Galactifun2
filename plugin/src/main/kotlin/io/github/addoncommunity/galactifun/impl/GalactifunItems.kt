@@ -13,6 +13,7 @@ import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType
 import org.bukkit.Material
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("unused")
 object GalactifunItems {
 
     val COMMAND_COMPUTER = buildSlimefunItem<CommandComputer> {
@@ -40,7 +41,7 @@ object GalactifunItems {
         +"<yellow>Capacity: 1000 L"
     }
 
-    val ROCKET_ENGINE_I = buildSlimefunItem<RocketEngine>(300.seconds, 100.kilonewtons, Gas.HYDROGEN) {
+    val ROCKET_ENGINE_I = buildSlimefunItem<RocketEngine>(3000.seconds, 100.kilonewtons, Gas.HYDROGEN) {
         category = GalactifunCategories.ROCKET_COMPONENTS
         id = "ROCKET_ENGINE_I"
         name = "<white>BMR-50 \"Lil' Boomer\""
@@ -52,7 +53,7 @@ object GalactifunItems {
         +""
         +"<gray>Manufacturer: Boomer & Bros. Explosives, Inc."
         +"<yellow>Thrust: 100 kN"
-        +"<yellow>Specific impulse: 300 s"
+        +"<yellow>Specific impulse: 3000 s"
         +"<yellow>Fuel: Hydrogen"
     }
 

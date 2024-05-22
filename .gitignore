@@ -2,6 +2,7 @@
 /.settings
 /target
 /.idea
+/.kotlin
 *.iml
 .project
 .classpath

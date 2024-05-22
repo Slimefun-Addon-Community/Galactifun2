@@ -7,7 +7,6 @@ import io.github.addoncommunity.galactifun.api.objects.MilkyWay
 import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.Star
 import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
-import io.github.addoncommunity.galactifun.util.PlanetMenu.PlanetClickHandler
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils
 import kotlinx.datetime.Clock
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu
@@ -20,13 +19,14 @@ import org.bukkit.inventory.ItemStack
 import java.util.*
 import kotlin.collections.ArrayDeque
 
-class PlanetMenu(
-    private val exitHandler: MenuClickHandler = MenuClickHandler { p, _, _, _ -> p.closeInventory(); false },
-    private val clickHandler: PlanetClickHandler = PlanetClickHandler { _, _, _ -> true },
-    private val modifier: (Player, CelestialObject, ItemStack) -> ItemStack = { _, _, item -> item }
-) {
+open class PlanetMenu {
 
     private val history = mutableMapOf<UUID, ArrayDeque<CelestialObject>>()
+
+    private val exitHandler = MenuClickHandler { player, _, _, _ ->
+        onExit(player)
+        false
+    }
 
     fun open(p: Player) {
         openGalaxy(p)
@@ -100,9 +100,9 @@ class PlanetMenu(
         }
         val item = to.item.clone()
         item.lore(info)
-        menu[i] = modifier(p, to, item)
+        menu[i] = modifyItem(p, to, item)
         menu[i] = MenuClickHandler { _, _, _, action ->
-            if (clickHandler.onClick(p, to, action) && to.orbiters.isNotEmpty()) {
+            if (onClick(p, to, action) && to.orbiters.isNotEmpty()) {
                 history.getOrPut(p.uniqueId, ::ArrayDeque).addLast(from)
                 open(p, to)
             }
@@ -110,13 +110,35 @@ class PlanetMenu(
         }
     }
 
-    fun interface PlanetClickHandler {
-        /**
-         * @param p The player who clicked
-         * @param obj The celestial object that was clicked
-         * @param action The action that was performed
-         * @return True if the menu should open the planet's children
-         */
-        fun onClick(p: Player, obj: CelestialObject, action: ClickAction): Boolean
+    /**
+     * Called when the menu is closed
+     *
+     * @param p The player who closed the menu
+     */
+    open fun onExit(p: Player) {
+        p.closeInventory()
+    }
+
+    /**
+     * Called when a player clicks on a celestial object
+     *
+     * @param p The player who clicked
+     * @param obj The celestial object that was clicked
+     * @param action The action that was performed
+     * @return `true` if the menu should open the planet's children
+     */
+    open fun onClick(p: Player, obj: CelestialObject, action: ClickAction): Boolean {
+        return true
+    }
+
+    /**
+     * Modifies the item that represents a celestial object
+     *
+     * @param p The player who is viewing the menu
+     * @param obj The celestial object that is being displayed
+     * @param item The item that represents the celestial object
+     */
+    open fun modifyItem(p: Player, obj: CelestialObject, item: ItemStack): ItemStack {
+        return item
     }
 }

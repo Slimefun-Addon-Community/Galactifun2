@@ -1,6 +1,7 @@
 package io.github.addoncommunity.galactifun.util
 
 import io.github.addoncommunity.galactifun.pluginInstance
+import kotlinx.coroutines.suspendCancellableCoroutine
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.TextColor
@@ -9,9 +10,11 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.*
 import org.bukkit.entity.Entity
+import org.bukkit.event.*
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.metadata.FixedMetadataValue
 import java.util.concurrent.CompletableFuture
+import kotlin.coroutines.resume
 
 fun String.key(): NamespacedKey = NamespacedKey(pluginInstance, this)
 
@@ -64,4 +67,26 @@ fun String.miniMessageToLegacy(): String =
 
 fun locationZero(world: World?): Location {
     return Location(world, 0.0, 0.0, 0.0)
+}
+
+suspend inline fun <reified E : Event> waitForEvent(
+    priority: EventPriority = EventPriority.NORMAL,
+    cancelIfEventCancelled: Boolean = false
+): E {
+    return suspendCancellableCoroutine { cont ->
+        Bukkit.getPluginManager().registerEvent(
+            E::class.java,
+            object : Listener {},
+            priority,
+            { listener, event ->
+                HandlerList.unregisterAll(listener)
+                if (cancelIfEventCancelled && event is Cancellable && event.isCancelled) {
+                    cont.cancel()
+                } else {
+                    cont.resume(event as E)
+                }
+            },
+            pluginInstance
+        )
+    }
 }
