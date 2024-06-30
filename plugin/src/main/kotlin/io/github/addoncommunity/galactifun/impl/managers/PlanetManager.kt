@@ -9,10 +9,10 @@ import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atm
 import io.github.addoncommunity.galactifun.impl.Permissions
 import io.github.addoncommunity.galactifun.impl.space.SpaceGenerator
 import io.github.addoncommunity.galactifun.pluginInstance
-import io.github.addoncommunity.galactifun.util.getNearbyEntitiesByType
 import io.github.addoncommunity.galactifun.util.key
 import io.github.addoncommunity.galactifun.util.locationZero
-import io.github.addoncommunity.galactifun.util.spawn
+import io.github.addoncommunity.galactifun.util.nearbyEntitiesByType
+import io.github.addoncommunity.galactifun.util.summon
 import io.papermc.paper.event.entity.EntityMoveEvent
 import org.bukkit.Bukkit
 import org.bukkit.GameRule
@@ -65,10 +65,10 @@ object PlanetManager : Listener {
         Atmosphere.NONE.applyEffects(spaceWorld)
         spaceWorld.setGameRule(GameRule.DO_MOB_SPAWNING, false)
 
-        spaceWorldMarker = spaceWorld.getNearbyEntitiesByType<Marker>(
+        spaceWorldMarker = spaceWorld.nearbyEntitiesByType<Marker>(
             locationZero(spaceWorld),
             0.1
-        ).firstOrNull() ?: spaceWorld.spawn<Marker>(locationZero(spaceWorld))
+        ).firstOrNull() ?: spaceWorld.summon<Marker>(locationZero(spaceWorld))
 
         orbits = spaceWorldMarker.persistentDataContainer.getOrDefault(orbitsKey, orbitsPdt, mutableMapOf())
 

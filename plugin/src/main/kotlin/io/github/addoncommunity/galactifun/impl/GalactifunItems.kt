@@ -1,6 +1,7 @@
 package io.github.addoncommunity.galactifun.impl
 
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
+import io.github.addoncommunity.galactifun.impl.items.CaptainsChair
 import io.github.addoncommunity.galactifun.impl.items.CommandComputer
 import io.github.addoncommunity.galactifun.impl.items.FuelTank
 import io.github.addoncommunity.galactifun.impl.items.RocketEngine
@@ -24,7 +25,18 @@ object GalactifunItems {
         recipeType = RecipeType.NULL
         recipe = emptyArray()
 
-        +"&7The core for any rocket"
+        +"<gray>The core for any rocket"
+    }
+
+    val CAPTAINS_CHAIR = buildSlimefunItem<CaptainsChair> {
+        category = GalactifunCategories.ROCKET_COMPONENTS
+        id = "CAPTAINS_CHAIR"
+        name = "<white>Captain's Chair"
+        material = MaterialType.Material(Material.OAK_STAIRS)
+        recipeType = RecipeType.NULL
+        recipe = emptyArray()
+
+        +"<gray>The Captain's Chair"
     }
 
     val FUEL_TANK_I = buildSlimefunItem<FuelTank>(1000.liters) {

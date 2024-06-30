@@ -12,7 +12,7 @@ import org.bukkit.*
 import org.bukkit.entity.Entity
 import org.bukkit.event.*
 import org.bukkit.event.player.PlayerTeleportEvent
-import org.bukkit.metadata.FixedMetadataValue
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import kotlin.coroutines.resume
 
@@ -20,7 +20,7 @@ fun String.key(): NamespacedKey = NamespacedKey(pluginInstance, this)
 
 fun Location.withWorld(world: World): Location = Location(world, x, y, z, yaw, pitch)
 
-inline fun <reified T : Entity> World.getNearbyEntitiesByType(
+inline fun <reified T : Entity> World.nearbyEntitiesByType(
     location: Location,
     radius: Double,
     crossinline predicate: (T) -> Boolean = { true }
@@ -32,7 +32,7 @@ inline fun <reified T : Entity> World.getNearbyEntitiesByType(
     }
 }
 
-inline fun <reified T : Entity> World.spawn(location: Location): T = spawn(location, T::class.java)
+inline fun <reified T : Entity> World.summon(location: Location): T = spawn(location, T::class.java)
 
 operator fun RegionAccessor.get(x: Int, y: Int, z: Int): Material = getType(x, y, z)
 operator fun RegionAccessor.get(location: Location): Material = getType(location)
@@ -47,7 +47,7 @@ fun Entity.galactifunTeleport(
     dest: Location,
     reason: PlayerTeleportEvent.TeleportCause = PlayerTeleportEvent.TeleportCause.PLUGIN
 ): CompletableFuture<Boolean> {
-    setMetadata("galactifun.teleporting", FixedMetadataValue(pluginInstance, Unit))
+    setMetadata("galactifun.teleporting", DummyMetadataValue)
     return teleportAsync(dest, reason).thenApply {
         removeMetadata("galactifun.teleporting", pluginInstance)
         it
@@ -56,18 +56,16 @@ fun Entity.galactifunTeleport(
 
 operator fun TextColor.plus(s: String): TextComponent = Component.text()
     .color(this)
-    .decoration(TextDecoration.ITALIC, false)
+    .decorations(EnumSet.allOf(TextDecoration::class.java), false)
     .content(s)
     .build()
 
 operator fun <T : Keyed> Tag<T>.contains(item: T): Boolean = isTagged(item)
 
-fun String.miniMessageToLegacy(): String =
-    LegacyComponentSerializer.legacyAmpersand().serialize(MiniMessage.miniMessage().deserialize(this))
+fun String.miniMessageToLegacy(): String = LegacyComponentSerializer.legacyAmpersand()
+    .serialize(MiniMessage.miniMessage().deserialize(this))
 
-fun locationZero(world: World?): Location {
-    return Location(world, 0.0, 0.0, 0.0)
-}
+fun locationZero(world: World?): Location = Location(world, 0.0, 0.0, 0.0)
 
 suspend inline fun <reified E : Event> waitForEvent(
     priority: EventPriority = EventPriority.NORMAL,
