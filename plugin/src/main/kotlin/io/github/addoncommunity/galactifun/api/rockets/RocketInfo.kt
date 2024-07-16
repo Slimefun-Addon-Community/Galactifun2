@@ -21,8 +21,8 @@ class RocketInfo(
 
     val engines = engineData.keys.map { it.first }
 
-    val thrust = engines.sumBy { it.thrust }
-    val wetMass = blocks.sumBy { it.block.wetMass }
+    val thrust = engines.unitSumOf { it.thrust }
+    val wetMass = blocks.unitSumOf { it.block.wetMass }
 
     val stages: List<Stage>
 
@@ -44,7 +44,7 @@ class RocketInfo(
         }
     }
 
-    val dryMass = wetMass - stages.sumBy { it.fuelMass }
+    val dryMass = wetMass - stages.unitSumOf { it.fuelMass }
 
     val info = buildString {
         val planet = PlanetManager.getByWorld(commandComputer.world) ?: error("Planet not found")
@@ -72,7 +72,8 @@ class RocketInfo(
 
     fun twr(gravity: Acceleration): Double {
         if (gravity == Acceleration.ZERO) return Double.POSITIVE_INFINITY
-        return thrust / (wetMass * gravity)
+        if (stages.isEmpty()) return 0.0
+        return stages.first().engines.unitSumOf { it.first.thrust } / (wetMass * gravity)
     }
 
     inner class Stage(
@@ -82,7 +83,7 @@ class RocketInfo(
         val fuel: Map<Gas, Volume> = fuelBlocks.processSlimefunBlocks<FuelTank, _>(FuelTank::getFuelLevel)
             .fold(mapOf()) { acc, fuel -> acc.mergeMaps(fuel, Volume::plus) }
 
-        val fuelMass = fuel.toList().sumBy { (gas, volume) -> gas.liquidDensity * volume }
+        val fuelMass = fuel.toList().unitSumOf { (gas, volume) -> gas.liquidDensity * volume }
 
         val deltaV = deltaV(
             engines.map { it.first },
@@ -93,7 +94,7 @@ class RocketInfo(
 }
 
 private fun deltaV(engines: List<RocketEngine>, wetMass: Mass, dryMass: Mass): Velocity {
-    val ispNeum = engines.sumBy { it.thrust }.newtons
+    val ispNeum = engines.unitSumOf { it.thrust }.newtons
     val ispDenom = engines.sumOf { it.thrust.newtons / it.specificImpulse.doubleSeconds }
     val isp = if (ispDenom == 0.0) 0.seconds else (ispNeum / ispDenom).seconds
 

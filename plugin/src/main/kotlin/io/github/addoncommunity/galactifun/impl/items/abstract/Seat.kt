@@ -3,9 +3,10 @@ package io.github.addoncommunity.galactifun.impl.items.abstract
 import io.github.addoncommunity.galactifun.api.betteritem.BetterSlimefunItem
 import io.github.addoncommunity.galactifun.api.betteritem.ItemHandler
 import io.github.addoncommunity.galactifun.units.Angle.Companion.radians
-import io.github.addoncommunity.galactifun.util.key
-import io.github.addoncommunity.galactifun.util.nearbyEntitiesByType
-import io.github.addoncommunity.galactifun.util.summon
+import io.github.addoncommunity.galactifun.util.bukkit.key
+import io.github.addoncommunity.galactifun.util.bukkit.nearbyEntitiesByType
+import io.github.addoncommunity.galactifun.util.bukkit.summon
+import io.github.seggan.sf4k.serial.pdc.get
 import io.github.seggan.sf4k.serial.pdc.set
 import io.github.thebusybiscuit.slimefun4.api.events.PlayerRightClickEvent
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
@@ -30,7 +31,14 @@ open class Seat(
     recipe: Array<out ItemStack?>
 ) : BetterSlimefunItem(itemGroup, item, recipeType, recipe) {
 
-    private val armorStandKey = "seat".key()
+    companion object {
+        private val armorStandKey = "seat".key()
+
+        fun getSitting(player: Player): Location? {
+            val armorStand = player.vehicle as? ArmorStand ?: return null
+            return armorStand.persistentDataContainer.get(armorStandKey)
+        }
+    }
 
     @ItemHandler(BlockPlaceHandler::class)
     private fun onPlace(e: BlockPlaceEvent) {
@@ -42,7 +50,7 @@ open class Seat(
         armorStand.setGravity(false)
         armorStand.setAI(false)
         armorStand.isMarker = true
-        armorStand.persistentDataContainer.set(armorStandKey, true)
+        armorStand.persistentDataContainer.set(armorStandKey, b.location)
         val data = b.blockData
         if (data is Directional) {
             val facing = data.facing

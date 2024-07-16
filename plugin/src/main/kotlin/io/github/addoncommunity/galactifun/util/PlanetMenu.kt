@@ -7,6 +7,8 @@ import io.github.addoncommunity.galactifun.api.objects.MilkyWay
 import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.Star
 import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
+import io.github.addoncommunity.galactifun.util.bukkit.modifyLore
+import io.github.addoncommunity.galactifun.util.bukkit.plus
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils
 import kotlinx.datetime.Clock
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu
@@ -83,6 +85,7 @@ open class PlanetMenu {
             is Star -> {
                 val dist = from.distanceTo(to, now)
                 val lore = mutableListOf<Component>()
+                lore += Component.empty()
                 lore += NamedTextColor.GRAY + "Distance: %,.2f light years".format(dist.lightYears)
                 lore += NamedTextColor.GRAY + "Planets: ${to.orbiters.size}"
                 lore
@@ -91,15 +94,15 @@ open class PlanetMenu {
             is PlanetaryObject -> {
                 val dist = from.distanceTo(to, now)
                 val lore = mutableListOf<Component>()
+                lore += Component.empty()
                 lore += NamedTextColor.GRAY + "Distance: %.2s".format(dist)
-                lore += NamedTextColor.GRAY + "Moons: ${to.orbiters.size}"
                 val dV = from.getDeltaVForTransferTo(to, now)
                 lore += NamedTextColor.GRAY + "Delta-V for travel: %.2s".format(dV)
                 lore
             }
         }
         val item = to.item.clone()
-        item.lore(info)
+        item.modifyLore { it.addAll(info) }
         menu[i] = modifyItem(p, to, item)
         menu[i] = MenuClickHandler { _, _, _, action ->
             if (onClick(p, to, action) && to.orbiters.isNotEmpty()) {
@@ -115,7 +118,7 @@ open class PlanetMenu {
      *
      * @param p The player who closed the menu
      */
-    open fun onExit(p: Player) {
+    protected open fun onExit(p: Player) {
         p.closeInventory()
     }
 
@@ -127,7 +130,7 @@ open class PlanetMenu {
      * @param action The action that was performed
      * @return `true` if the menu should open the planet's children
      */
-    open fun onClick(p: Player, obj: CelestialObject, action: ClickAction): Boolean {
+    protected open fun onClick(p: Player, obj: CelestialObject, action: ClickAction): Boolean {
         return true
     }
 
@@ -138,7 +141,7 @@ open class PlanetMenu {
      * @param obj The celestial object that is being displayed
      * @param item The item that represents the celestial object
      */
-    open fun modifyItem(p: Player, obj: CelestialObject, item: ItemStack): ItemStack {
+    protected open fun modifyItem(p: Player, obj: CelestialObject, item: ItemStack): ItemStack {
         return item
     }
 }

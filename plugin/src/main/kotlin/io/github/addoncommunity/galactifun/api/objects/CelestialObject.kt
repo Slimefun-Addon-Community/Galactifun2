@@ -7,10 +7,13 @@ import io.github.addoncommunity.galactifun.units.Angle.Companion.degrees
 import io.github.addoncommunity.galactifun.units.Distance
 import io.github.addoncommunity.galactifun.units.Mass
 import io.github.addoncommunity.galactifun.units.Velocity.Companion.metersPerSecond
+import io.github.addoncommunity.galactifun.util.bukkit.plus
 import io.github.addoncommunity.galactifun.util.general.LazyDouble
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack
 import io.github.thebusybiscuit.slimefun4.utils.ChatUtils
 import kotlinx.datetime.Instant
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.inventory.ItemStack
 import kotlin.math.sqrt
 
@@ -19,7 +22,14 @@ sealed class CelestialObject(name: String, baseItem: ItemStack) {
     val name = ChatUtils.removeColorCodes(name)
     val id = this.name.lowercase().replace(' ', '_')
 
-    val item = CustomItemStack(baseItem, name)
+    val item: ItemStack by lazy {
+        CustomItemStack(baseItem) { meta ->
+            meta.displayName(Component.text(name))
+            val lore = mutableListOf<String>()
+            addLoreProperties(lore)
+            meta.lore(lore.map { NamedTextColor.GRAY + it })
+        }
+    }
 
     abstract val mass: Mass
     abstract val radius: Distance
@@ -48,6 +58,13 @@ sealed class CelestialObject(name: String, baseItem: ItemStack) {
     }
 
     abstract fun distanceTo(other: CelestialObject, time: Instant): Distance
+
+    protected open fun addLoreProperties(lore: MutableList<String>) {
+        lore.add("Mass: $mass")
+        lore.add("Radius: $radius")
+        lore.add("Gravity: $gravity")
+        lore.add("Escape Velocity: $escapeVelocity")
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

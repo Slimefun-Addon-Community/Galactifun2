@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.util
+package io.github.addoncommunity.galactifun.util.bukkit
 
 import io.github.addoncommunity.galactifun.pluginInstance
 import org.bukkit.metadata.MetadataValueAdapter

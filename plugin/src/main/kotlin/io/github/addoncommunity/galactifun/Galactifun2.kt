@@ -19,8 +19,8 @@ import io.github.addoncommunity.galactifun.units.Angle.Companion.degrees
 import io.github.addoncommunity.galactifun.units.Distance.Companion.au
 import io.github.addoncommunity.galactifun.units.Distance.Companion.kilometers
 import io.github.addoncommunity.galactifun.units.Mass.Companion.kilograms
+import io.github.addoncommunity.galactifun.util.bukkit.plus
 import io.github.addoncommunity.galactifun.util.general.log
-import io.github.addoncommunity.galactifun.util.plus
 import io.github.seggan.sf4k.AbstractAddon
 import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun
@@ -29,7 +29,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.Style
+import net.kyori.adventure.text.format.TextDecoration
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -47,6 +50,7 @@ import kotlin.time.Duration.Companion.hours
 open class Galactifun2 : AbstractAddon() {
 
     private lateinit var manager: PaperCommandManager
+    lateinit var launchMessages: List<String> private set
 
     var isTest = classLoader.javaClass.packageName.startsWith("be.seeseemelk.mockbukkit")
 
@@ -61,7 +65,7 @@ open class Galactifun2 : AbstractAddon() {
 
         var shouldDisable = false
         if (!PaperLib.isPaper() && !isTest) {
-            logger.log(Level.SEVERE, "Galactifun2 only supports Paper and its forks (e.x. Airplane and Purpur)")
+            logger.log(Level.SEVERE, "Galactifun2 only supports Paper and its forks (e.x. Airplane or Purpur)")
             logger.log(Level.SEVERE, "Please use Paper or a fork of Paper")
             shouldDisable = true
         }
@@ -107,6 +111,8 @@ open class Galactifun2 : AbstractAddon() {
             PlanetManager.allPlanets.find { it.name == arg }
         }
         manager.registerCommand(Gf2Command)
+
+        launchMessages = config.getStringList("rockets.launch-msgs")
 
         BaseUniverse.init()
 
@@ -161,8 +167,9 @@ open class Galactifun2 : AbstractAddon() {
 
     override suspend fun onDisableAsync() {
         Bukkit.getConsoleSender().sendMessage(
-            NamedTextColor.GREEN +
-                    "YOU MAY SAFELY IGNORE THE COROUTINE CANCELLATION EXCEPTION BELOW, I HAVE NO IDEA HOW TO FIX IT"
+            Component.text()
+                .content("YOU MAY SAFELY IGNORE THE COROUTINE CANCELLATION EXCEPTION BELOW, I HAVE NO IDEA HOW TO FIX IT")
+                .style(Style.style(NamedTextColor.GREEN, TextDecoration.BOLD))
         )
     }
 

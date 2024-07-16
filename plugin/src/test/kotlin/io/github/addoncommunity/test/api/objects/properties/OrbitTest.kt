@@ -9,11 +9,12 @@ import io.github.addoncommunity.galactifun.units.Angle.Companion.radians
 import io.github.addoncommunity.galactifun.units.Distance.Companion.au
 import io.github.addoncommunity.galactifun.units.standardForm
 import io.github.addoncommunity.test.CommonTest
-import io.kotest.matchers.doubles.percent
-import io.kotest.matchers.doubles.plusOrMinus
-import io.kotest.matchers.shouldBe
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.BeforeEach
+import strikt.api.Assertion
+import strikt.api.expectThat
+import strikt.assertions.isEqualTo
+import strikt.assertions.isIn
 import kotlin.test.Test
 import kotlin.time.DurationUnit
 
@@ -35,26 +36,28 @@ class OrbitTest : CommonTest() {
 
     @Test
     fun testPeriod() {
-        orbit.period.toDouble(DurationUnit.DAYS) shouldBeRoughly 365.26
+        expectThat(orbit.period.toDouble(DurationUnit.DAYS)).isRoughly(365.26)
     }
 
     @Test
     fun testPosition() {
         val time = orbit.timeOfPeriapsis
         val pos = orbit.position(time)
-        pos.radius shouldBe orbit.radius(time)
+        expectThat(pos.radius).isEqualTo(orbit.radius(time))
     }
 
     @Test
     fun testVelocity() {
         fun testVelocityAt(time: Instant, expectedAngle: Angle) {
             val vel = orbit.velocity(time)
-            vel.length.meters shouldBeRoughly visVivaEquation(
-                orbit.parent.gravitationalParameter,
-                orbit.radius(orbit.timeOfPeriapsis),
-                orbit.semimajorAxis
-            ).metersPerSecond
-            vel.polar.angle.standardForm.degrees shouldBeRoughly expectedAngle.degrees
+            expectThat(vel.length.meters).isRoughly(
+                visVivaEquation(
+                    orbit.parent.gravitationalParameter,
+                    orbit.radius(orbit.timeOfPeriapsis),
+                    orbit.semimajorAxis
+                ).metersPerSecond
+            )
+            expectThat(vel.polar.angle.standardForm.degrees).isRoughly(expectedAngle.degrees)
         }
 
         testVelocityAt(orbit.timeOfPeriapsis, 90.degrees)
@@ -70,10 +73,11 @@ class OrbitTest : CommonTest() {
             0.radians,
             orbit.meanAnomaly(time + orbit.period / 4)
         )
-        timeOfFlight.inWholeDays shouldBe 91
+        expectThat(timeOfFlight.inWholeDays).isEqualTo(91)
     }
 }
 
-infix fun Double.shouldBeRoughly(expected: Double) = this shouldBe expected.plusOrMinus(0.1.percent)
+fun Assertion.Builder<Double>.isRoughly(expected: Double) = this
+    .isIn((expected - expected * .1)..(expected + expected * .1))
 
 val EPOCH = Instant.parse("1970-01-01T00:00:00Z")

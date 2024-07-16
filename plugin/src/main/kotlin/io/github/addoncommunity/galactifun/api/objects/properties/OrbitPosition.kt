@@ -1,11 +1,11 @@
 package io.github.addoncommunity.galactifun.api.objects.properties
 
 import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
-import io.github.seggan.sf4k.location.plus
+import io.github.addoncommunity.galactifun.util.bukkit.copy
+import kotlinx.serialization.Serializable
 import org.bukkit.Location
-import org.bukkit.persistence.PersistentDataAdapterContext
-import org.bukkit.persistence.PersistentDataType
 
+@Serializable
 data class OrbitPosition(val x: Int, val z: Int) {
 
     companion object {
@@ -25,17 +25,9 @@ data class OrbitPosition(val x: Int, val z: Int) {
             z * ORBIT_SIZE + ORBIT_SIZE / 2.0
         )
 
-    fun offset(location: Location): Location = centerLocation + location
-
-    object DataType : PersistentDataType<IntArray, OrbitPosition> {
-        override fun getPrimitiveType() = IntArray::class.java
-        override fun getComplexType() = OrbitPosition::class.java
-
-        override fun fromPrimitive(primitive: IntArray, context: PersistentDataAdapterContext): OrbitPosition {
-            return OrbitPosition(primitive[0], primitive[1])
-        }
-        override fun toPrimitive(complex: OrbitPosition, context: PersistentDataAdapterContext): IntArray {
-            return intArrayOf(complex.x, complex.z)
-        }
-    }
+    fun offset(x: Double, y: Double, z: Double) = centerLocation.copy(
+        x = centerLocation.x + x,
+        y = centerLocation.y + y,
+        z = centerLocation.z + z
+    )
 }

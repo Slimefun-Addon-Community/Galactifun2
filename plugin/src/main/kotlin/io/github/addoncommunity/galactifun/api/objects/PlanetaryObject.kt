@@ -13,6 +13,7 @@ import io.github.addoncommunity.galactifun.units.Velocity.Companion.metersPerSec
 import kotlinx.datetime.Instant
 import org.bukkit.inventory.ItemStack
 import kotlin.math.sqrt
+import kotlin.time.Duration
 
 abstract class PlanetaryObject(name: String, baseItem: ItemStack) : CelestialObject(name, baseItem) {
 
@@ -114,4 +115,44 @@ abstract class PlanetaryObject(name: String, baseItem: ItemStack) : CelestialObj
             return thisSibling.orbit.arbitraryTransfer(otherSibling.orbit, time) + thisDeltaV + otherDeltaV
         }
     }
+
+    override fun addLoreProperties(lore: MutableList<String>) {
+        super.addLoreProperties(lore)
+        lore.add("")
+        lore.add("Day length: $dayCycle")
+        lore.add("")
+        lore.add("Semimajor axis: %,d kilometers".format(orbit.semimajorAxis.kilometers))
+        val c = orbit.semimajorAxis * orbit.eccentricity
+        lore.add("Periapasis: %,d kilometers".format((orbit.semimajorAxis - c).kilometers))
+        lore.add("Apoapsis: %,d kilometers".format((orbit.semimajorAxis + c).kilometers))
+        lore.add("Eccentricity: %.2f".format(orbit.eccentricity))
+        lore.add("Longitude of periapsis: %.2f°".format(orbit.longitudeOfPeriapsis.degrees))
+        lore.add("Orbital period (year length): ${durationToYearsAndDays(orbit.period)}")
+        if (atmosphere.pressure > 0) {
+            lore.add("")
+            lore.add("Atmospheric pressure: %.2f atmospheres".format(atmosphere.pressure))
+        }
+        if (orbiters.isNotEmpty()) {
+            lore.add("")
+            lore.add("Number of moons: ${orbiters.size}")
+        }
+    }
+}
+
+private fun durationToYearsAndDays(duration: Duration): String {
+    val sb = StringBuilder()
+    val years = duration.inWholeDays / 365
+    val days = duration.inWholeDays % 365
+    if (years > 0) {
+        sb.append(years)
+        sb.append(" year")
+        if (years > 1) sb.append('s')
+    }
+    if (days > 0) {
+        if (years > 0) sb.append(", ")
+        sb.append(days)
+        sb.append(" day")
+        if (days > 1) sb.append('s')
+    }
+    return sb.toString()
 }

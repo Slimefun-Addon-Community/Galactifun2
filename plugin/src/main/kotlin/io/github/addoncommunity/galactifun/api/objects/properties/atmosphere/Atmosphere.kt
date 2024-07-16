@@ -1,6 +1,6 @@
 package io.github.addoncommunity.galactifun.api.objects.properties.atmosphere
 
-import io.github.addoncommunity.galactifun.util.set
+import io.github.addoncommunity.galactifun.util.bukkit.set
 import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.RandomizedSet
 import org.bukkit.GameRule
 import org.bukkit.Material
@@ -10,7 +10,7 @@ class Atmosphere private constructor(
     private val weatherEnabled: Boolean,
     private val storming: Boolean,
     private val thundering: Boolean,
-    private val pressure: Double,
+    val pressure: Double,
     private val composition: Map<Gas, Double>
 ) {
 

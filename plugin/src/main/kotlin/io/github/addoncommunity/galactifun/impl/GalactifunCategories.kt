@@ -1,6 +1,6 @@
 package io.github.addoncommunity.galactifun.impl
 
-import io.github.addoncommunity.galactifun.util.key
+import io.github.addoncommunity.galactifun.util.bukkit.key
 import io.github.thebusybiscuit.slimefun4.api.items.groups.NestedItemGroup
 import io.github.thebusybiscuit.slimefun4.api.items.groups.SubItemGroup
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack

@@ -27,4 +27,20 @@ class DayCycle(val duration: Duration) {
     fun tick(world: World) {
         world.time += perFiveSeconds
     }
+
+    override fun toString(): String {
+        val sb = StringBuilder()
+        if (duration.inWholeDays > 0) {
+            sb.append(duration.inWholeDays)
+            sb.append(" day")
+            if (duration.inWholeDays > 1) sb.append('s')
+        }
+        if (duration.inWholeHours > 0) {
+            if (sb.isNotEmpty()) sb.append(", ")
+            sb.append(duration.inWholeHours % 24)
+            sb.append(" hour")
+            if (duration.inWholeHours % 24 > 1) sb.append('s')
+        }
+        return sb.toString()
+    }
 }

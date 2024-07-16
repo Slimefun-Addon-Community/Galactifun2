@@ -1,8 +1,8 @@
 package io.github.addoncommunity.galactifun.impl.space
 
-import io.github.addoncommunity.galactifun.util.adjacentFaces
 import io.github.addoncommunity.galactifun.util.buildRandomizedSet
-import io.github.addoncommunity.galactifun.util.set
+import io.github.addoncommunity.galactifun.util.bukkit.adjacentFaces
+import io.github.addoncommunity.galactifun.util.bukkit.set
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.generator.BlockPopulator

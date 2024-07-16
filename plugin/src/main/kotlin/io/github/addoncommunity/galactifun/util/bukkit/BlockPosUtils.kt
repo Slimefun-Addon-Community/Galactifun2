@@ -1,8 +1,10 @@
-package io.github.addoncommunity.galactifun.util
+package io.github.addoncommunity.galactifun.util.bukkit
 
 import io.github.thebusybiscuit.slimefun4.libraries.dough.blocks.BlockPosition
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+
+val BlockPosition.location get() = this.toLocation()
 
 fun BlockPosition.getFace(face: BlockFace): BlockPosition {
     return BlockPosition(this.world, this.x + face.modX, this.y + face.modY, this.z + face.modZ)
@@ -57,3 +59,10 @@ inline fun BlockPosition.floodSearch(
 }
 
 data class FloodSearchResult(val found: Set<BlockPosition>, val exceededMax: Boolean)
+
+tailrec fun BlockPosition.isHighest(): Boolean {
+    val world = this.world
+    val next = this.getFace(BlockFace.UP)
+    if (next.y >= world.maxHeight) return true
+    return if (next.block.type.isAir) next.isHighest() else false
+}

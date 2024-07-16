@@ -6,6 +6,8 @@ import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType
 import io.github.thebusybiscuit.slimefun4.core.handlers.*
 import io.github.thebusybiscuit.slimefun4.implementation.handlers.SimpleBlockBreakHandler
+import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config
+import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker
 import org.bukkit.block.Block
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
@@ -97,11 +99,24 @@ open class BetterSlimefunItem : SlimefunItem {
         for (method in javaClass.getAllMethods()) {
             if (method.isAnnotationPresent(ItemHandler::class.java)) {
                 method.isAccessible = true
-                val handle = MethodHandles.lookup().unreflect(method)
+                val handle = MethodHandles.lookup().unreflect(method).bindTo(this)
                 val handler = method.getAnnotation(ItemHandler::class.java).handler
-                val handlerInstance = handlerMap[handler]?.invoke(handle.bindTo(this))
+                val handlerInstance = handlerMap[handler]?.invoke(handle)
                     ?: throw IllegalStateException("Handler $handler is not registered for BetterSlimefunItem")
                 addItemHandler(handlerInstance)
+            } else if (method.isAnnotationPresent(Ticker::class.java)) {
+                method.isAccessible = true
+                val handle = MethodHandles.lookup().unreflect(method).bindTo(this)
+                val ticker = method.getAnnotation(Ticker::class.java)
+                addItemHandler(object : BlockTicker() {
+                    override fun tick(b: Block, item: SlimefunItem, data: Config) {
+                        handle.invoke(b)
+                    }
+
+                    override fun isSynchronized(): Boolean {
+                        return !ticker.async
+                    }
+                })
             }
         }
     }

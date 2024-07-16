@@ -175,7 +175,7 @@ class UomProcessor(
             val t = TypeVariableName("T")
             @OptIn(ExperimentalTypeInference::class)
             file.addFunction(
-                FunSpec.builder("sumBy")
+                FunSpec.builder("unitSumOf")
                     .addAnnotation(
                         AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
                             .addMember("%T::class", ClassName("kotlin.experimental", "ExperimentalTypeInference"))

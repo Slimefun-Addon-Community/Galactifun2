@@ -2,13 +2,9 @@ package io.github.addoncommunity.galactifun.impl.items
 
 import io.github.addoncommunity.galactifun.api.blocks.CustomMass
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
-import io.github.addoncommunity.galactifun.units.Mass
+import io.github.addoncommunity.galactifun.units.*
 import io.github.addoncommunity.galactifun.units.Mass.Companion.kilograms
-import io.github.addoncommunity.galactifun.units.Volume
-import io.github.addoncommunity.galactifun.units.Volume.Companion.liters
-import io.github.addoncommunity.galactifun.units.sumBy
-import io.github.addoncommunity.galactifun.units.times
-import io.github.addoncommunity.galactifun.util.adjacentFaces
+import io.github.addoncommunity.galactifun.util.bukkit.adjacentFaces
 import io.github.addoncommunity.galactifun.util.checkBlock
 import io.github.addoncommunity.galactifun.util.general.enumMapOf
 import io.github.addoncommunity.galactifun.util.general.mergeMaps
@@ -54,7 +50,7 @@ class FuelTank(
             val consumed = item.amount.coerceAtMost(8)
             menu.consumeItem(INPUT, consumed)
             val fuel = getFuelLevel(b).toMutableMap()
-            fuel.merge(gasItem.gas, consumed.liters, Volume::plus)
+            fuel.merge(gasItem.gas, consumed.kilograms / gasItem.gas.liquidDensity, Volume::plus)
             setFuelLevel(b, fuel)
         }
 
@@ -76,7 +72,7 @@ class FuelTank(
                 distributable--
                 val stuffed = enumMapOf<Gas, Volume>()
                 for ((gas, amount) in fuels) {
-                    val space = cap - stuffed.values.sumOf { it.liters }.liters
+                    val space = cap - stuffed.values.sum()
                     val toAdd = amount.coerceAtMost(space)
                     stuffed.merge(gas, toAdd, Volume::plus)
                 }
@@ -122,7 +118,7 @@ class FuelTank(
 
     override fun getWetMass(block: Block): Mass {
         val fuelMass = getFuelLevel(block).toList()
-            .sumBy { (gas, amount) -> gas.liquidDensity * amount }
+            .unitSumOf { (gas, amount) -> gas.liquidDensity * amount }
         return getMass(block) + fuelMass
     }
 

@@ -53,10 +53,10 @@ object GalactifunItems {
         +"<yellow>Capacity: 1000 L"
     }
 
-    val ROCKET_ENGINE_I = buildSlimefunItem<RocketEngine>(3000.seconds, 100.kilonewtons, Gas.HYDROGEN) {
+    val ROCKET_ENGINE_I = buildSlimefunItem<RocketEngine>(30000.seconds, 100.kilonewtons, Gas.HYDROGEN) {
         category = GalactifunCategories.ROCKET_COMPONENTS
         id = "ROCKET_ENGINE_I"
-        name = "<white>BMR-50 \"Lil' Boomer\""
+        name = """<white>BMR-50 "Lil' Boomer""""
         material = MaterialType.Material(Material.FURNACE)
         recipeType = RecipeType.NULL
         recipe = emptyArray()
@@ -65,7 +65,23 @@ object GalactifunItems {
         +""
         +"<gray>Manufacturer: Boomer & Bros. Explosives, Inc."
         +"<yellow>Thrust: 100 kN"
-        +"<yellow>Specific impulse: 3000 s"
+        +"<yellow>Specific impulse: 30,000 s"
+        +"<yellow>Fuel: Hydrogen"
+    }
+
+    val ROCKET_ENGINE_II = buildSlimefunItem<RocketEngine>(20000.seconds, 300.kilonewtons, Gas.HYDROGEN) {
+        category = GalactifunCategories.ROCKET_COMPONENTS
+        id = "ROCKET_ENGINE_II"
+        name = """<white>BMR-100 "Normal Boomer""""
+        material = MaterialType.Material(Material.FURNACE)
+        recipeType = RecipeType.NULL
+        recipe = emptyArray()
+
+        +"<gray>Your standard junkyard rocket engine"
+        +""
+        +"<gray>Manufacturer: Boomer & Bros. Explosives, Inc."
+        +"<yellow>Thrust: 300 kN"
+        +"<yellow>Specific impulse: 20,000 s"
         +"<yellow>Fuel: Hydrogen"
     }
 

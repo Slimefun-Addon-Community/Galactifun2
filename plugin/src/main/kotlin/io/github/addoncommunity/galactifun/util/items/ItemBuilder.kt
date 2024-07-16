@@ -1,8 +1,8 @@
 package io.github.addoncommunity.galactifun.util.items
 
 import io.github.addoncommunity.galactifun.pluginInstance
+import io.github.addoncommunity.galactifun.util.bukkit.miniMessageToLegacy
 import io.github.addoncommunity.galactifun.util.general.RequiredProperty
-import io.github.addoncommunity.galactifun.util.miniMessageToLegacy
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack

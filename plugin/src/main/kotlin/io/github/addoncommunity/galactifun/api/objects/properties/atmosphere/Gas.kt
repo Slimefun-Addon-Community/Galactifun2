@@ -30,9 +30,11 @@ enum class Gas(texture: String?, val liquidDensity: Density) {
 
     val item = texture?.let {
         SlimefunItemStack(
-            "ATMOSPHERIC_GAS_$name",
+            "GF2_ATMOSPHERIC_GAS_$name",
             SlimefunUtils.getCustomHead(texture),
             "&f$this Gas Canister",
+            "",
+            "&7Contains one kilogram of $this",
             "",
             "&f&oTexture by Sefiraat"
         )

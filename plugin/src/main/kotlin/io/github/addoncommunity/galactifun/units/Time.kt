@@ -13,4 +13,4 @@ inline val Int.years: Duration
 inline val Duration.doubleSeconds: Double
     get() = toDouble(DurationUnit.SECONDS)
 
-fun Iterable<Duration>.sumBy(): Duration = fold(Duration.ZERO) { acc, duration -> acc + duration }
+fun Iterable<Duration>.unitSumOf(): Duration = fold(Duration.ZERO) { acc, duration -> acc + duration }
