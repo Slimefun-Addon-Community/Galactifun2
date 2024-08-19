@@ -9,9 +9,9 @@ import io.github.addoncommunity.galactifun.impl.items.abstract.Seat
 import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
 import io.github.addoncommunity.galactifun.impl.managers.RocketManager
 import io.github.addoncommunity.galactifun.pluginInstance
+import io.github.addoncommunity.galactifun.units.Acceleration.Companion.metersPerSecondSquared
 import io.github.addoncommunity.galactifun.units.Velocity.Companion.metersPerSecond
 import io.github.addoncommunity.galactifun.units.abs
-import io.github.addoncommunity.galactifun.units.div
 import io.github.addoncommunity.galactifun.units.times
 import io.github.addoncommunity.galactifun.units.unitSumOf
 import io.github.addoncommunity.galactifun.util.*
@@ -30,9 +30,7 @@ import io.github.thebusybiscuit.slimefun4.core.handlers.BlockPlaceHandler
 import io.github.thebusybiscuit.slimefun4.core.handlers.BlockUseHandler
 import io.github.thebusybiscuit.slimefun4.libraries.dough.blocks.BlockPosition
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.future.await
-import kotlinx.coroutines.joinAll
 import me.mrCookieSlime.Slimefun.api.BlockStorage
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Location
@@ -215,38 +213,30 @@ class CommandComputer(
         }
         launched.set(true)
 
-        val movingEntities = entities.filter { it.vehicle == null }
-        val offsets = movingEntities.associateWith { it.location.subtract(pos.toLocation()) }
+        val offsets = entities.associateWith { it.location.subtract(pos.toLocation()) }
         val maxHeight = world.maxHeight
         var position = pos.y.toDouble()
 
         val weight = rocket.wetMass * currentPlanet.gravity
         val netForce = firstStage.engines.unitSumOf { it.first.thrust } - weight
-        val acceleration = netForce / rocket.wetMass
+        val acceleration = 0.5.metersPerSecondSquared
         val marginalAcceleration = acceleration * 0.05.seconds
         var speed = 0.0.metersPerSecond
         while (position < maxHeight) {
-            for (entity in movingEntities) {
-                entity.galactifunTeleport(entity.location.add(0.0, (speed / 20).metersPerSecond, 0.0))
-                speed += marginalAcceleration
+            for (entity in entities) {
+                entity.galactifunTeleport(
+                    entity.location.add(0.0, (speed / 20).metersPerSecond, 0.0)
+                ).await()
                 position = max(position, entity.location.y)
             }
+            speed += marginalAcceleration
             delayTicks(1)
         }
 
-        val jobs = mutableListOf<Job>()
-        for (entity in movingEntities) {
-            jobs += pluginInstance.launch {
-                entity.galactifunTeleport(
-                    dest.copy(world = PlanetManager.spaceWorld) + offsets[entity]!!
-                ).await()
-                unfreezeEntity(entity)
-            }
-        }
-        jobs.joinAll()
-
         for (entity in entities) {
-            if (!entity.isValid || entity in movingEntities) continue
+            entity.galactifunTeleport(
+                dest + offsets[entity]!!.copy(world = PlanetManager.spaceWorld)
+            ).await()
             unfreezeEntity(entity)
         }
     }

@@ -80,6 +80,7 @@ tasks.shadowJar {
         relocate(from, "io.github.addoncommunity.galactifun.shadowlibs.$last")
     }
 
+    mergeServiceFiles()
     // Relocate if true or not set, always relocate bstats
     doRelocate("org.bstats")
     if (System.getenv("RELOCATE") != "false") {

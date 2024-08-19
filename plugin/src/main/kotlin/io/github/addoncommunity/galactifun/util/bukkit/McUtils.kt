@@ -1,6 +1,7 @@
 package io.github.addoncommunity.galactifun.util.bukkit
 
 import io.github.addoncommunity.galactifun.pluginInstance
+import io.papermc.paper.entity.TeleportFlag.EntityState
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.TextColor
@@ -51,32 +52,17 @@ operator fun RegionAccessor.set(location: Location, material: Material) = setTyp
  */
 fun Entity.galactifunTeleport(
     dest: Location,
-    preservePassengers: Boolean = true,
     reason: PlayerTeleportEvent.TeleportCause = PlayerTeleportEvent.TeleportCause.PLUGIN
 ): CompletableFuture<Boolean> {
-    if (preservePassengers && passengers.isNotEmpty()) {
-        val futures = mutableListOf<CompletableFuture<Boolean>>()
-        val passengers = this.passengers
-        for (passenger in passengers) {
-            removePassenger(passenger)
-            futures += passenger.galactifunTeleport(dest, true, reason)
-        }
-        var future = galactifunTeleport(dest, false, reason)
-        for (passengerFuture in futures) {
-            future = future.thenCombine(passengerFuture) { a, b -> a && b }
-        }
-        return future.thenApply {
-            if (it) {
-                passengers.forEach(::addPassenger)
-            }
-            it
-        }
-    } else {
-        setMetadata("galactifun.teleporting", DummyMetadataValue)
-        return teleportAsync(dest, reason).thenApply {
-            removeMetadata("galactifun.teleporting", pluginInstance)
-            it
-        }
+    setMetadata("galactifun.teleporting", DummyMetadataValue)
+    return teleportAsync(
+        dest,
+        reason,
+        EntityState.RETAIN_VEHICLE,
+        EntityState.RETAIN_PASSENGERS
+    ).thenApply {
+        removeMetadata("galactifun.teleporting", pluginInstance)
+        it
     }
 }
 

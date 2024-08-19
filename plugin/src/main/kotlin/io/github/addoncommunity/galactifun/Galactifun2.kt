@@ -221,8 +221,8 @@ open class Galactifun2 : AbstractAddon() {
                         Material.RED_SAND top 2
 
                         fillInRestWith(random {
-                            Material.RED_SANDSTONE withWeight 0.8f
-                            Material.IRON_ORE withWeight 0.2f
+                            Material.RED_SANDSTONE withWeight 80f
+                            Material.IRON_ORE withWeight 20f
                         })
                     }
 
