@@ -6,6 +6,8 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
     id("xyz.jpenilla.run-paper") version "2.3.0"
+
+    id("io.github.seggan.uom")
 }
 
 repositories {
@@ -124,4 +126,38 @@ tasks.runServer {
     }
     maxHeapSize = "4G"
     minecraftVersion("1.20.4")
+}
+
+uom {
+    val kmPerLy = 9.461e12
+    val kmPerAu = 1.495978707e8
+
+    pkg = "io.github.addoncommunity.galactifun.units"
+    val time = existingMeasure("kotlin.time.Duration", "doubleSeconds")
+    val distance = measure("Distance", "meters") {
+        unit("lightYears", kmPerLy * 1000)
+        unit("kilometers", 1000.0)
+        unit("au", kmPerAu * 1000)
+    }
+    val mass = measure("Mass", "kilograms") {
+        unit("tons", 1000.0)
+    }
+    val velocity = measure("Velocity", "metersPerSecond")
+    val acceleration = measure("Acceleration", "metersPerSecondSquared")
+    val force = measure("Force", "newtons") {
+        unit("kilonewtons", 1000.0)
+        unit("meganewtons", 1_000_000.0)
+    }
+    val volume = measure("Volume", "liters") {
+        unit("cubicMeters", 1000.0)
+    }
+    val density = measure("Density", "kilogramsPerLiter")
+
+    distance times time resultsIn velocity
+    velocity dividedBy time resultsIn acceleration
+    acceleration times time resultsIn velocity
+    mass dividedBy volume resultsIn density
+    density times volume resultsIn mass
+    acceleration times mass resultsIn force
+    force dividedBy acceleration resultsIn mass
 }
