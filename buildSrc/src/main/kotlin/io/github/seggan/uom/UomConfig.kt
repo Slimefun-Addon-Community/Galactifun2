@@ -3,20 +3,21 @@ package io.github.seggan.uom
 class UomConfig {
 
     lateinit var pkg: String
+    var allowKoltinxSerialization = false
 
-    internal val measures = mutableMapOf<String, Measure>()
+    internal val measures = mutableListOf<Measure>()
     internal val operations = mutableListOf<Operation>()
 
     fun measure(name: String, base: String, block: Measure.New.() -> Unit = {}): Measure {
         val measure = Measure.New(name, base)
         measure.block()
-        measures[name] = measure
+        measures.add(measure)
         return measure
     }
 
     fun existingMeasure(name: String, base: String): Measure {
         val measure = Measure.Existing(name, base)
-        measures[name] = measure
+        measures.add(measure)
         return measure
     }
 

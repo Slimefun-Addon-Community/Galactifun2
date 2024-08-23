@@ -46,9 +46,6 @@ dependencies {
 
     implementation("io.github.seggan:sf4k:0.4.1")
 
-    implementation(project(":uom"))
-    ksp(project(":uom-processor"))
-
     testImplementation(kotlin("test"))
     testImplementation("io.strikt:strikt-core:0.34.0")
     testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.80.0")
@@ -132,6 +129,7 @@ uom {
     val kmPerLy = 9.461e12
     val kmPerAu = 1.495978707e8
 
+    allowKoltinxSerialization = true
     pkg = "io.github.addoncommunity.galactifun.units"
     val time = existingMeasure("kotlin.time.Duration", "doubleSeconds")
     val distance = measure("Distance", "meters") {
