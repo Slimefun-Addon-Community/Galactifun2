@@ -131,7 +131,9 @@ uom {
 
     allowKoltinxSerialization = true
     pkg = "io.github.addoncommunity.galactifun.units"
-    val time = existingMeasure("kotlin.time.Duration", "doubleSeconds")
+    val time = existingMeasure("kotlin.time.Duration", "doubleSeconds") {
+        scalarToUnit("seconds", true)
+    }
     val distance = measure("Distance", "meters") {
         unit("lightYears", kmPerLy * 1000)
         unit("kilometers", 1000.0)
@@ -152,10 +154,11 @@ uom {
     val density = measure("Density", "kilogramsPerLiter")
 
     distance times time resultsIn velocity
-    velocity dividedBy time resultsIn acceleration
     acceleration times time resultsIn velocity
-    mass dividedBy volume resultsIn density
     density times volume resultsIn mass
     acceleration times mass resultsIn force
-    force dividedBy acceleration resultsIn mass
+
+    measure("Angle", "radians") {
+        unit("degrees", Math.PI / 180)
+    }
 }

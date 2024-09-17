@@ -26,7 +26,7 @@ abstract class PlanetaryObject(name: String, baseItem: ItemStack) : CelestialObj
             gravitationalParameter,
             parkingOrbit.semimajorAxis,
             parkingOrbit.semimajorAxis
-        ) - (radius * TAU / dayCycle.duration) // surface velocity
+        ) - (radius.meters * TAU / dayCycle.duration.doubleSeconds).metersPerSecond // surface velocity
     }
 
     val star: Star by lazy {

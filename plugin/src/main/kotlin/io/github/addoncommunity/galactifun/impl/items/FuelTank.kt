@@ -50,7 +50,7 @@ class FuelTank(
             val consumed = item.amount.coerceAtMost(8)
             menu.consumeItem(INPUT, consumed)
             val fuel = getFuelLevel(b).toMutableMap()
-            fuel.merge(gasItem.gas, consumed.kilograms / gasItem.gas.liquidDensity, Volume::plus)
+            fuel.merge(gasItem.gas, consumed.kilograms divToVolume gasItem.gas.liquidDensity, Volume::plus)
             setFuelLevel(b, fuel)
         }
 

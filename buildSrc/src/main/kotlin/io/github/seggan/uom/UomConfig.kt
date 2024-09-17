@@ -3,6 +3,7 @@ package io.github.seggan.uom
 class UomConfig {
 
     lateinit var pkg: String
+    val imports = mutableListOf<String>()
     var allowKoltinxSerialization = false
 
     internal val measures = mutableListOf<Measure>()
@@ -15,24 +16,27 @@ class UomConfig {
         return measure
     }
 
-    fun existingMeasure(name: String, base: String): Measure {
-        val measure = Measure.Existing(name, base)
+    fun existingMeasure(fqName: String, unitToScalar: String, block: Measure.Existing.() -> Unit = {}): Measure {
+        val measure = Measure.Existing(fqName, unitToScalar)
+        measure.block()
         measures.add(measure)
         return measure
     }
 
-    infix fun Measure.times(other: Measure) = PartialOperation.Multiply(this, other)
-    infix fun Measure.dividedBy(other: Measure) = PartialOperation.Divide(this, other)
+    infix fun Measure.times(other: Measure) = PartialOperation(this, other)
     infix fun PartialOperation.resultsIn(result: Measure) {
-        operations.add(Operation(this, result))
+        operations.add(Operation(left, right, result))
     }
 }
 
 sealed interface Measure {
     val name: String
-    val base: String
+    val unitToScalar: String
+    var scalarToUnit: String
 
-    data class New(override val name: String, override val base: String) : Measure {
+    data class New(override val name: String, override val unitToScalar: String) : Measure {
+
+        override var scalarToUnit = unitToScalar
         internal val units = mutableMapOf<String, Double>()
 
         fun unit(name: String, ratio: Double) {
@@ -40,12 +44,21 @@ sealed interface Measure {
         }
     }
 
-    data class Existing(override val name: String, override val base: String) : Measure
+    data class Existing(
+        override val name: String,
+        override val unitToScalar: String,
+    ) : Measure {
+
+        override var scalarToUnit = unitToScalar
+        internal var inCompanion = false
+
+        fun scalarToUnit(unit: String, inCompanion: Boolean = false) {
+            scalarToUnit = unit
+            this.inCompanion = inCompanion
+        }
+    }
 }
 
-sealed interface PartialOperation {
-    data class Multiply(val first: Measure, val second: Measure) : PartialOperation
-    data class Divide(val first: Measure, val second: Measure) : PartialOperation
-}
+data class PartialOperation(val left: Measure, val right: Measure)
 
-data class Operation(val partial: PartialOperation, val result: Measure)
+data class Operation(val left: Measure, val right: Measure, val result: Measure)
