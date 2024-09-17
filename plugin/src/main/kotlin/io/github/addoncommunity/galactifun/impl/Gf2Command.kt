@@ -6,9 +6,9 @@ import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
 import io.github.addoncommunity.galactifun.impl.managers.RocketManager
-import io.github.addoncommunity.galactifun.util.PlanetMenu
 import io.github.addoncommunity.galactifun.util.SerializedBlock
 import io.github.addoncommunity.galactifun.util.bukkit.galactifunTeleport
+import io.github.addoncommunity.galactifun.util.menu.PlanetMenu
 import io.github.seggan.sf4k.location.plusAssign
 import kotlinx.datetime.Clock
 import org.bukkit.Location

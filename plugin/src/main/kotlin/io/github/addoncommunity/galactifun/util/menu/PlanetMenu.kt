@@ -1,6 +1,4 @@
-@file:Suppress("DEPRECATION")
-
-package io.github.addoncommunity.galactifun.util
+package io.github.addoncommunity.galactifun.util.menu
 
 import io.github.addoncommunity.galactifun.api.objects.CelestialObject
 import io.github.addoncommunity.galactifun.api.objects.MilkyWay
@@ -9,6 +7,7 @@ import io.github.addoncommunity.galactifun.api.objects.Star
 import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
 import io.github.addoncommunity.galactifun.util.bukkit.modifyLore
 import io.github.addoncommunity.galactifun.util.bukkit.plus
+import io.github.addoncommunity.galactifun.util.set
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils
 import kotlinx.datetime.Clock
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu

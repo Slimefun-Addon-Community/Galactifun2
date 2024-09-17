@@ -13,8 +13,8 @@ plugins {
 repositories {
     mavenCentral()
     maven(url = "https://jitpack.io/")
+    maven(url = "https://repo.papermc.io/repository/maven-public/")
     maven(url = "https://repo.aikar.co/content/groups/aikar/")
-    maven(url = "https://hub.jeff-media.com/nexus/repository/jeff-media-public/")
 }
 
 dependencies {
@@ -38,8 +38,8 @@ dependencies {
     libraryAndTest(kotlin("scripting-jvm-host"))
     libraryAndTest(kotlin("script-runtime"))
 
-    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
-    compileOnlyAndTest("com.github.Slimefun:Slimefun4:RC-37")
+    compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
+    compileOnlyAndTest("com.github.Slimefun:Slimefun4:e02a0f61d1")
 
     implementation("org.bstats:bstats-bukkit:3.0.2")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
@@ -56,7 +56,7 @@ group = "io.github.addoncommunity.galactifun"
 version = "MODIFIED"
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 tasks.compileKotlin {
@@ -115,14 +115,14 @@ tasks.runServer {
     javaLauncher = javaToolchains.launcherFor {
         @Suppress("UnstableApiUsage")
         vendor = JvmVendorSpec.JETBRAINS
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
     jvmArgs("-XX:+AllowEnhancedClassRedefinition", "-XX:+AllowRedefinitionToAddDeleteMethods")
     downloadPlugins {
-        url("https://blob.build/dl/Slimefun4/Dev/1116")
+        url("https://blob.build/dl/Slimefun4/Dev/1154")
     }
     maxHeapSize = "4G"
-    minecraftVersion("1.20.4")
+    minecraftVersion("1.20.6")
 }
 
 uom {

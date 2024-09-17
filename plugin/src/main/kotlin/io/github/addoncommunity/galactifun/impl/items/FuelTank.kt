@@ -8,15 +8,15 @@ import io.github.addoncommunity.galactifun.util.bukkit.adjacentFaces
 import io.github.addoncommunity.galactifun.util.checkBlock
 import io.github.addoncommunity.galactifun.util.general.enumMapOf
 import io.github.addoncommunity.galactifun.util.general.mergeMaps
-import io.github.addoncommunity.galactifun.util.general.with
 import io.github.addoncommunity.galactifun.util.items.TickingBlock
-import io.github.addoncommunity.galactifun.util.items.buildMenu
+import io.github.addoncommunity.galactifun.util.menu.buildMenu
 import io.github.seggan.sf4k.serial.blockstorage.getBlockStorage
 import io.github.seggan.sf4k.serial.blockstorage.setBlockStorage
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack
+import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils
 import me.mrCookieSlime.Slimefun.api.BlockStorage
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -36,9 +36,12 @@ class FuelTank(
         private const val INPUT = 4
 
         private val menu = buildMenu {
-            numRows = 1
-            input(INPUT with 0).addBorder()
-            item(0 with 0, CustomItemStack(Material.WATER_BUCKET, "&fContents"))
+            +"c..#i#..."
+
+            'c' means CustomItemStack(Material.WATER_BUCKET, "&fContents")
+            '#' means ChestMenuUtils.getInputSlotTexture()
+            input('i')
+            background('.')
         }
     }
 
@@ -123,6 +126,6 @@ class FuelTank(
     }
 
     override fun preRegister() {
-        menu.applyOn(this)
+        menu.apply(this)
     }
 }
