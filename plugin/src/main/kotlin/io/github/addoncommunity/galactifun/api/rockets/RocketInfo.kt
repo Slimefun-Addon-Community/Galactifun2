@@ -1,13 +1,13 @@
 package io.github.addoncommunity.galactifun.api.rockets
 
 import io.github.addoncommunity.galactifun.EARTH_GRAVITY
+import io.github.addoncommunity.galactifun.api.blocks.wetMass
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.impl.items.FuelTank
 import io.github.addoncommunity.galactifun.impl.items.RocketEngine
 import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
 import io.github.addoncommunity.galactifun.units.*
 import io.github.addoncommunity.galactifun.util.general.mergeMaps
-import io.github.addoncommunity.galactifun.util.items.wetMass
 import io.github.addoncommunity.galactifun.util.processSlimefunBlocks
 import io.github.thebusybiscuit.slimefun4.libraries.dough.blocks.BlockPosition
 import kotlin.math.ln

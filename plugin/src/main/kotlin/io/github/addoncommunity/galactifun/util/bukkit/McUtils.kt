@@ -12,6 +12,7 @@ import org.bukkit.*
 import org.bukkit.entity.Entity
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.util.Vector
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
@@ -25,6 +26,8 @@ fun Location.copy(
     yaw: Float = this.yaw,
     pitch: Float = this.pitch
 ): Location = Location(world, x, y, z, yaw, pitch)
+
+fun Vector.copy(x: Double = this.x, y: Double = this.y, z: Double = this.z): Vector = Vector(x, y, z)
 
 inline fun <reified T : Entity> World.nearbyEntitiesByType(
     location: Location,

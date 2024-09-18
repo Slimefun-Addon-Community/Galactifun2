@@ -1,5 +1,7 @@
 package io.github.addoncommunity.galactifun.impl.items
 
+import io.github.addoncommunity.galactifun.api.betteritem.BetterSlimefunItem
+import io.github.addoncommunity.galactifun.api.betteritem.Ticker
 import io.github.addoncommunity.galactifun.api.blocks.CustomMass
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.units.*
@@ -8,7 +10,6 @@ import io.github.addoncommunity.galactifun.util.bukkit.adjacentFaces
 import io.github.addoncommunity.galactifun.util.checkBlock
 import io.github.addoncommunity.galactifun.util.general.enumMapOf
 import io.github.addoncommunity.galactifun.util.general.mergeMaps
-import io.github.addoncommunity.galactifun.util.items.TickingBlock
 import io.github.addoncommunity.galactifun.util.menu.buildMenu
 import io.github.seggan.sf4k.serial.blockstorage.getBlockStorage
 import io.github.seggan.sf4k.serial.blockstorage.setBlockStorage
@@ -30,7 +31,7 @@ class FuelTank(
     recipeType: RecipeType,
     recipe: Array<out ItemStack?>,
     private val capacity: Volume
-) : TickingBlock(itemGroup, item, recipeType, recipe), CustomMass {
+) : BetterSlimefunItem(itemGroup, item, recipeType, recipe), CustomMass {
 
     private companion object {
         private const val INPUT = 4
@@ -45,7 +46,8 @@ class FuelTank(
         }
     }
 
-    override fun tick(b: Block) {
+    @Ticker
+    private fun tick(b: Block) {
         val menu = BlockStorage.getInventory(b)
         val item = menu.getItemInSlot(INPUT)
         val gasItem = getByItem(item)

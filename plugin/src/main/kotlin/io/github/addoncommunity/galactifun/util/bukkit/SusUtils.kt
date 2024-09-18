@@ -7,34 +7,9 @@ import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.thebusybiscuit.slimefun4.utils.ChatUtils
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.suspendCancellableCoroutine
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.bukkit.event.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-
-suspend inline fun <reified E : Event> waitForEvent(
-    priority: EventPriority = EventPriority.NORMAL,
-    cancelIfEventCancelled: Boolean = false
-): E {
-    return suspendCancellableCoroutine { cont ->
-        Bukkit.getPluginManager().registerEvent(
-            E::class.java,
-            object : Listener {},
-            priority,
-            { listener, event ->
-                HandlerList.unregisterAll(listener)
-                if (cancelIfEventCancelled && event is Cancellable && event.isCancelled) {
-                    cont.cancel()
-                } else {
-                    cont.resume(event as E)
-                }
-            },
-            pluginInstance
-        )
-    }
-}
 
 suspend fun Player.awaitChatInput(): String {
     return suspendCoroutine { cont ->

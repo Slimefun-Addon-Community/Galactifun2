@@ -6,6 +6,7 @@ class LazyDouble(private val supplier: () -> Double)  {
 
     private var value = Double.NaN
     private var initialized = false
+
     operator fun getValue(thisRef: Any?, property: KProperty<*>): Double {
         if (!initialized) {
             value = supplier()

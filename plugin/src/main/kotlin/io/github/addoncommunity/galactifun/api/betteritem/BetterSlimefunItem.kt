@@ -107,14 +107,14 @@ open class BetterSlimefunItem : SlimefunItem {
             } else if (method.isAnnotationPresent(Ticker::class.java)) {
                 method.isAccessible = true
                 val handle = MethodHandles.lookup().unreflect(method).bindTo(this)
-                val ticker = method.getAnnotation(Ticker::class.java)
+                val isSync = !method.getAnnotation(Ticker::class.java).async
                 addItemHandler(object : BlockTicker() {
                     override fun tick(b: Block, item: SlimefunItem, data: Config) {
                         handle.invoke(b)
                     }
 
                     override fun isSynchronized(): Boolean {
-                        return !ticker.async
+                        return isSync
                     }
                 })
             }
