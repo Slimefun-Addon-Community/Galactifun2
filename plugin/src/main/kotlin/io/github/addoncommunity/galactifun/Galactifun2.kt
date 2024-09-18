@@ -15,6 +15,7 @@ import io.github.addoncommunity.galactifun.scripting.PlanetScript
 import io.github.addoncommunity.galactifun.scripting.dsl.*
 import io.github.addoncommunity.galactifun.scripting.dsl.gen.*
 import io.github.addoncommunity.galactifun.scripting.evalScript
+import io.github.addoncommunity.galactifun.serial.BlockVectorSerializer
 import io.github.addoncommunity.galactifun.units.Angle.Companion.degrees
 import io.github.addoncommunity.galactifun.units.Distance.Companion.au
 import io.github.addoncommunity.galactifun.units.Distance.Companion.kilometers
@@ -22,6 +23,7 @@ import io.github.addoncommunity.galactifun.units.Mass.Companion.kilograms
 import io.github.addoncommunity.galactifun.util.bukkit.plus
 import io.github.addoncommunity.galactifun.util.general.log
 import io.github.seggan.sf4k.AbstractAddon
+import io.github.seggan.sf4k.serial.serializers.CustomSerializerRegistry
 import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun
 import io.github.thebusybiscuit.slimefun4.libraries.paperlib.PaperLib
@@ -58,6 +60,7 @@ open class Galactifun2 : AbstractAddon() {
         if (!isTest) {
             Bukkit.spigot().config["world-settings.default.verbose"] = false
         }
+        CustomSerializerRegistry.register(BlockVectorSerializer)
     }
 
     override suspend fun onEnableAsync() {
