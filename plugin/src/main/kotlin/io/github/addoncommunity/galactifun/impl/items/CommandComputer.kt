@@ -16,8 +16,8 @@ import io.github.addoncommunity.galactifun.units.times
 import io.github.addoncommunity.galactifun.units.unitSumOf
 import io.github.addoncommunity.galactifun.util.*
 import io.github.addoncommunity.galactifun.util.bukkit.*
-import io.github.seggan.sf4k.location.plus
-import io.github.seggan.sf4k.location.position
+import io.github.seggan.sf4k.extensions.plus
+import io.github.seggan.sf4k.extensions.position
 import io.github.seggan.sf4k.serial.blockstorage.getBlockStorage
 import io.github.seggan.sf4k.serial.blockstorage.setBlockStorage
 import io.github.seggan.sf4k.serial.pdc.get

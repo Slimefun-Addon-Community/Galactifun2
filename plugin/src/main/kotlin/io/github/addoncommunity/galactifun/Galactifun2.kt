@@ -31,10 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.Style
-import net.kyori.adventure.text.format.TextDecoration
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -166,14 +163,6 @@ open class Galactifun2 : AbstractAddon() {
         }
 
         doTestingStuff()
-    }
-
-    override suspend fun onDisableAsync() {
-        Bukkit.getConsoleSender().sendMessage(
-            Component.text()
-                .content("YOU MAY SAFELY IGNORE THE COROUTINE CANCELLATION EXCEPTION BELOW, I HAVE NO IDEA HOW TO FIX IT")
-                .style(Style.style(NamedTextColor.GREEN, TextDecoration.BOLD))
-        )
     }
 
     override fun getJavaPlugin(): JavaPlugin = this

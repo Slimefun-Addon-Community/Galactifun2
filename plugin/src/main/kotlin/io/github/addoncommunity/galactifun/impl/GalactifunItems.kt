@@ -1,10 +1,7 @@
 package io.github.addoncommunity.galactifun.impl
 
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
-import io.github.addoncommunity.galactifun.impl.items.CaptainsChair
-import io.github.addoncommunity.galactifun.impl.items.CommandComputer
-import io.github.addoncommunity.galactifun.impl.items.FuelTank
-import io.github.addoncommunity.galactifun.impl.items.RocketEngine
+import io.github.addoncommunity.galactifun.impl.items.*
 import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.units.Force.Companion.kilonewtons
 import io.github.addoncommunity.galactifun.units.Volume.Companion.liters
@@ -16,6 +13,15 @@ import kotlin.time.Duration.Companion.seconds
 
 @Suppress("unused")
 object GalactifunItems {
+
+    val SLIMEFUN_STRUCTURE_BLOCK = buildSlimefunItem<SlimefunStructureBlock> {
+        category = GalactifunCategories.HIDDEN
+        id = "SLIMEFUN_STRUCTURE_BLOCK"
+        name = "<white>Slimefun Structure Block"
+        material = MaterialType.Material(Material.STRUCTURE_BLOCK)
+        recipeType = RecipeType.NULL
+        recipe = emptyArray()
+    }
 
     val COMMAND_COMPUTER = buildSlimefunItem<CommandComputer> {
         category = GalactifunCategories.ROCKET_COMPONENTS

@@ -8,6 +8,7 @@ import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType
 import io.github.thebusybiscuit.slimefun4.utils.SlimefunUtils
+import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
@@ -57,6 +58,9 @@ sealed interface MaterialType {
         override fun convert() = SlimefunUtils.getCustomHead(texture)
     }
 }
+
+val Material.materialType get() = MaterialType.Material(this)
+val ItemStack.materialType get() = MaterialType.ItemStack(this)
 
 inline fun <reified I : SlimefunItem> buildSlimefunItem(
     vararg otherArgs: Any?,

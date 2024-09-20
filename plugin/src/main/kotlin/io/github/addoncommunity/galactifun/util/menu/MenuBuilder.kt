@@ -1,5 +1,6 @@
 package io.github.addoncommunity.galactifun.util.menu
 
+import io.github.addoncommunity.galactifun.util.set
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction
@@ -7,7 +8,7 @@ import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.chars.CharOpenHashSet
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet
-import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow
 import org.bukkit.block.Block
@@ -29,17 +30,24 @@ class MenuBuilder {
         menu.add(this)
     }
 
-    infix fun Char.means(item: ItemStack): MenuItem {
-        return MenuItem(item).also { items[this] = it }
+    infix fun Char.means(item: MenuItem) {
+        items[this] = item
+    }
+
+    infix fun Char.means(item: ItemStack) {
+        items[this] = MenuItem(item)
     }
 
     fun background(c: Char) {
         items[c] = MenuItem(ChestMenuUtils.getBackground())
     }
 
-    infix fun MenuItem.onClick(block: (Player, ClickAction) -> Boolean): MenuItem {
-        onClick = block
-        return this
+    fun inputBorder(c: Char) {
+        items[c] = MenuItem(ChestMenuUtils.getInputSlotTexture())
+    }
+
+    fun outputBorder(c: Char) {
+        items[c] = MenuItem(ChestMenuUtils.getOutputSlotTexture())
     }
 
     fun input(c: Char) {
@@ -50,23 +58,32 @@ class MenuBuilder {
         outputs.add(c)
     }
 
+    fun item(builder: MenuItem.Builder.() -> Unit): MenuItem {
+        return MenuItem.Builder().apply(builder).build()
+    }
+
     fun apply(item: SlimefunItem) {
+        // They have to be up here because init() is called in the superclass constructor smh
+        val inputSlots = IntOpenHashSet()
+        val outputSlots = IntOpenHashSet()
+        val slotMap = mutableMapOf<Char, MutableList<Int>>()
+        val handlers = mutableListOf<Pair<Int, MenuItemClickHandler>>()
+        val inits = mutableListOf<Pair<Int, ItemContext.() -> Unit>>()
+
         object : BlockMenuPreset(item.id, item.itemName) {
-
-            private val inputSlots = IntOpenHashSet()
-            private val outputSlots = IntOpenHashSet()
-
             override fun init() {
                 var slot = 0
                 for (row in menu) {
                     for (char in row) {
+                        slotMap.getOrPut(char, ::mutableListOf).add(slot)
                         val menuItem = items[char]
                         if (menuItem != null) {
                             addItem(slot, menuItem.item)
                             if (menuItem.onClick != null) {
-                                addMenuClickHandler(slot) { p, _, _, action ->
-                                    menuItem.onClick?.invoke(p, action) ?: false
-                                }
+                                handlers.add(slot to menuItem.onClick)
+                            }
+                            if (menuItem.init != null) {
+                                inits.add(slot to menuItem.init)
                             }
                         }
                         if (inputs.contains(char)) {
@@ -81,9 +98,23 @@ class MenuBuilder {
                 isEmptySlotsClickable = emptySlotsClickable
             }
 
+            override fun newInstance(menu: BlockMenu, b: Block) {
+                for ((slot, handler) in handlers) {
+                    menu[slot] = { p, _, item, action ->
+                        val context = ClickContext(menu, b, item, slotMap)
+                        context.handler(p, action)
+                        context.allowTaking
+                    }
+                }
+                for ((slot, init) in inits) {
+                    val context = ItemContext(menu, b, menu.getItemInSlot(slot), slotMap)
+                    context.init()
+                }
+            }
+
             override fun canOpen(b: Block, p: Player): Boolean {
                 if (p.hasPermission("slimefun.inventory.bypass")) return true
-                return item.canUse(p, false)
+                return item.canUse(p, true)
                         && Slimefun.getProtectionManager().hasPermission(p, b, Interaction.INTERACT_BLOCK)
             }
 

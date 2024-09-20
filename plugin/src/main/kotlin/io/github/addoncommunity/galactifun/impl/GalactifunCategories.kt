@@ -24,4 +24,10 @@ object GalactifunCategories {
         MAIN,
         CustomItemStack(Material.BONE_MEAL, "&fGases")
     )
+
+    val HIDDEN = SubItemGroup(
+        "hidden".key(),
+        MAIN,
+        CustomItemStack(Material.BARRIER, "&fHidden")
+    )
 }

@@ -1,9 +1,8 @@
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
-    id("com.google.devtools.ksp") version "2.0.0-1.0.21"
 
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.gradleup.shadow") version "8.3.2"
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
     id("xyz.jpenilla.run-paper") version "2.3.0"
 
@@ -44,12 +43,12 @@ dependencies {
     implementation("org.bstats:bstats-bukkit:3.0.2")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
 
-    implementation("io.github.seggan:sf4k:0.4.1")
+    implementation("io.github.seggan:sf4k:0.5.0")
 
     testImplementation(kotlin("test"))
     testImplementation("io.strikt:strikt-core:0.34.0")
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.80.0")
-    testImplementation("com.github.shynixn.mccoroutine:mccoroutine-bukkit-test:2.14.0")
+    implementation("com.github.seeseemelk:MockBukkit-v1.20:3.93.2")
+    testImplementation("com.github.shynixn.mccoroutine:mccoroutine-bukkit-test:2.19.0")
 }
 
 group = "io.github.addoncommunity.galactifun"
@@ -73,6 +72,10 @@ tasks.test {
 
 tasks.shadowJar {
     dependsOn(tasks.test)
+
+    manifest {
+        attributes["paperweight-mappings-namespace"] = "mojang"
+    }
 
     fun doRelocate(from: String) {
         val last = from.split(".").last()

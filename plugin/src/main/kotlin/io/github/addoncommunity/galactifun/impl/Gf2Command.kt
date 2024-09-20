@@ -9,7 +9,7 @@ import io.github.addoncommunity.galactifun.impl.managers.RocketManager
 import io.github.addoncommunity.galactifun.util.SerializedBlock
 import io.github.addoncommunity.galactifun.util.bukkit.galactifunTeleport
 import io.github.addoncommunity.galactifun.util.menu.PlanetMenu
-import io.github.seggan.sf4k.location.plusAssign
+import io.github.seggan.sf4k.extensions.plusAssign
 import kotlinx.datetime.Clock
 import org.bukkit.Location
 import org.bukkit.entity.BlockDisplay

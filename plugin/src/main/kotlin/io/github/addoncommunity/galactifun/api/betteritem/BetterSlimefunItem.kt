@@ -1,6 +1,7 @@
 package io.github.addoncommunity.galactifun.api.betteritem
 
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
+import io.github.thebusybiscuit.slimefun4.api.items.ItemSetting
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType
@@ -119,6 +120,12 @@ open class BetterSlimefunItem : SlimefunItem {
                 })
             }
         }
+    }
+
+    protected fun <T : Any> itemSetting(key: String, default: T): ItemSetting<T> {
+        val setting = ItemSetting(this, key, default)
+        addItemSetting(setting)
+        return setting
     }
 }
 

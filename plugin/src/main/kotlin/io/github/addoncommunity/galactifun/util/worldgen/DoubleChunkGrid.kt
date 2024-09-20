@@ -23,24 +23,23 @@ class DoubleChunkGrid {
     private val lock = ReentrantReadWriteLock()
 
     init {
-        if (pluginInstance.isEnabled) {
-            val ref = WeakReference(this)
-            pluginInstance.launchAsync(Dispatchers.IO) {
-                while (true) {
-                    val time = System.currentTimeMillis()
-                    val grid = ref.get() ?: break
-                    grid.lock.writeLock().lock()
-                    val iterator = grid.chunkCreations.long2LongEntrySet().fastIterator()
-                    while (iterator.hasNext()) {
-                        val entry = iterator.next()
-                        if (time - entry.longValue > 3000) {
-                            iterator.remove()
-                            grid.chunks.remove(entry.longKey)
-                        }
+        val ref = WeakReference(this)
+        pluginInstance.launchAsync(Dispatchers.IO) {
+            while (true) {
+                val time = System.currentTimeMillis()
+                val grid = ref.get() ?: break
+                grid.lock.writeLock().lock()
+                val iterator = grid.chunkCreations.long2LongEntrySet().fastIterator()
+                while (iterator.hasNext()) {
+                    val entry = iterator.next()
+                    if (time - entry.longValue > 3000) {
+                        iterator.remove()
+                        grid.chunks.remove(entry.longKey)
                     }
-                    grid.lock.writeLock().unlock()
-                    delay(2999)
                 }
+                grid.lock.writeLock().unlock()
+                if (!pluginInstance.isEnabled) return@launchAsync
+                delay(2999)
             }
         }
     }

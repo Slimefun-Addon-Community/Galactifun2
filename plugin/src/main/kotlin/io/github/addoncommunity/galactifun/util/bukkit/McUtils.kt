@@ -6,12 +6,11 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
-import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.*
 import org.bukkit.entity.Entity
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.util.Vector
 import java.util.*
 import java.util.concurrent.CompletableFuture
@@ -85,7 +84,6 @@ inline fun ItemStack.modifyLore(modifier: (MutableList<Component>) -> Unit) {
 
 operator fun <T : Keyed> Tag<T>.contains(item: T): Boolean = isTagged(item)
 
-fun String.miniMessageToLegacy(): String = LegacyComponentSerializer.legacyAmpersand()
-    .serialize(MiniMessage.miniMessage().deserialize(this))
+operator fun PersistentDataContainer.contains(key: NamespacedKey): Boolean = has(key)
 
 fun locationZero(world: World?): Location = Location(world, 0.0, 0.0, 0.0)

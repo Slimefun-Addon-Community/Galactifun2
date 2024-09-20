@@ -1,13 +1,17 @@
 package io.github.addoncommunity.galactifun.util
 
+import io.github.addoncommunity.galactifun.serial.BlockVectorSerializer
 import io.github.addoncommunity.galactifun.util.bukkit.copy
 import io.github.addoncommunity.galactifun.util.bukkit.key
+import io.github.seggan.sf4k.extensions.div
+import io.github.seggan.sf4k.extensions.minus
+import io.github.seggan.sf4k.extensions.plus
 import io.github.seggan.sf4k.serial.pdc.get
 import io.github.seggan.sf4k.serial.pdc.set
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.serializer
 import me.mrCookieSlime.Slimefun.api.BlockStorage
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.RegionAccessor
+import org.bukkit.*
 import org.bukkit.block.structure.Mirror
 import org.bukkit.block.structure.StructureRotation
 import org.bukkit.structure.Structure
@@ -19,12 +23,18 @@ import java.util.*
 import kotlin.collections.set
 
 @Suppress("UnstableApiUsage")
-class SlimefunStructure(private val delegate: Structure) : Structure by delegate {
+class SlimefunStructure(
+    private val delegate: Structure = Bukkit.getStructureManager().createStructure()
+) : Structure by delegate {
 
     private var center: Vector = resetCenter()
 
     companion object {
         private val blockStorageKey = "block_storage".key()
+
+        fun load(key: NamespacedKey): SlimefunStructure? {
+            return Bukkit.getStructureManager().loadStructure(key)?.let(::SlimefunStructure)
+        }
     }
 
     override fun place(
@@ -110,15 +120,8 @@ class SlimefunStructure(private val delegate: Structure) : Structure by delegate
         blockTransformers: MutableCollection<BlockTransformer>,
         entityTransformers: MutableCollection<EntityTransformer>
     ) {
-        val data = persistentDataContainer.get<Map<BlockVector, Pair<String, Material>>>(blockStorageKey) ?: emptyMap()
-        val rotated = data.mapKeys { (vector, _) ->
-            val newVec = structureRotation.rotateAroundCenter(vector)
-            when (mirror) {
-                Mirror.NONE -> newVec
-                Mirror.FRONT_BACK -> newVec.copy(x = -newVec.x)
-                Mirror.LEFT_RIGHT -> newVec.copy(z = -newVec.z)
-            }
-        }
+        val data = persistentDataContainer.get<Map<BlockVector, Pair<String, Material>>>(blockStorageKey, serializersModule.serializer()) ?: emptyMap()
+        val rotated = data.mapKeys { (vector, _) -> vector.applyStructureTransforms(structureRotation, mirror) }
         blockTransformers.add(BlockTransformer { region, x, y, z, current, _ ->
             val vector = BlockVector(x, y, z).subtract(location)
             val (json, material) = rotated[vector] ?: return@BlockTransformer current
@@ -147,7 +150,7 @@ class SlimefunStructure(private val delegate: Structure) : Structure by delegate
             for (y in 0 until size.blockY) {
                 for (z in 0 until size.blockZ) {
                     val vector = BlockVector(x, y, z)
-                    val block = origin.clone().add(vector).block
+                    val block = (origin + vector).block
                     if (BlockStorage.hasBlockInfo(block)) {
                         data[vector] = BlockStorage.getBlockInfoAsJson(block) to block.type
                     }
@@ -155,7 +158,8 @@ class SlimefunStructure(private val delegate: Structure) : Structure by delegate
             }
         }
         delegate.fill(origin, size, includeEntities)
-        persistentDataContainer.set(blockStorageKey, data)
+        persistentDataContainer.remove(blockStorageKey)
+        persistentDataContainer.set(blockStorageKey, data, serializersModule.serializer())
         center = resetCenter()
     }
 
@@ -163,18 +167,32 @@ class SlimefunStructure(private val delegate: Structure) : Structure by delegate
         fill(corner1, corner2.clone().subtract(corner1).toVector().toBlockVector(), includeEntities)
     }
 
-    private fun resetCenter(): Vector {
-        return size.clone().multiply(0.5).setY(0)
+    fun save(key: NamespacedKey) {
+        Bukkit.getStructureManager().saveStructure(key, delegate)
     }
 
-    private fun StructureRotation.rotateAroundCenter(location: Vector): BlockVector {
-        val centered = location.clone().subtract(center)
-        val rotated = when (this) {
+    private fun resetCenter(): Vector {
+        val center = size / 2
+        return center.setY(0)
+    }
+
+    private fun Vector.applyStructureTransforms(rotation: StructureRotation, mirror: Mirror): BlockVector {
+        val centered = this - center
+        val rotated = when (rotation) {
             StructureRotation.NONE -> centered
             StructureRotation.CLOCKWISE_90 -> centered.copy(x = -centered.z, z = centered.x)
             StructureRotation.CLOCKWISE_180 -> centered.copy(x = -centered.x, z = -centered.z)
             StructureRotation.COUNTERCLOCKWISE_90 -> centered.copy(x = centered.z, z = -centered.x)
         }
-        return rotated.add(center).toBlockVector()
+        val mirrored = when (mirror) {
+            Mirror.NONE -> rotated
+            Mirror.FRONT_BACK -> rotated.copy(x = -rotated.x)
+            Mirror.LEFT_RIGHT -> rotated.copy(z = -rotated.z)
+        }
+        return mirrored.add(center).toBlockVector()
     }
+}
+
+private val serializersModule = SerializersModule {
+    contextual(BlockVector::class, BlockVectorSerializer)
 }
