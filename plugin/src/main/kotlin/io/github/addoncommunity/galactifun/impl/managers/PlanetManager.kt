@@ -8,9 +8,9 @@ import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atm
 import io.github.addoncommunity.galactifun.impl.Permissions
 import io.github.addoncommunity.galactifun.impl.space.SpaceGenerator
 import io.github.addoncommunity.galactifun.pluginInstance
+import io.github.addoncommunity.galactifun.util.bukkit.getPdc
 import io.github.addoncommunity.galactifun.util.bukkit.key
-import io.github.seggan.sf4k.serial.pdc.getData
-import io.github.seggan.sf4k.serial.pdc.setData
+import io.github.addoncommunity.galactifun.util.bukkit.setPdc
 import io.papermc.paper.event.entity.EntityMoveEvent
 import org.bukkit.Bukkit
 import org.bukkit.GameRule
@@ -59,7 +59,7 @@ object PlanetManager : Listener {
         Atmosphere.NONE.applyEffects(spaceWorld)
         spaceWorld.setGameRule(GameRule.DO_MOB_SPAWNING, false)
 
-        orbits = spaceWorld.persistentDataContainer.getData(orbitsKey) ?: mutableMapOf()
+        orbits = spaceWorld.getPdc(orbitsKey) ?: mutableMapOf()
 
         Bukkit.getPluginManager().registerEvents(this, pluginInstance)
     }
@@ -76,7 +76,7 @@ object PlanetManager : Listener {
                 orbits.size / maxOrbits + offset
             )
             orbits[planet.name] = orbitPos
-            spaceWorld.persistentDataContainer.setData(orbitsKey, orbits)
+            spaceWorld.setPdc(orbitsKey, orbits)
         }
 
         if (planet is PlanetaryWorld) {

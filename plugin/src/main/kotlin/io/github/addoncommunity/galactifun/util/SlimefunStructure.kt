@@ -1,12 +1,12 @@
 package io.github.addoncommunity.galactifun.util
 
 import io.github.addoncommunity.galactifun.util.bukkit.copy
+import io.github.addoncommunity.galactifun.util.bukkit.getPdc
 import io.github.addoncommunity.galactifun.util.bukkit.key
+import io.github.addoncommunity.galactifun.util.bukkit.setPdc
 import io.github.seggan.sf4k.extensions.div
 import io.github.seggan.sf4k.extensions.minus
 import io.github.seggan.sf4k.extensions.plus
-import io.github.seggan.sf4k.serial.pdc.getData
-import io.github.seggan.sf4k.serial.pdc.setData
 import me.mrCookieSlime.Slimefun.api.BlockStorage
 import org.bukkit.*
 import org.bukkit.block.structure.Mirror
@@ -123,7 +123,7 @@ class SlimefunStructure(
         blockTransformers: MutableCollection<BlockTransformer>,
         entityTransformers: MutableCollection<EntityTransformer>
     ) {
-        val data = persistentDataContainer.getData<Map<BlockVector, Pair<String, Material>>>(blockStorageKey) ?: emptyMap()
+        val data = getPdc<Map<BlockVector, Pair<String, Material>>>(blockStorageKey) ?: emptyMap()
         val rotated = data.mapKeys { (vector, _) -> vector.applyStructureTransforms(structureRotation, mirror) }
         blockTransformers.add(BlockTransformer { region, x, y, z, current, _ ->
             val vector = BlockVector(x, y, z).subtract(location)
@@ -162,7 +162,7 @@ class SlimefunStructure(
         }
         delegate.fill(origin, size, includeEntities)
         persistentDataContainer.remove(blockStorageKey)
-        persistentDataContainer.setData(blockStorageKey, data)
+        setPdc(blockStorageKey, data)
         center = getNewCenter()
     }
 
