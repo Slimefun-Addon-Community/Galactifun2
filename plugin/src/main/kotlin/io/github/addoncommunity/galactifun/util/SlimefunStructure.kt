@@ -1,15 +1,12 @@
 package io.github.addoncommunity.galactifun.util
 
-import io.github.addoncommunity.galactifun.serial.BlockVectorSerializer
 import io.github.addoncommunity.galactifun.util.bukkit.copy
 import io.github.addoncommunity.galactifun.util.bukkit.key
 import io.github.seggan.sf4k.extensions.div
 import io.github.seggan.sf4k.extensions.minus
 import io.github.seggan.sf4k.extensions.plus
-import io.github.seggan.sf4k.serial.pdc.get
-import io.github.seggan.sf4k.serial.pdc.set
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.serializer
+import io.github.seggan.sf4k.serial.pdc.getData
+import io.github.seggan.sf4k.serial.pdc.setData
 import me.mrCookieSlime.Slimefun.api.BlockStorage
 import org.bukkit.*
 import org.bukkit.block.structure.Mirror
@@ -19,6 +16,8 @@ import org.bukkit.util.BlockTransformer
 import org.bukkit.util.BlockVector
 import org.bukkit.util.EntityTransformer
 import org.bukkit.util.Vector
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.*
 import kotlin.collections.set
 
@@ -27,13 +26,17 @@ class SlimefunStructure(
     private val delegate: Structure = Bukkit.getStructureManager().createStructure()
 ) : Structure by delegate {
 
-    private var center: Vector = resetCenter()
+    private var center: Vector = getNewCenter()
 
     companion object {
         private val blockStorageKey = "block_storage".key()
 
         fun load(key: NamespacedKey): SlimefunStructure? {
             return Bukkit.getStructureManager().loadStructure(key)?.let(::SlimefunStructure)
+        }
+
+        fun loadFromStream(stream: InputStream): SlimefunStructure {
+            return Bukkit.getStructureManager().loadStructure(stream).let(::SlimefunStructure)
         }
     }
 
@@ -120,7 +123,7 @@ class SlimefunStructure(
         blockTransformers: MutableCollection<BlockTransformer>,
         entityTransformers: MutableCollection<EntityTransformer>
     ) {
-        val data = persistentDataContainer.get<Map<BlockVector, Pair<String, Material>>>(blockStorageKey, serializersModule.serializer()) ?: emptyMap()
+        val data = persistentDataContainer.getData<Map<BlockVector, Pair<String, Material>>>(blockStorageKey) ?: emptyMap()
         val rotated = data.mapKeys { (vector, _) -> vector.applyStructureTransforms(structureRotation, mirror) }
         blockTransformers.add(BlockTransformer { region, x, y, z, current, _ ->
             val vector = BlockVector(x, y, z).subtract(location)
@@ -159,8 +162,8 @@ class SlimefunStructure(
         }
         delegate.fill(origin, size, includeEntities)
         persistentDataContainer.remove(blockStorageKey)
-        persistentDataContainer.set(blockStorageKey, data, serializersModule.serializer())
-        center = resetCenter()
+        persistentDataContainer.setData(blockStorageKey, data)
+        center = getNewCenter()
     }
 
     override fun fill(corner1: Location, corner2: Location, includeEntities: Boolean) {
@@ -171,7 +174,11 @@ class SlimefunStructure(
         Bukkit.getStructureManager().saveStructure(key, delegate)
     }
 
-    private fun resetCenter(): Vector {
+    fun saveToStream(stream: OutputStream) {
+        Bukkit.getStructureManager().saveStructure(stream, delegate)
+    }
+
+    private fun getNewCenter(): Vector {
         val center = size / 2
         return center.setY(0)
     }
@@ -191,8 +198,4 @@ class SlimefunStructure(
         }
         return mirrored.add(center).toBlockVector()
     }
-}
-
-private val serializersModule = SerializersModule {
-    contextual(BlockVector::class, BlockVectorSerializer)
 }

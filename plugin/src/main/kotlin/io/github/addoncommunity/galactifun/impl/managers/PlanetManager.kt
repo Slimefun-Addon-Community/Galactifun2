@@ -9,19 +9,14 @@ import io.github.addoncommunity.galactifun.impl.Permissions
 import io.github.addoncommunity.galactifun.impl.space.SpaceGenerator
 import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.util.bukkit.key
-import io.github.addoncommunity.galactifun.util.bukkit.locationZero
-import io.github.addoncommunity.galactifun.util.bukkit.nearbyEntitiesByType
-import io.github.addoncommunity.galactifun.util.bukkit.summon
-import io.github.seggan.sf4k.serial.pdc.get
-import io.github.seggan.sf4k.serial.pdc.set
+import io.github.seggan.sf4k.serial.pdc.getData
+import io.github.seggan.sf4k.serial.pdc.setData
 import io.papermc.paper.event.entity.EntityMoveEvent
 import org.bukkit.Bukkit
 import org.bukkit.GameRule
 import org.bukkit.World
 import org.bukkit.WorldCreator
 import org.bukkit.configuration.file.YamlConfiguration
-import org.bukkit.entity.Entity
-import org.bukkit.entity.Marker
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerMoveEvent
@@ -39,7 +34,6 @@ object PlanetManager : Listener {
         get() = planets
 
     val spaceWorld: World
-    private val spaceWorldMarker: Entity
 
     private val orbits: MutableMap<String, OrbitPosition>
     private val orbitsKey = "orbits".key()
@@ -65,12 +59,7 @@ object PlanetManager : Listener {
         Atmosphere.NONE.applyEffects(spaceWorld)
         spaceWorld.setGameRule(GameRule.DO_MOB_SPAWNING, false)
 
-        spaceWorldMarker = spaceWorld.nearbyEntitiesByType<Marker>(
-            locationZero(spaceWorld),
-            0.1
-        ).firstOrNull() ?: spaceWorld.summon<Marker>(locationZero(spaceWorld))
-
-        orbits = spaceWorldMarker.persistentDataContainer.get(orbitsKey) ?: mutableMapOf()
+        orbits = spaceWorld.persistentDataContainer.getData(orbitsKey) ?: mutableMapOf()
 
         Bukkit.getPluginManager().registerEvents(this, pluginInstance)
     }
@@ -87,7 +76,7 @@ object PlanetManager : Listener {
                 orbits.size / maxOrbits + offset
             )
             orbits[planet.name] = orbitPos
-            spaceWorldMarker.persistentDataContainer.set(orbitsKey, orbits)
+            spaceWorld.persistentDataContainer.setData(orbitsKey, orbits)
         }
 
         if (planet is PlanetaryWorld) {

@@ -23,7 +23,7 @@ import io.github.addoncommunity.galactifun.units.Mass.Companion.kilograms
 import io.github.addoncommunity.galactifun.util.bukkit.plus
 import io.github.addoncommunity.galactifun.util.general.log
 import io.github.seggan.sf4k.AbstractAddon
-import io.github.seggan.sf4k.serial.serializers.CustomSerializerRegistry
+import io.github.seggan.sf4k.serial.serializers.BukkitSerializerRegistry
 import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun
 import io.github.thebusybiscuit.slimefun4.libraries.paperlib.PaperLib
@@ -37,6 +37,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.block.Biome
 import org.bukkit.plugin.java.JavaPlugin
+import java.nio.file.Path
 import java.util.logging.Level
 import kotlin.coroutines.CoroutineContext
 import kotlin.script.experimental.api.ResultValue
@@ -50,6 +51,7 @@ open class Galactifun2 : AbstractAddon() {
 
     private lateinit var manager: PaperCommandManager
     lateinit var launchMessages: List<String> private set
+    lateinit var structuresFolder: Path private set
 
     var isTest = classLoader.javaClass.packageName.startsWith("be.seeseemelk.mockbukkit")
 
@@ -57,7 +59,7 @@ open class Galactifun2 : AbstractAddon() {
         if (!isTest) {
             Bukkit.spigot().config["world-settings.default.verbose"] = false
         }
-        CustomSerializerRegistry.register(BlockVectorSerializer)
+        BukkitSerializerRegistry.addSerializer(BlockVectorSerializer)
     }
 
     override suspend fun onEnableAsync() {
@@ -91,7 +93,7 @@ open class Galactifun2 : AbstractAddon() {
         }
 
         if (!isTest) {
-            Metrics(this, 11613)
+            Metrics(this, 23447)
         }
 
         manager = PaperCommandManager(this)
@@ -113,6 +115,7 @@ open class Galactifun2 : AbstractAddon() {
         manager.registerCommand(Gf2Command)
 
         launchMessages = config.getStringList("rockets.launch-msgs")
+        structuresFolder = dataFolder.toPath().resolve("structures")
 
         BaseUniverse.init()
 

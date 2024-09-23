@@ -43,7 +43,7 @@ dependencies {
     implementation("org.bstats:bstats-bukkit:3.0.2")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
 
-    implementation("io.github.seggan:sf4k:0.5.0")
+    implementation("io.github.seggan:sf4k:0.6.0")
 
     testImplementation(kotlin("test"))
     testImplementation("io.strikt:strikt-core:0.34.0")

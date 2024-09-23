@@ -6,8 +6,8 @@ import io.github.addoncommunity.galactifun.units.Angle.Companion.radians
 import io.github.addoncommunity.galactifun.util.bukkit.key
 import io.github.addoncommunity.galactifun.util.bukkit.nearbyEntitiesByType
 import io.github.addoncommunity.galactifun.util.bukkit.summon
-import io.github.seggan.sf4k.serial.pdc.get
-import io.github.seggan.sf4k.serial.pdc.set
+import io.github.seggan.sf4k.serial.pdc.getData
+import io.github.seggan.sf4k.serial.pdc.setData
 import io.github.thebusybiscuit.slimefun4.api.events.PlayerRightClickEvent
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
@@ -36,7 +36,7 @@ open class Seat(
 
         fun getSitting(player: Player): Location? {
             val armorStand = player.vehicle as? ArmorStand ?: return null
-            return armorStand.persistentDataContainer.get(armorStandKey)
+            return armorStand.persistentDataContainer.getData(armorStandKey)
         }
     }
 
@@ -50,7 +50,7 @@ open class Seat(
         armorStand.setGravity(false)
         armorStand.setAI(false)
         armorStand.isMarker = true
-        armorStand.persistentDataContainer.set(armorStandKey, b.location)
+        armorStand.persistentDataContainer.setData(armorStandKey, b.location)
         val data = b.blockData
         if (data is Directional) {
             val facing = data.facing

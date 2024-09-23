@@ -6,8 +6,8 @@ import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
 import io.github.addoncommunity.galactifun.impl.managers.RocketManager
-import io.github.addoncommunity.galactifun.util.SerializedBlock
 import io.github.addoncommunity.galactifun.util.bukkit.galactifunTeleport
+import io.github.addoncommunity.galactifun.util.bukkit.toBlock
 import io.github.addoncommunity.galactifun.util.menu.PlanetMenu
 import io.github.seggan.sf4k.extensions.plusAssign
 import kotlinx.datetime.Clock
@@ -47,7 +47,12 @@ object Gf2Command : BaseCommand() {
     fun distance(player: Player, planet: PlanetaryObject) {
         val start = PlanetManager.getByWorld(player.world) ?: return
         val distance = start.getDeltaVForTransferTo(planet, Clock.System.now())
-        player.sendMessage("The delta-v required to transfer to %s is %.2f m/s".format(planet.name, distance.metersPerSecond))
+        player.sendMessage(
+            "The delta-v required to transfer to %s is %.2f m/s".format(
+                planet.name,
+                distance.metersPerSecond
+            )
+        )
     }
 
     @Subcommand("selector")
@@ -62,9 +67,7 @@ object Gf2Command : BaseCommand() {
         var count = 0
         for (entity in player.world.entities) {
             if (entity is BlockDisplay) {
-                val block = SerializedBlock.loadFromDisplayEntity(entity)
-                if (block != null) {
-                    block.place(entity.location)
+                if (entity.toBlock()) {
                     count++
                 }
             }

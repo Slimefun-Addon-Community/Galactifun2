@@ -20,8 +20,8 @@ import io.github.seggan.sf4k.extensions.plus
 import io.github.seggan.sf4k.extensions.position
 import io.github.seggan.sf4k.serial.blockstorage.getBlockStorage
 import io.github.seggan.sf4k.serial.blockstorage.setBlockStorage
-import io.github.seggan.sf4k.serial.pdc.get
-import io.github.seggan.sf4k.serial.pdc.set
+import io.github.seggan.sf4k.serial.pdc.getData
+import io.github.seggan.sf4k.serial.pdc.setData
 import io.github.thebusybiscuit.slimefun4.api.events.PlayerRightClickEvent
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
@@ -45,7 +45,6 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.BoundingBox
 import java.util.*
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.collections.ArrayDeque
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.max
@@ -60,6 +59,10 @@ class CommandComputer(
 ) : BetterSlimefunItem(itemGroup, item, recipeType, recipe) {
 
     private val counters = Object2IntOpenHashMap<BlockPosition>()
+
+    companion object {
+        val SERIALIZED_BLOCK_KEY = "serialized_block".key()
+    }
 
     @Ticker
     private fun tick(b: Block) {
@@ -167,20 +170,19 @@ class CommandComputer(
                 world.getNearbyEntities(BoundingBox.of(block.getRelative(BlockFace.UP)))
                     .filter { it.isOnGround }
             )
-            val serialized = SerializedBlock.serialize(block)
-            val display = serialized.createDisplayEntity(b.location)
+            val display = block.toDisplay()
             entities.add(display)
             entities.addAll(foundEntities.filter { it.vehicle == null }.flatMap(::freezeEntity))
         }
 
         // Random launch messages
-        val launched = AtomicBoolean(false)
+        var launched = false
         pluginInstance.launch {
             val launchMessages = ArrayDeque(pluginInstance.launchMessages)
             launchMessages.shuffle()
             while (true) {
                 delayTicks(Random.nextInt(15, 30))
-                if (launched.get()) break
+                if (launched) break
                 for (player in entities.filterIsInstance<Player>()) {
                     player.sendMessage(launchMessages.removeFirst() + "...")
                 }
@@ -189,7 +191,7 @@ class CommandComputer(
 
         // Engine smoke
         pluginInstance.launch {
-            while (!launched.get()) {
+            while (!launched) {
                 for ((_, engine) in firstStage.engines) {
                     world.spawnParticle(
                         Particle.CAMPFIRE_SIGNAL_SMOKE,
@@ -211,7 +213,7 @@ class CommandComputer(
             }
             delayTicks(20)
         }
-        launched.set(true)
+        launched = true
 
         val offsets = entities.associateWith { it.location.subtract(pos.toLocation()) }
         val maxHeight = world.maxHeight
@@ -249,14 +251,14 @@ private val FLIGHT_KEY = "is_flight".key()
 
 fun freezeEntity(entity: Entity): List<Entity> {
     val pdc = entity.persistentDataContainer
-    pdc.set(GRAVITY_KEY, entity.hasGravity())
+    pdc.setData(GRAVITY_KEY, entity.hasGravity())
     entity.setGravity(false)
     if (entity is LivingEntity) {
         if (entity is Player) {
-            pdc.set(FLIGHT_KEY, entity.allowFlight)
+            pdc.setData(FLIGHT_KEY, entity.allowFlight)
             entity.allowFlight = false
         } else {
-            pdc.set(AI_KEY, entity.hasAI())
+            pdc.setData(AI_KEY, entity.hasAI())
             entity.setAI(false)
         }
     }
@@ -268,16 +270,15 @@ fun unfreezeEntity(entity: Entity) {
     when (entity) {
         is Player -> {
             entity.sendMessage("You have arrived at your destination")
-            entity.allowFlight = pdc.get(FLIGHT_KEY) ?: false
+            entity.allowFlight = pdc.getData(FLIGHT_KEY) ?: false
         }
 
-        is BlockDisplay -> SerializedBlock.loadFromDisplayEntity(entity, true)
-            ?.place(entity.location)
+        is BlockDisplay -> entity.toBlock()
 
         else -> {
-            entity.setGravity(pdc.get(GRAVITY_KEY) ?: true)
+            entity.setGravity(pdc.getData(GRAVITY_KEY) ?: true)
             if (entity is LivingEntity) {
-                entity.setAI(pdc.get(AI_KEY) ?: true)
+                entity.setAI(pdc.getData(AI_KEY) ?: true)
             }
         }
     }

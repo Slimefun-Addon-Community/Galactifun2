@@ -33,14 +33,14 @@ import org.bukkit.Location
 import org.bukkit.Particle
 import org.bukkit.block.Block
 import org.bukkit.block.Structure
-import org.bukkit.block.structure.Mirror
-import org.bukkit.block.structure.StructureRotation
 import org.bukkit.block.structure.UsageMode
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.BlockVector
 import org.bukkit.util.Vector
-import java.util.*
+import kotlin.io.path.exists
+import kotlin.io.path.inputStream
+import kotlin.io.path.outputStream
 
 class SlimefunStructureBlock(
     itemGroup: ItemGroup,
@@ -86,15 +86,15 @@ class SlimefunStructureBlock(
                     val offsetLocation = block.location + offset
                     structure.fill(offsetLocation, size, true)
 
-                    val keyName = block.getBlockStorage<String>(KEY_NAME)
-                    if (keyName.isNullOrBlank()) {
+                    val name = block.getBlockStorage<String>(KEY_NAME)
+                    if (name.isNullOrBlank()) {
                         p.sendMessage(NamedTextColor.RED + "Please set a name first")
                         return@onClick
                     }
-                    val key = keyName.key()
-                    structure.save(key)
+                    pluginInstance.structuresFolder.resolve("$name.nbt")
+                        .outputStream().use(structure::saveToStream)
 
-                    p.sendMessage(NamedTextColor.GREEN + "Saved structure with key $key")
+                    p.sendMessage(NamedTextColor.GREEN + "Saved structure $name")
                 }
             }
 
@@ -117,20 +117,17 @@ class SlimefunStructureBlock(
                         return@onClick
                     }
                     val key = keyName.key()
-                    val structure = SlimefunStructure.load(key)
+                    val structureFile = pluginInstance.structuresFolder.resolve("$key.nbt")
+                    val structure = if (structureFile.exists()) {
+                        structureFile.inputStream().use(SlimefunStructure::loadFromStream)
+                    } else {
+                        null
+                    }
                     if (structure == null) {
                         p.sendMessage(NamedTextColor.RED + "No structure found with key $key")
                         return@onClick
                     }
-                    structure.place(
-                        offsetLocation,
-                        true,
-                        StructureRotation.NONE,
-                        Mirror.NONE,
-                        0,
-                        1f,
-                        Random(block.world.seed)
-                    )
+                    structure.placeDefault(offsetLocation)
 
                     p.sendMessage(NamedTextColor.GREEN + "Loaded structure with key $key")
                 }
