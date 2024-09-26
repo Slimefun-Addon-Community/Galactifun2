@@ -1,13 +1,13 @@
 package io.github.addoncommunity.galactifun.impl.managers
 
 import com.github.shynixn.mccoroutine.bukkit.launch
+import io.github.addoncommunity.galactifun.Galactifun2
 import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.api.objects.properties.OrbitPosition
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
 import io.github.addoncommunity.galactifun.impl.Permissions
 import io.github.addoncommunity.galactifun.impl.space.SpaceGenerator
-import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.util.bukkit.getPdc
 import io.github.addoncommunity.galactifun.util.bukkit.key
 import io.github.addoncommunity.galactifun.util.bukkit.setPdc
@@ -41,12 +41,12 @@ object PlanetManager : Listener {
     private val config = YamlConfiguration()
 
     init {
-        val configFile = pluginInstance.dataFolder.resolve("worlds.yml")
+        val configFile = Galactifun2.dataFolder.resolve("worlds.yml")
         if (configFile.exists()) {
             config.load(configFile)
         }
 
-        pluginInstance.launch {
+        Galactifun2.launch {
             config.options().copyDefaults(true)
             config.save(configFile)
         }
@@ -61,7 +61,7 @@ object PlanetManager : Listener {
 
         orbits = spaceWorld.getPdc(orbitsKey) ?: mutableMapOf()
 
-        Bukkit.getPluginManager().registerEvents(this, pluginInstance)
+        Bukkit.getPluginManager().registerEvents(this, Galactifun2)
     }
 
     fun register(planet: PlanetaryObject) {

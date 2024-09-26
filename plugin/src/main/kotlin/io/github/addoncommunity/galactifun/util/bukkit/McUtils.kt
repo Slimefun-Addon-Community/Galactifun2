@@ -1,6 +1,6 @@
 package io.github.addoncommunity.galactifun.util.bukkit
 
-import io.github.addoncommunity.galactifun.pluginInstance
+import io.github.addoncommunity.galactifun.Galactifun2
 import net.kyori.adventure.text.Component
 import org.bukkit.*
 import org.bukkit.block.structure.Mirror
@@ -13,7 +13,7 @@ import org.bukkit.util.Vector
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
-internal fun String.key(): NamespacedKey = NamespacedKey(pluginInstance, this)
+internal fun String.key(): NamespacedKey = NamespacedKey(Galactifun2, this)
 
 fun Location.copy(
     world: World? = this.world,
@@ -59,7 +59,7 @@ fun Entity.galactifunTeleport(
         dest,
         reason
     ).thenApply {
-        removeMetadata("galactifun.teleporting", pluginInstance)
+        removeMetadata("galactifun.teleporting", Galactifun2)
         it
     }
 }

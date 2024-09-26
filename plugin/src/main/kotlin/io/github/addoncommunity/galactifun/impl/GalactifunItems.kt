@@ -1,8 +1,8 @@
 package io.github.addoncommunity.galactifun.impl
 
+import io.github.addoncommunity.galactifun.Galactifun2
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.impl.items.*
-import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.units.Force.Companion.kilonewtons
 import io.github.addoncommunity.galactifun.units.Volume.Companion.liters
 import io.github.addoncommunity.galactifun.util.items.MaterialType
@@ -94,7 +94,7 @@ object GalactifunItems {
     init {
         for (gas in Gas.entries) {
             if (gas.item == null) continue
-            Gas.Item(GalactifunCategories.GASES, gas, RecipeType.NULL, emptyArray()).register(pluginInstance)
+            Gas.Item(GalactifunCategories.GASES, gas, RecipeType.NULL, emptyArray()).register(Galactifun2)
         }
     }
 }

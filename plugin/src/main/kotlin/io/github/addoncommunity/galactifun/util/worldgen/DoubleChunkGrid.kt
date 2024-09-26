@@ -1,8 +1,8 @@
 package io.github.addoncommunity.galactifun.util.worldgen
 
 import com.google.common.util.concurrent.AtomicDoubleArray
+import io.github.addoncommunity.galactifun.Galactifun2
 import io.github.addoncommunity.galactifun.launchAsync
-import io.github.addoncommunity.galactifun.pluginInstance
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +24,7 @@ class DoubleChunkGrid {
 
     init {
         val ref = WeakReference(this)
-        pluginInstance.launchAsync(Dispatchers.IO) {
+        Galactifun2.launchAsync(Dispatchers.IO) {
             while (true) {
                 val time = System.currentTimeMillis()
                 val grid = ref.get() ?: break
@@ -38,7 +38,7 @@ class DoubleChunkGrid {
                     }
                 }
                 grid.lock.writeLock().unlock()
-                if (!pluginInstance.isEnabled) return@launchAsync
+                if (!Galactifun2.isEnabled) return@launchAsync
                 delay(2999)
             }
         }

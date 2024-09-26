@@ -1,6 +1,6 @@
 package io.github.addoncommunity.galactifun.util.items
 
-import io.github.addoncommunity.galactifun.pluginInstance
+import io.github.addoncommunity.galactifun.Galactifun2
 import io.github.addoncommunity.galactifun.util.bukkit.miniMessageToLegacy
 import io.github.addoncommunity.galactifun.util.general.RequiredProperty
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
@@ -37,7 +37,7 @@ class ItemBuilder {
             *lore.toTypedArray()
         )
         val constructor = clazz.primaryConstructor ?: error("Primary constructor not found for $clazz")
-        constructor.call(category, sfi, recipeType, recipe, *otherArgs).register(pluginInstance)
+        constructor.call(category, sfi, recipeType, recipe, *otherArgs).register(Galactifun2)
         return sfi
     }
 }

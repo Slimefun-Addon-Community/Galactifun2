@@ -6,7 +6,6 @@ import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.impl.BaseUniverse
-import io.github.addoncommunity.galactifun.pluginInstance
 import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.block.Biome
@@ -71,7 +70,7 @@ object PlanetScriptHost : ScriptingHostConfiguration({
             contextClassLoader: ClassLoader?,
             hostConfiguration: ScriptingHostConfiguration
         ): KClass<*> {
-            val cl = pluginInstance::class.java.classLoader
+            val cl = Galactifun2::class.java.classLoader
             val fromClass = classType.fromClass
             if (fromClass != null) {
                 if (fromClass.java.classLoader == null) return fromClass // root classloader
@@ -79,7 +78,7 @@ object PlanetScriptHost : ScriptingHostConfiguration({
                 if (actualClassLoadersChain.any { it == fromClass.java.classLoader }) return fromClass
             }
             return try {
-                pluginInstance::class.java.classLoader.loadClass(classType.typeName).kotlin
+                Galactifun2::class.java.classLoader.loadClass(classType.typeName).kotlin
             } catch (e: Throwable) {
                 throw IllegalArgumentException("unable to load class ${classType.typeName}", e)
             }

@@ -1,7 +1,7 @@
 package io.github.addoncommunity.galactifun.api.objects.planet
 
+import io.github.addoncommunity.galactifun.Galactifun2
 import io.github.addoncommunity.galactifun.api.objects.planet.gen.WorldGenerator
-import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.util.general.log
 import org.bukkit.GameRule
 import org.bukkit.Material
@@ -19,7 +19,7 @@ abstract class AlienWorld(name: String, baseItem: ItemStack) : PlanetaryWorld(na
     private val blockMappings = EnumMap<Material, ItemStack>(Material::class.java)
 
     override fun loadWorld(): World {
-        pluginInstance.logger.log("Loading world $name")
+        Galactifun2.logger.log("Loading world $name")
 
         val world = WorldCreator("world_galactifun_$id")
             .generator(generator)

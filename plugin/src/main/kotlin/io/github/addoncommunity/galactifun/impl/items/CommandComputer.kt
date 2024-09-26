@@ -2,6 +2,7 @@ package io.github.addoncommunity.galactifun.impl.items
 
 import com.destroystokyo.paper.ParticleBuilder
 import com.github.shynixn.mccoroutine.bukkit.launch
+import io.github.addoncommunity.galactifun.Galactifun2
 import io.github.addoncommunity.galactifun.api.betteritem.BetterSlimefunItem
 import io.github.addoncommunity.galactifun.api.betteritem.ItemHandler
 import io.github.addoncommunity.galactifun.api.betteritem.Ticker
@@ -9,7 +10,6 @@ import io.github.addoncommunity.galactifun.api.rockets.RocketInfo
 import io.github.addoncommunity.galactifun.impl.items.abstract.Seat
 import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
 import io.github.addoncommunity.galactifun.impl.managers.RocketManager
-import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.units.abs
 import io.github.addoncommunity.galactifun.util.*
 import io.github.addoncommunity.galactifun.util.bukkit.*
@@ -66,7 +66,7 @@ class CommandComputer(
         private val frozenEntities = mutableSetOf<Entity>()
 
         init {
-            Bukkit.getPluginManager().registerEvents(this, pluginInstance)
+            Bukkit.getPluginManager().registerEvents(this, Galactifun2)
         }
 
         @EventHandler
@@ -136,7 +136,7 @@ class CommandComputer(
             && BlockStorage.check(seat) is CaptainsChair
             && seat.getBlockStorage<BlockPosition>("rocket") == pos
         ) {
-            RocketManager.launches += pluginInstance.launch { launchRocket(p, pos, info, seat) }
+            RocketManager.launches += Galactifun2.launch { launchRocket(p, pos, info, seat) }
         } else {
             e.player.sendMessage(NamedTextColor.GOLD + info.info)
         }
@@ -207,7 +207,7 @@ class CommandComputer(
         var launched = false
 
         // Engine smoke
-        pluginInstance.launch {
+        Galactifun2.launch {
             while (!launched) {
                 for ((_, engine) in firstStage.engines) {
                     ParticleBuilder(Particle.CAMPFIRE_SIGNAL_SMOKE)
@@ -221,7 +221,7 @@ class CommandComputer(
         }
 
         // Countdown
-        val launchMessages = ArrayDeque(pluginInstance.launchMessages)
+        val launchMessages = ArrayDeque(Galactifun2.launchMessages)
         launchMessages.shuffle()
         repeat(10) {
             val message = NamedTextColor.GOLD + "${launchMessages.removeFirst()}..."
@@ -305,7 +305,7 @@ class CommandComputer(
         }
 
         for (entity in entities) {
-            pluginInstance.launch {
+            Galactifun2.launch {
                 if (!entity.galactifunTeleport(
                     dest + offsets[entity]!!.copy(world = PlanetManager.spaceWorld)
                 ).await()) {

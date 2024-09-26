@@ -1,8 +1,8 @@
 package io.github.addoncommunity.galactifun.api.objects.properties
 
 import io.github.addoncommunity.galactifun.EARTH_GRAVITY
+import io.github.addoncommunity.galactifun.Galactifun2
 import io.github.addoncommunity.galactifun.api.objects.CelestialObject
-import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.units.*
 import io.github.addoncommunity.galactifun.units.Angle.Companion.radians
 import io.github.addoncommunity.galactifun.units.Distance.Companion.meters
@@ -143,7 +143,7 @@ data class Orbit(
         } while (iterations++ != MAX_ITERATIONS && minDiff.radians > 1e-3)
 
         if (iterations == MAX_ITERATIONS + 1) {
-            pluginInstance.logger.warning("Failed to find a transfer orbit after $iterations iterations")
+            Galactifun2.logger.warning("Failed to find a transfer orbit after $iterations iterations")
         }
 
         return when (val transfer = transfers.minBy { it.key }.value) {

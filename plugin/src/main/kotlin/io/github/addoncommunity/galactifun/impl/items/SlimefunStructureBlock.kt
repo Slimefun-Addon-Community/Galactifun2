@@ -2,11 +2,11 @@ package io.github.addoncommunity.galactifun.impl.items
 
 import com.destroystokyo.paper.ParticleBuilder
 import com.github.shynixn.mccoroutine.bukkit.launch
+import io.github.addoncommunity.galactifun.Galactifun2
 import io.github.addoncommunity.galactifun.api.betteritem.BetterSlimefunItem
 import io.github.addoncommunity.galactifun.api.betteritem.ItemHandler
 import io.github.addoncommunity.galactifun.api.betteritem.Ticker
 import io.github.addoncommunity.galactifun.impl.GalactifunHeads
-import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.util.SlimefunStructure
 import io.github.addoncommunity.galactifun.util.bukkit.*
 import io.github.addoncommunity.galactifun.util.getValue
@@ -89,7 +89,7 @@ class SlimefunStructureBlock(
                         p.sendMessage(NamedTextColor.RED + "Please set a name first")
                         return@onClick
                     }
-                    pluginInstance.structuresFolder.resolve("$name.nbt")
+                    Galactifun2.structuresFolder.resolve("$name.nbt")
                         .apply { deleteIfExists() }
                         .createFile()
                         .outputStream()
@@ -117,7 +117,7 @@ class SlimefunStructureBlock(
                         p.sendMessage(NamedTextColor.RED + "Please set a name first")
                         return@onClick
                     }
-                    val structureFile = pluginInstance.structuresFolder.resolve("$name.nbt")
+                    val structureFile = Galactifun2.structuresFolder.resolve("$name.nbt")
                     if (!structureFile.exists()) {
                         p.sendMessage(NamedTextColor.RED + "No structure found with name $name")
                         return@onClick
@@ -137,7 +137,7 @@ class SlimefunStructureBlock(
                 +"Click to rename"
 
                 onClick { p, _ ->
-                    pluginInstance.launch {
+                    Galactifun2.launch {
                         p.closeInventory()
                         p.sendMessage("Type the new name in chat")
                         val name = p.awaitChatInput()
@@ -318,7 +318,7 @@ class SlimefunStructureBlock(
     @ItemHandler(BlockUseHandler::class)
     private fun onClick(e: PlayerRightClickEvent) {
         e.cancel()
-        pluginInstance.launch {
+        Galactifun2.launch {
             delayTicks(1)
             BlockStorage.getInventory(e.clickedBlock.orElseThrow()).open(e.player)
         }

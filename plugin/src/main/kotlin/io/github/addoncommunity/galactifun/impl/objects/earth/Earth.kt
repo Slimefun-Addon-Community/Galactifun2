@@ -1,11 +1,11 @@
 package io.github.addoncommunity.galactifun.impl.objects.earth
 
+import io.github.addoncommunity.galactifun.Galactifun2
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.api.objects.properties.DayCycle
 import io.github.addoncommunity.galactifun.api.objects.properties.Orbit
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Atmosphere
 import io.github.addoncommunity.galactifun.impl.BaseUniverse
-import io.github.addoncommunity.galactifun.pluginInstance
 import io.github.addoncommunity.galactifun.units.Angle.Companion.degrees
 import io.github.addoncommunity.galactifun.units.Distance.Companion.au
 import io.github.addoncommunity.galactifun.units.Distance.Companion.kilometers
@@ -31,7 +31,7 @@ class Earth : PlanetaryWorld("Earth", ItemStack(Material.GRASS_BLOCK)) {
     override val atmosphere = Atmosphere.EARTH_LIKE
 
     override fun loadWorld(): World {
-        val name = pluginInstance.config.getString("worlds.earth") ?: "world"
+        val name = Galactifun2.config.getString("worlds.earth") ?: "world"
         return WorldCreator(name).createWorld() // load the world
             ?: error("Failed to read earth world name from config; no default world found")
     }

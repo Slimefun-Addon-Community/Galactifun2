@@ -26,7 +26,6 @@ import io.github.seggan.sf4k.AbstractAddon
 import io.github.seggan.sf4k.serial.serializers.BukkitSerializerRegistry
 import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun
-import io.github.thebusybiscuit.slimefun4.libraries.paperlib.PaperLib
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
@@ -48,38 +47,21 @@ import kotlin.script.experimental.host.toScriptSource
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
-open class Galactifun2 : AbstractAddon() {
+object Galactifun2 : AbstractAddon() {
 
     private lateinit var manager: PaperCommandManager
     lateinit var launchMessages: List<String> private set
     lateinit var structuresFolder: Path private set
 
-    var isTest = classLoader.javaClass.packageName.startsWith("be.seeseemelk.mockbukkit")
-
     override suspend fun onLoadAsync() {
-        if (!isTest) {
-            Bukkit.spigot().config["world-settings.default.verbose"] = false
-        }
         BukkitSerializerRegistry.addSerializer(BlockVectorSerializer)
     }
 
     override suspend fun onEnableAsync() {
-        instance = this
-
         var shouldDisable = false
-        if (!PaperLib.isPaper() && !isTest) {
-            logger.log(Level.SEVERE, "Galactifun2 only supports Paper and its forks (e.x. Airplane or Purpur)")
-            logger.log(Level.SEVERE, "Please use Paper or a fork of Paper")
-            shouldDisable = true
-        }
-        if (Slimefun.getMinecraftVersion().isBefore(MinecraftVersion.MINECRAFT_1_19)) {
-            logger.log(Level.SEVERE, "Galactifun2 only supports Minecraft 1.19 and above")
-            logger.log(Level.SEVERE, "Please use Minecraft 1.19 or above")
-            shouldDisable = true
-        }
-        if (Bukkit.getPluginManager().isPluginEnabled("ClayTech")) {
-            logger.log(Level.SEVERE, "Galactifun2 will not work properly with ClayTech")
-            logger.log(Level.SEVERE, "Please disable ClayTech")
+        if (Slimefun.getMinecraftVersion().isBefore(MinecraftVersion.MINECRAFT_1_20_5)) {
+            logger.log(Level.SEVERE, "Galactifun2 only supports Minecraft 1.20.5 and above")
+            logger.log(Level.SEVERE, "Please use Minecraft 1.20.5 or above")
             shouldDisable = true
         }
         if (Bukkit.getPluginManager().isPluginEnabled("Galactifun")) {
@@ -93,9 +75,7 @@ open class Galactifun2 : AbstractAddon() {
             return
         }
 
-        if (!isTest) {
-            Metrics(this, 23447)
-        }
+        Metrics(this, 23447)
 
         manager = PaperCommandManager(this)
         manager.enableUnstableAPI("help")
@@ -156,6 +136,8 @@ open class Galactifun2 : AbstractAddon() {
 
         GalactifunItems // Trigger static init
 
+        doTestingStuff()
+
         launch {
             Bukkit.getConsoleSender().sendMessage(
                 NamedTextColor.GREEN + """################# Galactifun2 $pluginVersion #################
@@ -166,8 +148,6 @@ open class Galactifun2 : AbstractAddon() {
                 ###################################################""".trimIndent()
             )
         }
-
-        doTestingStuff()
     }
 
     override fun getJavaPlugin(): JavaPlugin = this
@@ -237,14 +217,9 @@ open class Galactifun2 : AbstractAddon() {
     }
 }
 
-private var instance: Galactifun2? = null
-
-val pluginInstance: Galactifun2
-    get() = checkNotNull(instance) { "Plugin is not enabled" }
-
 fun JavaPlugin.launchAsync(
     context: CoroutineContext = asyncDispatcher,
     block: suspend CoroutineScope.() -> Unit
-): Job = pluginInstance.launch {
+): Job = Galactifun2.launch {
     withContext(context, block)
 }

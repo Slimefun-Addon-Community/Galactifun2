@@ -1,9 +1,11 @@
+import net.minecrell.pluginyml.paper.PaperPluginDescription
+
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
 
     id("com.gradleup.shadow") version "8.3.2"
-    id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
+    id("net.minecrell.plugin-yml.paper") version "0.6.0"
     id("xyz.jpenilla.run-paper") version "2.3.0"
 
     id("io.github.seggan.uom")
@@ -19,7 +21,7 @@ repositories {
 
 dependencies {
     fun DependencyHandlerScope.libraryAndTest(dependency: Any) {
-        library(dependency)
+        paperLibrary(dependency)
         testImplementation(dependency)
     }
 
@@ -28,7 +30,7 @@ dependencies {
         testImplementation(dependency)
     }
 
-    library(kotlin("stdlib"))
+    paperLibrary(kotlin("stdlib"))
     libraryAndTest("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC2")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0") // For some reason libraryloader doesn't like this
     libraryAndTest(kotlin("reflect"))
@@ -74,8 +76,6 @@ tasks.test {
 }
 
 tasks.shadowJar {
-    dependsOn(tasks.test)
-
     manifest {
         attributes["paperweight-mappings-namespace"] = "mojang"
     }
@@ -107,15 +107,28 @@ tasks.shadowJar {
     archiveBaseName = "galactifun2"
 }
 
-bukkit {
+paper {
     name = rootProject.name
     main = "io.github.addoncommunity.galactifun.Galactifun2"
+    loader = "io.github.addoncommunity.galactifun.Galactifun2Loader"
+    bootstrapper = "io.github.addoncommunity.galactifun.Galactifun2Bootstrapper"
     version = project.version.toString()
     author = "Seggan"
     apiVersion = "1.20"
-    softDepend = listOf("ClayTech")
-    loadBefore = listOf("Multiverse-Core")
-    depend = listOf("Slimefun")
+    generateLibrariesJson = true
+
+    serverDependencies {
+        register("Multiverse-Core") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.AFTER
+        }
+
+        register("Slimefun") {
+            required = true
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+            joinClasspath = true
+        }
+    }
 }
 
 tasks.runServer {

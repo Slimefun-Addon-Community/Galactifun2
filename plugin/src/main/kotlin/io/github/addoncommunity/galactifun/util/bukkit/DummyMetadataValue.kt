@@ -1,9 +1,9 @@
 package io.github.addoncommunity.galactifun.util.bukkit
 
-import io.github.addoncommunity.galactifun.pluginInstance
+import io.github.addoncommunity.galactifun.Galactifun2
 import org.bukkit.metadata.MetadataValueAdapter
 
-object DummyMetadataValue : MetadataValueAdapter(pluginInstance) {
+object DummyMetadataValue : MetadataValueAdapter(Galactifun2) {
     override fun value() = Unit
     override fun invalidate() {}
 }
