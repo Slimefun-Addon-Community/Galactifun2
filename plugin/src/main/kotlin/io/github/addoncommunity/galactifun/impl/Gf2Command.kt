@@ -12,7 +12,7 @@ import io.github.addoncommunity.galactifun.util.menu.PlanetMenu
 import io.github.seggan.sf4k.extensions.plusAssign
 import kotlinx.datetime.Clock
 import org.bukkit.Location
-import org.bukkit.entity.BlockDisplay
+import org.bukkit.entity.FallingBlock
 import org.bukkit.entity.Player
 
 @Suppress("unused")
@@ -66,7 +66,7 @@ object Gf2Command : BaseCommand() {
     fun undiplayentityify(player: Player) {
         var count = 0
         for (entity in player.world.entities) {
-            if (entity is BlockDisplay) {
+            if (entity is FallingBlock) {
                 if (entity.toBlock()) {
                     count++
                 }

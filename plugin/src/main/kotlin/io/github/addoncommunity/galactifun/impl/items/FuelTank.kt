@@ -127,7 +127,7 @@ class FuelTank(
         return getMass(block) + fuelMass
     }
 
-    override fun preRegister() {
+    override fun beforeRegister() {
         menu.apply(this)
     }
 }

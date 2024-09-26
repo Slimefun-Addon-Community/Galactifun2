@@ -14,7 +14,7 @@ import io.github.thebusybiscuit.slimefun4.implementation.handlers.SimpleBlockBre
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.data.Directional
-import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Arrow
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.inventory.ItemStack
@@ -31,47 +31,44 @@ open class Seat(
         private val armorStandKey = "seat".key()
 
         fun getSitting(player: Player): Location? {
-            val armorStand = player.vehicle as? ArmorStand ?: return null
-            return armorStand.getPdc(armorStandKey)
+            val entity = player.vehicle as? Arrow ?: return null
+            return entity.getPdc(armorStandKey)
         }
     }
 
     @ItemHandler(BlockPlaceHandler::class)
     private fun onPlace(e: BlockPlaceEvent) {
         val b = e.block
-        val armorStand = b.world.summon<ArmorStand>(b.location.toStandLocation())
-        armorStand.isInvisible = true
-        armorStand.isInvulnerable = true
-        armorStand.isSmall = true
-        armorStand.setGravity(false)
-        armorStand.setAI(false)
-        armorStand.isMarker = true
-        armorStand.setPdc(armorStandKey, b.location)
+        val entity = b.world.summon<Arrow>(b.location.toStandLocation())
+        entity.isInvisible = true
+        entity.isInvulnerable = true
+        entity.setGravity(false)
+        entity.setPdc(armorStandKey, b.location)
         val data = b.blockData
         if (data is Directional) {
             val facing = data.facing
-            val location = armorStand.location
+            val location = entity.location
             location.yaw = atan2(facing.modZ.toDouble(), facing.modX.toDouble()).radians
                 .degrees.toFloat() + 90
-            armorStand.teleportAsync(location)
+            entity.teleportAsync(location)
         }
     }
 
     @ItemHandler(SimpleBlockBreakHandler::class)
     private fun onBreak(b: Block) {
-        val armorStand = b.world.nearbyEntitiesByType<ArmorStand>(b.location.toStandLocation(), 0.5) {
+        val entity = b.world.nearbyEntitiesByType<Arrow>(b.location.toStandLocation(), 0.5) {
             it.persistentDataContainer.has(armorStandKey)
         }.firstOrNull() ?: return
-        armorStand.remove()
+        entity.remove()
     }
 
     @ItemHandler(BlockUseHandler::class)
     private fun onUse(e: PlayerRightClickEvent) {
         val block = e.clickedBlock.get()
-        val armorStand = block.world.nearbyEntitiesByType<ArmorStand>(block.location.toStandLocation(), 0.5) {
+        val entity = block.world.nearbyEntitiesByType<Arrow>(block.location.toStandLocation(), 0.5) {
             it.persistentDataContainer.has(armorStandKey)
         }.firstOrNull() ?: return
-        armorStand.addPassenger(e.player)
+        entity.addPassenger(e.player)
         onSit(e.player, block)
     }
 

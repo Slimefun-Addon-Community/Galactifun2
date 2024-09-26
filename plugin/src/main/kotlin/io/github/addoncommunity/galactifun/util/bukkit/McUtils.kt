@@ -1,7 +1,6 @@
 package io.github.addoncommunity.galactifun.util.bukkit
 
 import io.github.addoncommunity.galactifun.pluginInstance
-import io.papermc.paper.entity.TeleportFlag.EntityState
 import net.kyori.adventure.text.Component
 import org.bukkit.*
 import org.bukkit.block.structure.Mirror
@@ -58,9 +57,7 @@ fun Entity.galactifunTeleport(
     setMetadata("galactifun.teleporting", DummyMetadataValue)
     return teleportAsync(
         dest,
-        reason,
-        EntityState.RETAIN_VEHICLE,
-        EntityState.RETAIN_PASSENGERS
+        reason
     ).thenApply {
         removeMetadata("galactifun.teleporting", pluginInstance)
         it

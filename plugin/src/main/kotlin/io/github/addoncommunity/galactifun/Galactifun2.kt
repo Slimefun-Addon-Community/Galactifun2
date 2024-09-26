@@ -40,6 +40,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import java.nio.file.Path
 import java.util.logging.Level
 import kotlin.coroutines.CoroutineContext
+import kotlin.io.path.createDirectories
 import kotlin.script.experimental.api.ResultValue
 import kotlin.script.experimental.api.ScriptDiagnostic
 import kotlin.script.experimental.api.valueOrThrow
@@ -116,6 +117,7 @@ open class Galactifun2 : AbstractAddon() {
 
         launchMessages = config.getStringList("rockets.launch-msgs")
         structuresFolder = dataFolder.toPath().resolve("structures")
+        structuresFolder.createDirectories()
 
         BaseUniverse.init()
 

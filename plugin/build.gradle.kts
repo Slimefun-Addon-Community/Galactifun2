@@ -11,9 +11,10 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven(url = "https://jitpack.io/")
-    maven(url = "https://repo.papermc.io/repository/maven-public/")
-    maven(url = "https://repo.aikar.co/content/groups/aikar/")
+    maven("https://jitpack.io/")
+    maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://repo.aikar.co/content/groups/aikar/")
+    maven("https://repo.metamechanists.org/releases/")
 }
 
 dependencies {
@@ -42,6 +43,8 @@ dependencies {
 
     implementation("org.bstats:bstats-bukkit:3.0.2")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
+
+    implementation("org.metamechanists:DisplayModelLib:34")
 
     implementation("io.github.seggan:sf4k:0.6.0")
 
@@ -89,6 +92,7 @@ tasks.shadowJar {
         doRelocate("io.github.seggan.kfun")
         doRelocate("co.aikar.commands")
         doRelocate("co.aikar.locales")
+        doRelocate("org.metamechanists.displaymodellib")
     } else {
         archiveClassifier = "unrelocated"
     }

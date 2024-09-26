@@ -47,7 +47,7 @@ class RocketInfo(
     val dryMass = wetMass - stages.unitSumOf { it.fuelMass }
 
     val info = buildString {
-        val planet = PlanetManager.getByWorld(commandComputer.world) ?: error("Planet not found")
+        val planet = PlanetManager.getByWorld(commandComputer.world)
         appendLine("Stages:")
         var stageNum = 1
         for (stage in stages) {
@@ -66,7 +66,9 @@ class RocketInfo(
         appendLine("Thrust: %,.2f kilonewtons".format(thrust.kilonewtons))
         appendLine("Wet mass: %.2s".format(wetMass))
         appendLine("Dry mass: %.2s".format(dryMass))
-        appendLine("TWR: %.2f".format(twr(planet.gravity)))
+        if (planet != null) {
+            appendLine("TWR: %.2f".format(twr(planet.gravity)))
+        }
         appendLine("Delta-V: %.2s".format(deltaV(engines, wetMass, dryMass)))
     }
 

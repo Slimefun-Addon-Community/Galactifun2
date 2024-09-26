@@ -96,7 +96,7 @@ open class BetterSlimefunItem : SlimefunItem {
         }
     }
 
-    override fun preRegister() {
+    final override fun preRegister() {
         for (method in javaClass.getAllMethods()) {
             if (method.isAnnotationPresent(ItemHandler::class.java)) {
                 method.isAccessible = true
@@ -120,7 +120,10 @@ open class BetterSlimefunItem : SlimefunItem {
                 })
             }
         }
+        beforeRegister()
     }
+
+    protected open fun beforeRegister() {}
 
     protected fun <T : Any> itemSetting(key: String, default: T): ItemSetting<T> {
         val setting = ItemSetting(this, key, default)

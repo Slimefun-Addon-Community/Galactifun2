@@ -2,13 +2,14 @@ package io.github.addoncommunity.galactifun.util.bukkit
 
 import io.github.addoncommunity.galactifun.impl.items.CommandComputer
 import io.github.addoncommunity.galactifun.util.SlimefunStructure
+import io.github.seggan.sf4k.extensions.minus
+import io.github.seggan.sf4k.extensions.plus
 import io.github.seggan.sf4k.serial.pdc.getData
 import io.github.seggan.sf4k.serial.pdc.setData
-import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
-import org.bukkit.entity.BlockDisplay
+import org.bukkit.entity.FallingBlock
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataHolder
 import org.bukkit.util.BlockVector
@@ -24,9 +25,15 @@ inline fun <reified T> PersistentDataHolder.setPdc(key: NamespacedKey, value: T)
     persistentDataContainer.setData(key, value)
 }
 
-fun Block.toDisplay(spawnLocation: Location = location): BlockDisplay {
-    val display = world.summon<BlockDisplay>(spawnLocation)
-    display.block = blockData
+fun Block.toEntity(): FallingBlock {
+    val display = world.summon<FallingBlock>(location + (UnitVector.X + UnitVector.Z))
+    display.blockData = blockData
+    display.cancelDrop = true
+    display.isInvulnerable = true
+    display.isSilent = true
+    display.setGravity(false)
+    display.setHurtEntities(false)
+
     val structure = SlimefunStructure()
     structure.fill(location, BlockVector(1, 1, 1), false)
     val bytes = ByteArrayOutputStream().apply(structure::saveToStream).toByteArray()
@@ -35,10 +42,10 @@ fun Block.toDisplay(spawnLocation: Location = location): BlockDisplay {
     return display
 }
 
-fun BlockDisplay.toBlock(placeLocation: Location = location): Boolean {
+fun FallingBlock.toBlock(): Boolean {
     val bytes = persistentDataContainer.getData<ByteArray>(CommandComputer.SERIALIZED_BLOCK_KEY) ?: return false
     val block = SlimefunStructure.loadFromStream(bytes.inputStream())
-    block.placeDefault(placeLocation)
+    block.placeDefault(location - (UnitVector.X + UnitVector.Z))
     remove()
     return true
 }

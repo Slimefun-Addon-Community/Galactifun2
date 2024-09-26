@@ -38,9 +38,7 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.BlockVector
 import org.bukkit.util.Vector
-import kotlin.io.path.exists
-import kotlin.io.path.inputStream
-import kotlin.io.path.outputStream
+import kotlin.io.path.*
 
 class SlimefunStructureBlock(
     itemGroup: ItemGroup,
@@ -92,7 +90,10 @@ class SlimefunStructureBlock(
                         return@onClick
                     }
                     pluginInstance.structuresFolder.resolve("$name.nbt")
-                        .outputStream().use(structure::saveToStream)
+                        .apply { deleteIfExists() }
+                        .createFile()
+                        .outputStream()
+                        .use(structure::saveToStream)
 
                     p.sendMessage(NamedTextColor.GREEN + "Saved structure $name")
                 }
@@ -111,25 +112,20 @@ class SlimefunStructureBlock(
                     val offset = getOffset(block)
                     val offsetLocation = block.location + offset
 
-                    val keyName = block.getBlockStorage<String>(KEY_NAME)
-                    if (keyName.isNullOrBlank()) {
+                    val name = block.getBlockStorage<String>(KEY_NAME)
+                    if (name.isNullOrBlank()) {
                         p.sendMessage(NamedTextColor.RED + "Please set a name first")
                         return@onClick
                     }
-                    val key = keyName.key()
-                    val structureFile = pluginInstance.structuresFolder.resolve("$key.nbt")
-                    val structure = if (structureFile.exists()) {
-                        structureFile.inputStream().use(SlimefunStructure::loadFromStream)
-                    } else {
-                        null
-                    }
-                    if (structure == null) {
-                        p.sendMessage(NamedTextColor.RED + "No structure found with key $key")
+                    val structureFile = pluginInstance.structuresFolder.resolve("$name.nbt")
+                    if (!structureFile.exists()) {
+                        p.sendMessage(NamedTextColor.RED + "No structure found with name $name")
                         return@onClick
                     }
+                    val structure = structureFile.inputStream().use(SlimefunStructure::loadFromStream)
                     structure.placeDefault(offsetLocation)
 
-                    p.sendMessage(NamedTextColor.GREEN + "Loaded structure with key $key")
+                    p.sendMessage(NamedTextColor.GREEN + "Loaded structure with key $name")
                 }
             }
 
@@ -340,22 +336,30 @@ class SlimefunStructureBlock(
         val start = block.location + offset
         val steps = size * particlesPerBlock
 
-        for ((axis, opposite) in AXES) {
+        for ((axes, color) in AXES) {
+            val (axis, axis1, axis2) = axes
             val stepVector = axis / particlesPerBlock
-            val (axis1, axis2) = opposite
             val startPoints = listOf(
                 start,
                 start + (size * axis1),
                 start + (size * axis2),
                 start + size * (axis1 + axis2),
             )
+            var colored = false
             for (startPoint in startPoints) {
-                generateParticles(startPoint, stepVector * axis, (steps * axis).length().toInt())
+                val lineColor = if (colored) Color.WHITE else color
+                generateParticles(
+                    startPoint,
+                    stepVector * axis,
+                    (steps * axis).length().toInt(),
+                    lineColor
+                )
+                colored = true
             }
         }
     }
 
-    private fun generateParticles(start: Location, step: Vector, steps: Int) {
+    private fun generateParticles(start: Location, step: Vector, steps: Int, color: Color) {
         val locations = mutableListOf<Location>()
         val current = start.clone()
         repeat(steps) {
@@ -366,7 +370,7 @@ class SlimefunStructureBlock(
             ParticleBuilder(Particle.DUST)
                 .count(1)
                 .location(location)
-                .color(Color.WHITE)
+                .color(color)
                 .spawn()
         }
     }
@@ -378,7 +382,7 @@ class SlimefunStructureBlock(
 }
 
 private val AXES = listOf(
-    UnitVector.X to (UnitVector.Y to UnitVector.Z),
-    UnitVector.Y to (UnitVector.X to UnitVector.Z),
-    UnitVector.Z to (UnitVector.X to UnitVector.Y),
+    listOf(UnitVector.X, UnitVector.Y, UnitVector.Z) to Color.RED,
+    listOf(UnitVector.Y, UnitVector.X, UnitVector.Z) to Color.GREEN,
+    listOf(UnitVector.Z, UnitVector.X, UnitVector.Y) to Color.BLUE,
 )
