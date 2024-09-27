@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.impl.items
+package io.github.addoncommunity.galactifun.impl.items.rocket
 
 import io.github.addoncommunity.galactifun.api.blocks.HeatResistant
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas

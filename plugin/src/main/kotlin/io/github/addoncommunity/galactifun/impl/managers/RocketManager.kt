@@ -6,7 +6,7 @@ import io.github.addoncommunity.galactifun.Galactifun2
 import io.github.addoncommunity.galactifun.api.blocks.ReentryBurnable
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.api.rockets.RocketInfo
-import io.github.addoncommunity.galactifun.impl.items.abstract.Seat
+import io.github.addoncommunity.galactifun.impl.items.rocket.Seat
 import io.github.addoncommunity.galactifun.units.abs
 import io.github.addoncommunity.galactifun.util.bukkit.*
 import io.github.seggan.sf4k.extensions.minus

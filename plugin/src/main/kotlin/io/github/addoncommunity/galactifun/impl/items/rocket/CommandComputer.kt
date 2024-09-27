@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.impl.items
+package io.github.addoncommunity.galactifun.impl.items.rocket
 
 import io.github.addoncommunity.galactifun.api.betteritem.BetterSlimefunItem
 import io.github.addoncommunity.galactifun.api.betteritem.ItemHandler
@@ -7,15 +7,11 @@ import io.github.addoncommunity.galactifun.api.objects.WorldType
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.api.rockets.RocketInfo
 import io.github.addoncommunity.galactifun.impl.GalactifunHeads
-import io.github.addoncommunity.galactifun.impl.items.abstract.Seat
-import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
 import io.github.addoncommunity.galactifun.impl.managers.RocketManager
 import io.github.addoncommunity.galactifun.util.*
 import io.github.addoncommunity.galactifun.util.bukkit.*
 import io.github.addoncommunity.galactifun.util.menu.buildMenu
 import io.github.seggan.sf4k.extensions.position
-import io.github.seggan.sf4k.serial.blockstorage.getBlockStorage
-import io.github.seggan.sf4k.serial.blockstorage.setBlockStorage
 import io.github.thebusybiscuit.slimefun4.api.events.PlayerRightClickEvent
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
@@ -26,7 +22,6 @@ import io.github.thebusybiscuit.slimefun4.core.handlers.BlockUseHandler
 import io.github.thebusybiscuit.slimefun4.libraries.dough.blocks.BlockPosition
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu
-import me.mrCookieSlime.Slimefun.api.BlockStorage
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Location
 import org.bukkit.block.Block
@@ -75,9 +70,7 @@ class CommandComputer(
         val rocketBlocks = pos.floodSearch { this.checkBlock<RocketEngine>() == null }
         val detected = if (!rocketBlocks.exceededMax) rocketBlocks.found else emptySet()
         val blocks = detected.map(BlockPosition::getBlock)
-        blocks.processSlimefunBlocks<CaptainsChair, Unit> {
-            it.setBlockStorage("rocket", pos)
-        }
+        blocks.processSlimefunBlocks<Seat, _> { Seat.setRocket(it.location, pos) }
         val engines = blocks.processSlimefunBlocks<RocketEngine, _> { b ->
             val fuel = b.position.floodSearch { it.checkBlock<FuelTank>() != null }.found.toMutableSet()
             fuel.remove(b.position)
@@ -99,18 +92,6 @@ class CommandComputer(
             return
         }
         getMenu(block, info).open(p)
-        val seat = Seat.getSitting(p)
-        if (seat != null
-            && BlockStorage.check(seat) is CaptainsChair
-            && seat.getBlockStorage<BlockPosition>("rocket") == pos
-        ) {
-            if (p.world == PlanetManager.spaceWorld) {
-            } else {
-                RocketManager.launchRocket(p, info, seat)
-            }
-        } else {
-            e.player.sendMessage(NamedTextColor.GOLD + info.info)
-        }
     }
 
     @OptIn(ExperimentalContracts::class)
@@ -118,9 +99,7 @@ class CommandComputer(
         contract {
             returns(true) implies (seat != null)
         }
-        return seat != null
-                && BlockStorage.check(seat) is CaptainsChair
-                && seat.getBlockStorage<BlockPosition>("rocket") == info.commandComputer
+        return seat != null && Seat.getRocket(seat)?.commandComputer == info.commandComputer
     }
 
     private fun getMenu(b: Block, rocket: RocketInfo): ChestMenu {
@@ -210,34 +189,33 @@ class CommandComputer(
 
                     null -> {
                         name = "Invalid world"
+                        return@item
                     }
                 }
 
-                if (worldType != null) {
-                    onClick { p, action ->
-                        val seat = Seat.getSitting(p)
-                        if (canLaunch(seat, rocket)) {
-                            when (worldType) {
-                                is WorldType.Planet -> RocketManager.launchRocket(p, rocket, seat)
-                                is WorldType.Space -> {
-                                    val orbiting = worldType.orbiting
-                                    if (orbiting is PlanetaryWorld) {
-                                        RocketManager.landRocket(
-                                            p,
-                                            rocket,
-                                            seat,
-                                            action.isRightClicked
-                                                    && orbiting.atmosphere.canAerobrake
-                                                    && rocket.isFullyShielded
-                                        )
-                                    } else {
-                                        p.sendMessage(NamedTextColor.RED + "You cannot land on ${orbiting.name}")
-                                    }
+                onClick { p, action ->
+                    val seat = Seat.getSitting(p)
+                    if (canLaunch(seat, rocket)) {
+                        when (worldType) {
+                            is WorldType.Planet -> RocketManager.launchRocket(p, rocket, seat)
+                            is WorldType.Space -> {
+                                val orbiting = worldType.orbiting
+                                if (orbiting is PlanetaryWorld) {
+                                    RocketManager.landRocket(
+                                        p,
+                                        rocket,
+                                        seat,
+                                        action.isRightClicked
+                                                && orbiting.atmosphere.canAerobrake
+                                                && rocket.isFullyShielded
+                                    )
+                                } else {
+                                    p.sendMessage(NamedTextColor.RED + "You cannot land on ${orbiting.name}")
                                 }
                             }
-                        } else {
-                            p.sendMessage(NamedTextColor.RED + "You must be sitting in the captain's chair to operate the rocket")
                         }
+                    } else {
+                        p.sendMessage(NamedTextColor.RED + "You must be sitting in the captain's chair to operate the rocket")
                     }
                 }
             }

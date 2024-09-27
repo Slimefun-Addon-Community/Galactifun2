@@ -1,4 +1,4 @@
-package io.github.addoncommunity.galactifun.impl.items
+package io.github.addoncommunity.galactifun.impl.items.rocket
 
 import io.github.addoncommunity.galactifun.api.betteritem.BetterSlimefunItem
 import io.github.addoncommunity.galactifun.api.betteritem.Ticker

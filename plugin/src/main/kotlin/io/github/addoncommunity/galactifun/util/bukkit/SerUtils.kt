@@ -1,6 +1,6 @@
 package io.github.addoncommunity.galactifun.util.bukkit
 
-import io.github.addoncommunity.galactifun.impl.items.CommandComputer
+import io.github.addoncommunity.galactifun.impl.items.rocket.CommandComputer
 import io.github.addoncommunity.galactifun.util.SlimefunStructure
 import io.github.seggan.sf4k.extensions.minus
 import io.github.seggan.sf4k.extensions.plus

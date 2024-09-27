@@ -4,8 +4,8 @@ import io.github.addoncommunity.galactifun.EARTH_GRAVITY
 import io.github.addoncommunity.galactifun.api.blocks.HeatResistant
 import io.github.addoncommunity.galactifun.api.blocks.wetMass
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
-import io.github.addoncommunity.galactifun.impl.items.FuelTank
-import io.github.addoncommunity.galactifun.impl.items.RocketEngine
+import io.github.addoncommunity.galactifun.impl.items.rocket.FuelTank
+import io.github.addoncommunity.galactifun.impl.items.rocket.RocketEngine
 import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
 import io.github.addoncommunity.galactifun.units.*
 import io.github.addoncommunity.galactifun.util.general.mergeMaps

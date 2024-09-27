@@ -2,7 +2,8 @@ package io.github.addoncommunity.galactifun.impl
 
 import io.github.addoncommunity.galactifun.Galactifun2
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
-import io.github.addoncommunity.galactifun.impl.items.*
+import io.github.addoncommunity.galactifun.impl.items.SlimefunStructureBlock
+import io.github.addoncommunity.galactifun.impl.items.rocket.*
 import io.github.addoncommunity.galactifun.units.Force.Companion.kilonewtons
 import io.github.addoncommunity.galactifun.units.Volume.Companion.liters
 import io.github.addoncommunity.galactifun.util.items.buildSlimefunItem
@@ -59,15 +60,15 @@ object GalactifunItems {
         +"A heat shield that requires replacement"
     }
 
-    val CAPTAINS_CHAIR = buildSlimefunItem<CaptainsChair> {
+    val SEAT = buildSlimefunItem<Seat> {
         category = GalactifunCategories.ROCKET_COMPONENTS
-        id = "CAPTAINS_CHAIR"
-        name = "Captain's Chair"
+        id = "SEAT"
+        name = "Seat"
         material = Material.OAK_STAIRS.materialType
         recipeType = RecipeType.NULL
         recipe = emptyArray()
 
-        +"The captain's chair"
+        +"What do you mean, \"operate the rocket standing\"?"
     }
 
     val FUEL_TANK_I = buildSlimefunItem<FuelTank>(1000.liters) {
