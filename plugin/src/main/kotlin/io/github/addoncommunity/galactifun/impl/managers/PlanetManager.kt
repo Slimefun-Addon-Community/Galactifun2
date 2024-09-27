@@ -12,10 +12,7 @@ import io.github.addoncommunity.galactifun.util.bukkit.getPdc
 import io.github.addoncommunity.galactifun.util.bukkit.key
 import io.github.addoncommunity.galactifun.util.bukkit.setPdc
 import io.papermc.paper.event.entity.EntityMoveEvent
-import org.bukkit.Bukkit
-import org.bukkit.GameRule
-import org.bukkit.World
-import org.bukkit.WorldCreator
+import org.bukkit.*
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -86,6 +83,11 @@ object PlanetManager : Listener {
 
     fun getOrbit(planet: PlanetaryObject): OrbitPosition {
         return orbits[planet.name] ?: error("Orbit not found for planet ${planet.name}")
+    }
+
+    fun getOrbiting(location: Location): PlanetaryObject? {
+        val position = OrbitPosition.fromLocation(location)
+        return allPlanets.find { it.orbitPosition == position }
     }
 
     fun getByWorld(world: World): PlanetaryWorld? {

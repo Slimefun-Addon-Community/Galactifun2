@@ -20,6 +20,7 @@ import io.github.addoncommunity.galactifun.units.Angle.Companion.degrees
 import io.github.addoncommunity.galactifun.units.Distance.Companion.au
 import io.github.addoncommunity.galactifun.units.Distance.Companion.kilometers
 import io.github.addoncommunity.galactifun.units.Mass.Companion.kilograms
+import io.github.addoncommunity.galactifun.units.Pressure.Companion.atmospheres
 import io.github.addoncommunity.galactifun.util.bukkit.plus
 import io.github.addoncommunity.galactifun.util.general.log
 import io.github.seggan.sf4k.AbstractAddon
@@ -172,7 +173,7 @@ object Galactifun2 : AbstractAddon() {
             dayCycle = (1.days + 0.65.hours).long
 
             atmosphere {
-                pressure = 0.006
+                pressure = 0.006.atmospheres
 
                 composition {
                     95 percent Gas.CARBON_DIOXIDE

@@ -15,6 +15,7 @@ internal fun UomConfig.generateUomClassForMeasure(measure: Measure, file: FileSp
                 file.addImport("$clazzName.Companion", measure.scalarToUnit)
             }
         }
+
         is Measure.New -> {
             val clazz = TypeSpec.classBuilder(clazzName)
                 .addModifiers(KModifier.VALUE)
@@ -133,9 +134,10 @@ internal fun UomConfig.generateUomClassForMeasure(measure: Measure, file: FileSp
                 )
                 .addFunction(
                     FunSpec.builder("sum")
-                        .addAnnotation(AnnotationSpec.builder(JvmName::class)
-                            .addMember("%S", "${clazzName.simpleName.lowercase()}Sum")
-                            .build()
+                        .addAnnotation(
+                            AnnotationSpec.builder(JvmName::class)
+                                .addMember("%S", "${clazzName.simpleName.lowercase()}Sum")
+                                .build()
                         )
                         .returns(clazzName)
                         .receiver(ITERABLE.parameterizedBy(clazzName))
@@ -152,9 +154,10 @@ internal fun UomConfig.generateUomClassForMeasure(measure: Measure, file: FileSp
                             .addMember("%T::class", ClassName("kotlin.experimental", "ExperimentalTypeInference"))
                             .build()
                     )
-                    .addAnnotation(AnnotationSpec.builder(JvmName::class)
-                        .addMember("%S", "${clazzName.simpleName.lowercase()}SumOf")
-                        .build()
+                    .addAnnotation(
+                        AnnotationSpec.builder(JvmName::class)
+                            .addMember("%S", "${clazzName.simpleName.lowercase()}SumOf")
+                            .build()
                     )
                     .addAnnotation(OverloadResolutionByLambdaReturnType::class)
                     .addModifiers(KModifier.INLINE)
@@ -171,6 +174,7 @@ internal fun UomConfig.generateUomClassForMeasure(measure: Measure, file: FileSp
     }
 }
 
+@Suppress("DuplicatedCode")
 internal fun UomConfig.generateOperation(operation: Operation, file: FileSpec.Builder) {
     val leftClazz = operation.left.name.className(pkg)
     val rightClazz = operation.right.name.className(pkg)
@@ -181,16 +185,12 @@ internal fun UomConfig.generateOperation(operation: Operation, file: FileSpec.Bu
             .receiver(leftClazz)
             .addParameter("other", rightClazz)
             .returns(resultClazz)
-            .addStatement("return (%L * other.%L).%L", operation.left.unitToScalar, operation.right.unitToScalar, operation.result.scalarToUnit)
-            .build()
-    )
-    file.addFunction(
-        FunSpec.builder("times")
-            .addModifiers(KModifier.OPERATOR)
-            .receiver(rightClazz)
-            .addParameter("other", leftClazz)
-            .returns(resultClazz)
-            .addStatement("return (%L * other.%L).%L", operation.right.unitToScalar, operation.left.unitToScalar, operation.result.scalarToUnit)
+            .addStatement(
+                "return (%L * other.%L).%L",
+                operation.left.unitToScalar,
+                operation.right.unitToScalar,
+                operation.result.scalarToUnit
+            )
             .build()
     )
     file.addFunction(
@@ -199,18 +199,44 @@ internal fun UomConfig.generateOperation(operation: Operation, file: FileSpec.Bu
             .receiver(resultClazz)
             .addParameter("other", leftClazz)
             .returns(rightClazz)
-            .addStatement("return (this.%L / other.%L).%L", operation.result.unitToScalar, operation.left.unitToScalar, operation.right.scalarToUnit)
+            .addStatement(
+                "return (this.%L / other.%L).%L",
+                operation.result.unitToScalar,
+                operation.left.unitToScalar,
+                operation.right.scalarToUnit
+            )
             .build()
     )
-    file.addFunction(
-        FunSpec.builder("divTo${leftClazz.simpleName}")
-            .addModifiers(KModifier.INFIX)
-            .receiver(resultClazz)
-            .addParameter("other", rightClazz)
-            .returns(leftClazz)
-            .addStatement("return (this.%L / other.%L).%L", operation.result.unitToScalar, operation.right.unitToScalar, operation.left.scalarToUnit)
-            .build()
-    )
+    if (leftClazz.simpleName != rightClazz.simpleName) {
+        file.addFunction(
+            FunSpec.builder("times")
+                .addModifiers(KModifier.OPERATOR)
+                .receiver(rightClazz)
+                .addParameter("other", leftClazz)
+                .returns(resultClazz)
+                .addStatement(
+                    "return (%L * other.%L).%L",
+                    operation.right.unitToScalar,
+                    operation.left.unitToScalar,
+                    operation.result.scalarToUnit
+                )
+                .build()
+        )
+        file.addFunction(
+            FunSpec.builder("divTo${leftClazz.simpleName}")
+                .addModifiers(KModifier.INFIX)
+                .receiver(resultClazz)
+                .addParameter("other", rightClazz)
+                .returns(leftClazz)
+                .addStatement(
+                    "return (this.%L / other.%L).%L",
+                    operation.result.unitToScalar,
+                    operation.right.unitToScalar,
+                    operation.left.scalarToUnit
+                )
+                .build()
+        )
+    }
 }
 
 private fun String.className(pkg: String): ClassName {

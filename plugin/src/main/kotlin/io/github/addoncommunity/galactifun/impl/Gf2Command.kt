@@ -5,8 +5,7 @@ import co.aikar.commands.annotation.*
 import io.github.addoncommunity.galactifun.api.objects.PlanetaryObject
 import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
-import io.github.addoncommunity.galactifun.impl.managers.RocketManager
-import io.github.addoncommunity.galactifun.util.bukkit.galactifunTeleport
+import io.github.addoncommunity.galactifun.util.bukkit.teleportSpecial
 import io.github.addoncommunity.galactifun.util.bukkit.toBlock
 import io.github.addoncommunity.galactifun.util.menu.PlanetMenu
 import io.github.seggan.sf4k.extensions.plusAssign
@@ -26,7 +25,7 @@ object Gf2Command : BaseCommand() {
     fun tpPlanet(player: Player, planet: PlanetaryWorld, @Optional location: Location?) {
         val loc = location ?: planet.world.spawnLocation
         loc.world = planet.world
-        player.galactifunTeleport(loc)
+        player.teleportSpecial(loc)
     }
 
     @Subcommand("orbit")
@@ -38,7 +37,7 @@ object Gf2Command : BaseCommand() {
         if (offset != null) {
             location += offset
         }
-        player.galactifunTeleport(location)
+        player.teleportSpecial(location)
     }
 
     @Subcommand("distance")
@@ -73,16 +72,5 @@ object Gf2Command : BaseCommand() {
             }
         }
         player.sendMessage("Undisplayentityified $count entities")
-    }
-
-    @Subcommand("cancellaunches")
-    @CommandPermission(Permissions.ADMIN)
-    @Description("Cancels all rocket launches")
-    fun cancelLaunches(player: Player) {
-        for (launch in RocketManager.launches) {
-            launch.cancel()
-        }
-        player.sendMessage("Cancelled ${RocketManager.launches.size} rocket launches")
-        RocketManager.launches.clear()
     }
 }

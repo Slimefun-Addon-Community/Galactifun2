@@ -1,6 +1,7 @@
 package io.github.addoncommunity.galactifun.api.rockets
 
 import io.github.addoncommunity.galactifun.EARTH_GRAVITY
+import io.github.addoncommunity.galactifun.api.blocks.HeatResistant
 import io.github.addoncommunity.galactifun.api.blocks.wetMass
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.impl.items.FuelTank
@@ -10,6 +11,7 @@ import io.github.addoncommunity.galactifun.units.*
 import io.github.addoncommunity.galactifun.util.general.mergeMaps
 import io.github.addoncommunity.galactifun.util.processSlimefunBlocks
 import io.github.thebusybiscuit.slimefun4.libraries.dough.blocks.BlockPosition
+import me.mrCookieSlime.Slimefun.api.BlockStorage
 import kotlin.math.ln
 import kotlin.time.Duration.Companion.seconds
 
@@ -46,23 +48,12 @@ class RocketInfo(
 
     val dryMass = wetMass - stages.unitSumOf { it.fuelMass }
 
+    val isFullyShielded = blocks.groupBy { it.x to it.z } // organize by column
+        .map { (_, v) -> v.maxBy { it.y }} // grab the highest
+        .all { BlockStorage.check(it.block) is HeatResistant }
+
     val info = buildString {
         val planet = PlanetManager.getByWorld(commandComputer.world)
-        appendLine("Stages:")
-        var stageNum = 1
-        for (stage in stages) {
-            appendLine("  Stage ${stageNum++}: ")
-            appendLine("    Fuel:")
-            for ((gas, volume) in stage.fuel) {
-                appendLine("      $gas: %.2s, %.2s".format(volume, volume * gas.liquidDensity))
-            }
-            appendLine("    Engines:")
-            var engineNum = 1
-            for (engine in stage.engines) {
-                appendLine("      Engine ${engineNum++}: %,.2f kilonewtons".format(engine.first.thrust.kilonewtons))
-            }
-            appendLine("    Delta-V: %.2s".format(stage.deltaV))
-        }
         appendLine("Thrust: %,.2f kilonewtons".format(thrust.kilonewtons))
         appendLine("Wet mass: %.2s".format(wetMass))
         appendLine("Dry mass: %.2s".format(dryMass))

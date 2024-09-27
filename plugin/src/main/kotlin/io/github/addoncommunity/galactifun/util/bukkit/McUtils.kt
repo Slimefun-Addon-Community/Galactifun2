@@ -1,6 +1,12 @@
 package io.github.addoncommunity.galactifun.util.bukkit
 
+import com.github.shynixn.mccoroutine.bukkit.launch
 import io.github.addoncommunity.galactifun.Galactifun2
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.future.await
 import net.kyori.adventure.text.Component
 import org.bukkit.*
 import org.bukkit.block.structure.Mirror
@@ -11,7 +17,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.structure.Structure
 import org.bukkit.util.Vector
 import java.util.*
-import java.util.concurrent.CompletableFuture
 
 internal fun String.key(): NamespacedKey = NamespacedKey(Galactifun2, this)
 
@@ -50,18 +55,37 @@ operator fun RegionAccessor.set(location: Location, material: Material) = setTyp
  * Teleports while telling Galactifun that the teleport should not be blocked.
  * Can be used to teleport entities with passengers.
  */
-fun Entity.galactifunTeleport(
+suspend fun Entity.teleportSpecialAsync(
     dest: Location,
     reason: PlayerTeleportEvent.TeleportCause = PlayerTeleportEvent.TeleportCause.PLUGIN
-): CompletableFuture<Boolean> {
+): Boolean = coroutineScope {
     setMetadata("galactifun.teleporting", DummyMetadataValue)
-    return teleportAsync(
-        dest,
-        reason
-    ).thenApply {
-        removeMetadata("galactifun.teleporting", Galactifun2)
-        it
+    val tp = mutableListOf<Deferred<Pair<Entity, Boolean>>>()
+    for (passenger in passengers) {
+        removePassenger(passenger)
+        tp += async { passenger to passenger.teleportSpecialAsync(dest, reason) }
     }
+    val (entities, results) = tp.awaitAll().unzip()
+    if (results.all { it }) {
+        val result = teleportAsync(
+            dest,
+            reason
+        ).await()
+        removeMetadata("galactifun.teleporting", Galactifun2)
+        for (entity in entities) {
+            addPassenger(entity)
+        }
+        result
+    } else {
+        false
+    }
+}
+
+fun Entity.teleportSpecial(
+    dest: Location,
+    reason: PlayerTeleportEvent.TeleportCause = PlayerTeleportEvent.TeleportCause.PLUGIN
+) {
+    Galactifun2.launch { teleportSpecialAsync(dest, reason) }
 }
 
 inline fun ItemStack.modifyLore(modifier: (MutableList<Component>) -> Unit) {

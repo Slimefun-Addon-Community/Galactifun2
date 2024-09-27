@@ -1,6 +1,7 @@
 package io.github.addoncommunity.galactifun.api.objects.properties.atmosphere
 
 import io.github.addoncommunity.galactifun.scripting.PlanetDsl
+import io.github.addoncommunity.galactifun.units.Pressure.Companion.atmospheres
 import java.util.*
 
 @PlanetDsl
@@ -10,7 +11,7 @@ class AtmosphereBuilder internal constructor() {
     var weatherEnabled = false
     var storming = false
     var thundering = false
-    var pressure = 1.0
+    var pressure = 1.atmospheres
 
     internal val composition = EnumMap<Gas, Double>(Gas::class.java)
 

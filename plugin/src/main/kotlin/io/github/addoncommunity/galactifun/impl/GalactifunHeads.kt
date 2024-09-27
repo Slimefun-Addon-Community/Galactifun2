@@ -28,6 +28,12 @@ enum class GalactifunHeads(private val texture: String) {
 
     // https://minecraft-heads.com/custom-heads/head/94712-forest-green-z
     LETTER_Z("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmEwOTg5NzVhNzI3ZTkyYmQ5YmM5OGIxY2JmMTQwZTdhNDFhOTkyZmU2NGNmYmI3MTk2ZTdkYmRhNDM0OTczIn19fQ=="),
+
+    // https://minecraft-heads.com/custom-heads/head/46571-rocket
+    ROCKET("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTRmOWRkMzkwNzAxODY0MWJkYjEwNWI5NjQ3YzA4MjI3OTYyZjEwNjUwMmE2ODI5YWRkNGI5MDhmNzQyYTgzNyJ9fX0="),
+
+    // https://minecraft-heads.com/custom-heads/head/97906-info
+    INFO("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2ZmOGNmOGVlMmYyMzNiMTcyZTE2MjE4MmNlZmFjODRiMWI4ZTEzZDk0OGMxNWRjODkyNzMxYmIyYWJhNzI5ZCJ9fX0="),
     ;
 
     val item = SlimefunUtils.getCustomHead(texture)

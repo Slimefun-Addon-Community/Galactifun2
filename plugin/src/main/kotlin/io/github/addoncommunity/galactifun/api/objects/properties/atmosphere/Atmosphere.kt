@@ -1,5 +1,8 @@
 package io.github.addoncommunity.galactifun.api.objects.properties.atmosphere
 
+import io.github.addoncommunity.galactifun.units.Pressure
+import io.github.addoncommunity.galactifun.units.Pressure.Companion.atmospheres
+import io.github.addoncommunity.galactifun.units.Pressure.Companion.pascals
 import io.github.addoncommunity.galactifun.util.bukkit.set
 import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.RandomizedSet
 import org.bukkit.GameRule
@@ -10,17 +13,19 @@ class Atmosphere private constructor(
     private val weatherEnabled: Boolean,
     private val storming: Boolean,
     private val thundering: Boolean,
-    val pressure: Double,
+    val pressure: Pressure,
     private val composition: Map<Gas, Double>
 ) {
 
     val environment = when {
-        pressure > 2.0 -> World.Environment.NETHER
-        pressure < 0.001 -> World.Environment.THE_END
+        pressure > 2.atmospheres -> World.Environment.NETHER
+        pressure < 100.pascals -> World.Environment.THE_END
         else -> World.Environment.NORMAL
     }
 
     private val flammable = composition.getOrDefault(Gas.OXYGEN, 0.0) > 5
+
+    val canAerobrake = pressure > 100.pascals
 
     private val growthAttempts = (pressurizedCompositionOf(Gas.CARBON_DIOXIDE) / earthCo2).toInt()
 
@@ -37,7 +42,7 @@ class Atmosphere private constructor(
     }
 
     fun pressurizedCompositionOf(gas: Gas): Double {
-        return compositionOf(gas) * pressure
+        return pressure.atmospheres * compositionOf(gas)
     }
 
     fun applyEffects(world: World) {
@@ -87,7 +92,7 @@ class Atmosphere private constructor(
 
         val EARTH_LIKE = buildAtmosphere {
             weatherEnabled = true
-            pressure = 1.0
+            pressure = 1.atmospheres
 
             composition {
                 77.084 percent Gas.NITROGEN // subtracted 1 to allow water to fit in
@@ -100,7 +105,7 @@ class Atmosphere private constructor(
 
         val NONE = buildAtmosphere {
             weatherEnabled = false
-            pressure = 0.0
+            pressure = 0.atmospheres
         }
     }
 }

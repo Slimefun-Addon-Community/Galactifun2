@@ -8,6 +8,10 @@ import java.io.File
 
 open class GenerationTask : DefaultTask() {
 
+    init {
+        outputs.upToDateWhen { false }
+    }
+
     @OutputDirectory
     val outputDir: File = project.layout.buildDirectory.dir("generated/uom").get().asFile
 

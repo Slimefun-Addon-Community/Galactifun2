@@ -1,11 +1,11 @@
 package io.github.addoncommunity.galactifun.util.menu
 
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 
 open class ItemContext(
-    val menu: BlockMenu,
+    val menu: ChestMenu,
     val block: Block,
     val thisItem: ItemStack,
     private val slotMap: Map<Char, List<Int>>
@@ -18,7 +18,7 @@ open class ItemContext(
 }
 
 class ClickContext(
-    menu: BlockMenu,
+    menu: ChestMenu,
     block: Block,
     thisItem: ItemStack,
     slotMap: Map<Char, List<Int>>

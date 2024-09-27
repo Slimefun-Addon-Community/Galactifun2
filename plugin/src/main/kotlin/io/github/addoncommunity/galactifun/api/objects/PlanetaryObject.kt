@@ -9,6 +9,7 @@ import io.github.addoncommunity.galactifun.api.objects.properties.visVivaEquatio
 import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
 import io.github.addoncommunity.galactifun.units.*
 import io.github.addoncommunity.galactifun.units.Distance.Companion.meters
+import io.github.addoncommunity.galactifun.units.Pressure.Companion.atmospheres
 import io.github.addoncommunity.galactifun.units.Velocity.Companion.metersPerSecond
 import kotlinx.datetime.Instant
 import org.bukkit.inventory.ItemStack
@@ -21,7 +22,7 @@ abstract class PlanetaryObject(name: String, baseItem: ItemStack) : CelestialObj
     abstract val atmosphere: Atmosphere
     abstract val orbit: Orbit
 
-    val surfaceToOrbitCost by lazy {
+    val orbitCost by lazy {
         visVivaEquation(
             gravitationalParameter,
             parkingOrbit.semimajorAxis,
@@ -128,7 +129,7 @@ abstract class PlanetaryObject(name: String, baseItem: ItemStack) : CelestialObj
         lore.add("Eccentricity: %.2f".format(orbit.eccentricity))
         lore.add("Longitude of periapsis: %.2f°".format(orbit.longitudeOfPeriapsis.degrees))
         lore.add("Orbital period (year length): ${durationToYearsAndDays(orbit.period)}")
-        if (atmosphere.pressure > 0) {
+        if (atmosphere.pressure > 0.atmospheres) {
             lore.add("")
             lore.add("Atmospheric pressure: %.2f atmospheres".format(atmosphere.pressure))
         }

@@ -1,6 +1,7 @@
 package io.github.addoncommunity.galactifun.util.items
 
 import io.github.addoncommunity.galactifun.Galactifun2
+import io.github.addoncommunity.galactifun.util.bukkit.legacyDefaultColor
 import io.github.addoncommunity.galactifun.util.bukkit.miniMessageToLegacy
 import io.github.addoncommunity.galactifun.util.general.RequiredProperty
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
@@ -33,8 +34,8 @@ class ItemBuilder {
         val sfi = SlimefunItemStack(
             id,
             material.convert(),
-            name.miniMessageToLegacy(),
-            *lore.toTypedArray()
+            name.miniMessageToLegacy().legacyDefaultColor('f'),
+            *lore.map { it.legacyDefaultColor('7') }.toTypedArray()
         )
         val constructor = clazz.primaryConstructor ?: error("Primary constructor not found for $clazz")
         constructor.call(category, sfi, recipeType, recipe, *otherArgs).register(Galactifun2)

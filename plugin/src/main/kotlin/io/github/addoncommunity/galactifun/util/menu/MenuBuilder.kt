@@ -8,6 +8,7 @@ import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.chars.CharOpenHashSet
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow
@@ -32,22 +33,23 @@ class MenuBuilder {
 
     infix fun Char.means(item: MenuItem) {
         items[this] = item
+        slots = null
     }
 
     infix fun Char.means(item: ItemStack) {
-        items[this] = MenuItem(item)
+        this means MenuItem(item)
     }
 
     fun background(c: Char) {
-        items[c] = MenuItem(ChestMenuUtils.getBackground())
+        c means MenuItem(ChestMenuUtils.getBackground())
     }
 
     fun inputBorder(c: Char) {
-        items[c] = MenuItem(ChestMenuUtils.getInputSlotTexture())
+        c means MenuItem(ChestMenuUtils.getInputSlotTexture())
     }
 
     fun outputBorder(c: Char) {
-        items[c] = MenuItem(ChestMenuUtils.getOutputSlotTexture())
+        c means MenuItem(ChestMenuUtils.getOutputSlotTexture())
     }
 
     fun input(c: Char) {
@@ -62,37 +64,48 @@ class MenuBuilder {
         return MenuItem.Builder().apply(builder).build()
     }
 
-    fun apply(item: SlimefunItem) {
+    private var slots: MutableMap<Char, MutableList<Int>>? = null
+
+    private val slotMap: Map<Char, List<Int>>
+        get() {
+            if (slots == null) {
+                var slot = 0
+                slots = mutableMapOf()
+                for (row in menu) {
+                    for (char in row) {
+                        slots!!.getOrPut(char, ::mutableListOf).add(slot)
+                        slot++
+                    }
+                }
+            }
+            return slots!!
+        }
+
+    fun apply(sfi: SlimefunItem) {
         // They have to be up here because init() is called in the superclass constructor smh
         val inputSlots = IntOpenHashSet()
         val outputSlots = IntOpenHashSet()
-        val slotMap = mutableMapOf<Char, MutableList<Int>>()
         val handlers = mutableListOf<Pair<Int, MenuItemClickHandler>>()
         val inits = mutableListOf<Pair<Int, ItemContext.() -> Unit>>()
 
-        object : BlockMenuPreset(item.id, item.itemName) {
+        object : BlockMenuPreset(sfi.id, sfi.itemName) {
             override fun init() {
-                var slot = 0
-                for (row in menu) {
-                    for (char in row) {
-                        slotMap.getOrPut(char, ::mutableListOf).add(slot)
-                        val menuItem = items[char]
-                        if (menuItem != null) {
-                            addItem(slot, menuItem.item)
-                            if (menuItem.onClick != null) {
-                                handlers.add(slot to menuItem.onClick)
-                            }
-                            if (menuItem.init != null) {
-                                inits.add(slot to menuItem.init)
-                            }
+                for ((char, item) in items) {
+                    val slots = slotMap[char] ?: continue
+                    for (slot in slots) {
+                        addItem(slot, item.item)
+                        if (item.onClick != null) {
+                            handlers.add(slot to item.onClick)
                         }
-                        if (inputs.contains(char)) {
-                            inputSlots.add(slot)
+                        if (item.init != null) {
+                            inits.add(slot to item.init)
                         }
-                        if (outputs.contains(char)) {
-                            outputSlots.add(slot)
-                        }
-                        slot++
+                    }
+                    if (inputs.contains(char)) {
+                        inputSlots.addAll(slots)
+                    }
+                    if (outputs.contains(char)) {
+                        outputSlots.addAll(slots)
                     }
                 }
                 isEmptySlotsClickable = emptySlotsClickable
@@ -114,7 +127,7 @@ class MenuBuilder {
 
             override fun canOpen(b: Block, p: Player): Boolean {
                 if (p.hasPermission("slimefun.inventory.bypass")) return true
-                return item.canUse(p, true)
+                return sfi.canUse(p, true)
                         && Slimefun.getProtectionManager().hasPermission(p, b, Interaction.INTERACT_BLOCK)
             }
 
@@ -126,6 +139,32 @@ class MenuBuilder {
             }
         }
     }
+
+    fun newMenu(name: String, block: Block): ChestMenu {
+        val menu = ChestMenu(name)
+        for ((char, item) in items) {
+            val slots = slotMap[char] ?: continue
+            for (slot in slots) {
+                menu.addItem(slot, item.item)
+                if (item.onClick != null) {
+                    menu.addMenuClickHandler(slot) { p, _, stack, action ->
+                        val context = ClickContext(menu, block, stack, slotMap)
+                        item.onClick.invoke(context, p, action)
+                        context.allowTaking
+                    }
+                }
+                if (item.init != null) {
+                    val context = ItemContext(menu, block, item.item, slotMap)
+                    item.init.invoke(context)
+                }
+            }
+        }
+        menu.isEmptySlotsClickable = emptySlotsClickable
+        return menu
+    }
 }
 
-inline fun buildMenu(block: MenuBuilder.() -> Unit): MenuBuilder = MenuBuilder().apply(block)
+inline fun buildMenu(
+    builder: MenuBuilder = MenuBuilder(),
+    block: MenuBuilder.() -> Unit
+): MenuBuilder = builder.apply(block)

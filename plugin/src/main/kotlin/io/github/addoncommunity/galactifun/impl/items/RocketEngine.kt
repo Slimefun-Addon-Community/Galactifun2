@@ -1,5 +1,6 @@
 package io.github.addoncommunity.galactifun.impl.items
 
+import io.github.addoncommunity.galactifun.api.blocks.HeatResistant
 import io.github.addoncommunity.galactifun.api.objects.properties.atmosphere.Gas
 import io.github.addoncommunity.galactifun.units.Force
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
@@ -18,7 +19,7 @@ class RocketEngine(
     val specificImpulse: Duration,
     val thrust: Force,
     val fuel: Gas
-) : SlimefunItem(itemGroup, item, recipeType, recipe) {
+) : SlimefunItem(itemGroup, item, recipeType, recipe), HeatResistant {
 
     init {
         addItemHandler(BlockUseHandler {

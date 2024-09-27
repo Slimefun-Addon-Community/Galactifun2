@@ -168,15 +168,24 @@ uom {
         unit("kilonewtons", 1000.0)
         unit("meganewtons", 1_000_000.0)
     }
-    val volume = measure("Volume", "liters") {
-        unit("cubicMeters", 1000.0)
+    val pressure = measure("Pressure", "pascals") {
+        unit("atmospheres", 101325.0)
     }
-    val density = measure("Density", "kilogramsPerLiter")
+    val area = measure("Area", "squareMeters")
+    val volume = measure("Volume", "cubicMeters") {
+        unit("liters", 0.001)
+    }
+    val density = measure("Density", "kilogramsPerCubicMeter") {
+        unit("kilogramsPerLiter", 1000.0)
+    }
 
     distance times time resultsIn velocity
     acceleration times time resultsIn velocity
     density times volume resultsIn mass
     acceleration times mass resultsIn force
+    distance times distance resultsIn area
+    distance times area resultsIn volume
+    pressure times area resultsIn force
 
     measure("Angle", "radians") {
         unit("degrees", Math.PI / 180)

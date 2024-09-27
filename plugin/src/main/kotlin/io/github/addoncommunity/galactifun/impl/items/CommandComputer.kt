@@ -1,20 +1,18 @@
 package io.github.addoncommunity.galactifun.impl.items
 
-import com.destroystokyo.paper.ParticleBuilder
-import com.github.shynixn.mccoroutine.bukkit.launch
-import io.github.addoncommunity.galactifun.Galactifun2
 import io.github.addoncommunity.galactifun.api.betteritem.BetterSlimefunItem
 import io.github.addoncommunity.galactifun.api.betteritem.ItemHandler
 import io.github.addoncommunity.galactifun.api.betteritem.Ticker
+import io.github.addoncommunity.galactifun.api.objects.WorldType
+import io.github.addoncommunity.galactifun.api.objects.planet.PlanetaryWorld
 import io.github.addoncommunity.galactifun.api.rockets.RocketInfo
+import io.github.addoncommunity.galactifun.impl.GalactifunHeads
 import io.github.addoncommunity.galactifun.impl.items.abstract.Seat
 import io.github.addoncommunity.galactifun.impl.managers.PlanetManager
 import io.github.addoncommunity.galactifun.impl.managers.RocketManager
-import io.github.addoncommunity.galactifun.units.abs
 import io.github.addoncommunity.galactifun.util.*
 import io.github.addoncommunity.galactifun.util.bukkit.*
-import io.github.seggan.sf4k.extensions.minus
-import io.github.seggan.sf4k.extensions.plus
+import io.github.addoncommunity.galactifun.util.menu.buildMenu
 import io.github.seggan.sf4k.extensions.position
 import io.github.seggan.sf4k.serial.blockstorage.getBlockStorage
 import io.github.seggan.sf4k.serial.blockstorage.setBlockStorage
@@ -22,33 +20,23 @@ import io.github.thebusybiscuit.slimefun4.api.events.PlayerRightClickEvent
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType
+import io.github.thebusybiscuit.slimefun4.core.handlers.BlockBreakHandler
 import io.github.thebusybiscuit.slimefun4.core.handlers.BlockPlaceHandler
 import io.github.thebusybiscuit.slimefun4.core.handlers.BlockUseHandler
 import io.github.thebusybiscuit.slimefun4.libraries.dough.blocks.BlockPosition
-import io.papermc.paper.event.entity.EntityMoveEvent
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu
 import me.mrCookieSlime.Slimefun.api.BlockStorage
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.title.Title
-import net.kyori.adventure.util.Ticks
-import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.Particle
 import org.bukkit.block.Block
-import org.bukkit.block.BlockFace
-import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
-import org.bukkit.event.player.PlayerMoveEvent
-import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
-import org.bukkit.util.BoundingBox
 import java.util.*
-import kotlin.collections.ArrayDeque
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.jvm.optionals.getOrNull
 
 class CommandComputer(
@@ -62,33 +50,6 @@ class CommandComputer(
 
     companion object : Listener {
         val SERIALIZED_BLOCK_KEY = "serialized_block".key()
-
-        private val frozenEntities = mutableSetOf<Entity>()
-
-        init {
-            Bukkit.getPluginManager().registerEvents(this, Galactifun2)
-        }
-
-        @EventHandler
-        private fun onPlayerMove(e: PlayerMoveEvent) {
-            val player = e.player
-            if (player in frozenEntities && e.hasChangedPosition()) {
-                e.isCancelled = true
-            }
-        }
-
-        @EventHandler
-        private fun onEntityMove(e: EntityMoveEvent) {
-            val entity = e.entity
-            if (entity in frozenEntities && e.hasChangedPosition()) {
-                e.isCancelled = true
-            }
-        }
-
-        @EventHandler
-        private fun onPlayerLeave(e: PlayerQuitEvent) {
-            frozenEntities.remove(e.player)
-        }
     }
 
     @Ticker
@@ -103,6 +64,11 @@ class CommandComputer(
     @ItemHandler(BlockPlaceHandler::class)
     private fun onPlace(e: BlockPlaceEvent) {
         rescanRocket(e.block.position)
+    }
+
+    @ItemHandler(BlockBreakHandler::class)
+    private fun onBreak(e: BlockBreakEvent, item: ItemStack, drops: MutableList<ItemStack>) {
+        RocketManager.unregister(RocketManager.getInfo(e.block.position) ?: return)
     }
 
     private fun rescanRocket(pos: BlockPosition) {
@@ -124,202 +90,157 @@ class CommandComputer(
     private fun onRightClick(e: PlayerRightClickEvent) {
         e.cancel()
         val p = e.player
-        val pos = e.clickedBlock.getOrNull()?.position ?: return
+        val block = e.clickedBlock.getOrNull() ?: return
+        val pos = block.position
         rescanRocket(pos)
         val info = RocketManager.getInfo(pos)!!
         if (info.blocks.isEmpty()) {
             p.sendMessage(NamedTextColor.RED + "No rocket detected")
             return
         }
+        getMenu(block, info).open(p)
         val seat = Seat.getSitting(p)
         if (seat != null
             && BlockStorage.check(seat) is CaptainsChair
             && seat.getBlockStorage<BlockPosition>("rocket") == pos
         ) {
-            RocketManager.launches += Galactifun2.launch { launchRocket(p, pos, info, seat) }
+            if (p.world == PlanetManager.spaceWorld) {
+            } else {
+                RocketManager.launchRocket(p, info, seat)
+            }
         } else {
             e.player.sendMessage(NamedTextColor.GOLD + info.info)
         }
     }
 
-    private suspend fun launchRocket(p: Player, pos: BlockPosition, rocket: RocketInfo, seat: Location) {
-        val world = p.world
-        val currentPlanet = PlanetManager.getByWorld(world)
-        if (currentPlanet == null) {
-            p.sendMessage(NamedTextColor.RED + "You are not on a planet")
-            return
+    @OptIn(ExperimentalContracts::class)
+    private fun canLaunch(seat: Location?, info: RocketInfo): Boolean {
+        contract {
+            returns(true) implies (seat != null)
         }
-        val space = currentPlanet.orbitPosition
-        p.sendMessage("The rocket's current position is ${pos.x}, ${pos.y}, ${pos.z}")
-        p.sendMessage("The cost to travel to space is %.2s".format(currentPlanet.surfaceToOrbitCost))
+        return seat != null
+                && BlockStorage.check(seat) is CaptainsChair
+                && seat.getBlockStorage<BlockPosition>("rocket") == info.commandComputer
+    }
 
-        val firstStage = rocket.stages.first()
-        val dVMinusSpace = firstStage.deltaV - currentPlanet.surfaceToOrbitCost
-        if (dVMinusSpace.metersPerSecond <= 0) {
-            p.sendMessage(
-                NamedTextColor.RED +
-                        "The rocket needs %.2s more delta-v to reach space".format(abs(dVMinusSpace))
-            )
-            return
-        }
-        p.sendMessage("The rocket will have %.2s delta-v left after reaching space".format(dVMinusSpace))
+    private fun getMenu(b: Block, rocket: RocketInfo): ChestMenu {
+        val worldType = WorldType.fromLocation(b.location)
+        return buildMenu {
+            +"..i.l.t.."
 
-        if (rocket.twr(currentPlanet.gravity) < 1) {
-            p.sendMessage("The rocket doesn't have enough thrust-to-weight ratio to get off the ground")
-            return
-        }
+            background('.')
 
-        val hasBlocking = rocket.blocks.groupBy { it.x to it.z }
-            .map { (_, blocks) -> blocks.maxBy { it.y } }
-            .any { !it.isHighest() }
+            'i' means item {
+                name = "Rocket Information"
+                material = GalactifunHeads.INFO.materialType
 
-        if (hasBlocking) {
-            p.sendMessage("The rocket is blocked by terrain")
-            return
-        }
-
-        p.sendMessage("Enter the destination's x y z coordinates separated by spaces")
-        val coords = p.awaitChatInput()
-        if (Seat.getSitting(p) != seat) return
-        val match = coordinateRegex.matchEntire(coords)
-        if (match == null) {
-            p.sendMessage("Invalid coordinates")
-            return
-        }
-        val (x, y, z) = match.destructured
-        val dest = space.offset(x.toDouble(), y.toDouble(), z.toDouble())
-
-        val entities = mutableSetOf<Entity>()
-        val players = mutableSetOf<Player>()
-        val blocks = rocket.blocks + rocket.blocks.map { it.getFace(BlockFace.UP) }
-        blocks.toSet().consumeSpreadOut(200) { b ->
-            val block = b.block
-            for (entity in world.getNearbyEntities(BoundingBox.of(block))) {
-                if (entity is Player) {
-                    players.add(entity)
-                    entities.add(entity)
-                } else {
-                    entity.remove()
+                +""
+                for (line in rocket.info.lines()) {
+                    +line
+                }
+                if (worldType is WorldType.Space) {
+                    +""
+                    +"Orbiting: ${worldType.orbiting.name}"
                 }
             }
-        }
 
-        var launched = false
+            'l' means item {
+                material = GalactifunHeads.ROCKET.materialType
 
-        // Engine smoke
-        Galactifun2.launch {
-            while (!launched) {
-                for ((_, engine) in firstStage.engines) {
-                    ParticleBuilder(Particle.CAMPFIRE_SIGNAL_SMOKE)
-                        .location(engine.location)
-                        .offset(0.5, 0.5, 0.5)
-                        .count(1)
-                        .spawn()
+                when (worldType) {
+                    is WorldType.Planet -> {
+                        name = "Launch Rocket"
+
+                        val planet = worldType.planet
+                        val cost = planet.orbitCost
+
+                        +""
+                        +"<gold>Delta-V required to launch to orbit: $cost m/s"
+                        if (rocket.stages.first().deltaV < cost) {
+                            +""
+                            +"<red><bold>The rocket does not have enough delta-v to reach orbit"
+                        }
+                        if (rocket.twr(planet.gravity) < 1) {
+                            +""
+                            +"<red><bold>The rocket does not have enough thrust to get off the ground"
+                        }
+                        +""
+                        +"<yellow><bold>Click to launch the rocket"
+                    }
+
+                    is WorldType.Space -> {
+                        name = "Land rocket"
+
+                        val orbiting = worldType.orbiting
+                        val cost = orbiting.orbitCost
+
+                        +""
+                        if (orbiting is PlanetaryWorld) {
+                            var canAerobrake = false
+                            if (orbiting.atmosphere.canAerobrake) {
+                                +"<green>The atmosphere is thick enough to aerobrake"
+                                if (rocket.isFullyShielded) {
+                                    +"<green>You can land without using any fuel"
+                                    +"<green>(but any heat shielding tiles will be used up)"
+                                    canAerobrake = true
+                                } else {
+                                    +"<red>Your rocket does not have enough shielding to aerobrake"
+                                }
+                                +""
+                            }
+                            +"<gold>Delta-v required for landing: $cost m/s"
+                            if (rocket.stages.first().deltaV < cost) {
+                                +""
+                                +"<red><bold>The rocket does not have enough delta-v to land"
+                                if (canAerobrake) {
+                                    +"<green>However, you can still aerobrake at no fuel cost"
+                                }
+                            }
+                            +""
+                            if (canAerobrake) {
+                                +"<yellow><bold>Left click to land using engines"
+                                +"<yellow><bold>Right click to aerobrake"
+                            } else {
+                                +"<yellow><bold>Click to land"
+                            }
+                        } else {
+                            +"<red><bold>You cannot land on ${orbiting.name}"
+                        }
+                    }
+
+                    null -> {
+                        name = "Invalid world"
+                    }
                 }
-                delayTicks(2)
-            }
-        }
 
-        // Countdown
-        val launchMessages = ArrayDeque(Galactifun2.launchMessages)
-        launchMessages.shuffle()
-        repeat(10) {
-            val message = NamedTextColor.GOLD + "${launchMessages.removeFirst()}..."
-            for (player in players) {
-                player.sendMessage(message)
-                player.showTitle(
-                    Title.title(
-                        "<green><bold>T-${10 - it}".miniComponent(),
-                        Component.empty(),
-                        Title.Times.times(
-                            Ticks.duration(5),
-                            Ticks.duration(10),
-                            Ticks.duration(5)
-                        )
-                    )
-                )
-            }
-            delayTicks(20)
-        }
-        launched = true
-
-        val blockOffsets = blocks.associateWith { it.location - pos.toLocation() }
-        val entityOffsets = entities.associateWith { it.location - pos.toLocation() }
-        val destMinHeight = PlanetManager.spaceWorld.minHeight
-        val globalOffset = (destMinHeight - blockOffsets.minOf { (_, offset) -> offset.y })
-            .coerceAtLeast(0.0)
-
-        val explosionLocations = mutableSetOf<Location>()
-        for (blockPos in blocks) {
-            val oldBlock = blockPos.block
-            val newLoc = dest + blockOffsets[blockPos]!!.copy(world = PlanetManager.spaceWorld)
-            newLoc.y += globalOffset
-            val newBlock = newLoc.block
-            if (!newBlock.type.isAir && !newBlock.isReplaceable) {
-                explosionLocations.add(newLoc)
-            }
-            newBlock.type = oldBlock.type
-            newBlock.blockData = oldBlock.blockData
-            @Suppress("UnstableApiUsage")
-            oldBlock.state.copy(newLoc)
-
-            if (BlockStorage.hasBlockInfo(oldBlock)) {
-                val oldBs = BlockStorage.getBlockInfoAsJson(oldBlock)
-                BlockStorage.clearBlockInfo(oldBlock)
-                BlockStorage.setBlockInfo(newBlock, oldBs, true)
-            }
-
-            oldBlock.type = Material.AIR
-        }
-
-        for (entity in entities) {
-            val end = dest + entityOffsets[entity]!!.copy(world = PlanetManager.spaceWorld)
-            end.y += globalOffset
-            entity.galactifunTeleport(end)
-        }
-
-        delayTicks(1)
-
-        for (loc in explosionLocations) {
-            loc.world.createExplosion(loc, 3f, false, true)
-        }
-
-        /*
-        TODO make rockets move
-
-        val maxHeight = world.maxHeight
-        var position = pos.y.toDouble()
-        val offsets = entities.associateWith { it.location - pos.toLocation() }
-
-        val weight = rocket.wetMass * currentPlanet.gravity
-        val netForce = firstStage.engines.unitSumOf { it.first.thrust } - weight
-        val acceleration = netForce divToAcceleration rocket.wetMass
-        val marginalAcceleration = acceleration * 0.05.seconds
-        val marginalAccelerationVector = UnitVector.Y * marginalAcceleration.metersPerSecond
-        while (position < maxHeight) {
-            for (entity in entities) {
-                entity.velocity += marginalAccelerationVector
-                position = max(position, entity.location.y)
-            }
-            delayTicks(1)
-        }
-
-        for (entity in entities) {
-            Galactifun2.launch {
-                if (!entity.galactifunTeleport(
-                    dest + offsets[entity]!!.copy(world = PlanetManager.spaceWorld)
-                ).await()) {
-                    error("Failed to teleport entity")
-                }
-                delayTicks(1)
-                when (entity) {
-                    is FallingBlock -> entity.toBlock()
-                    is Player -> frozenPlayers.remove(entity)
+                if (worldType != null) {
+                    onClick { p, action ->
+                        val seat = Seat.getSitting(p)
+                        if (canLaunch(seat, rocket)) {
+                            when (worldType) {
+                                is WorldType.Planet -> RocketManager.launchRocket(p, rocket, seat)
+                                is WorldType.Space -> {
+                                    val orbiting = worldType.orbiting
+                                    if (orbiting is PlanetaryWorld) {
+                                        RocketManager.landRocket(
+                                            p,
+                                            rocket,
+                                            seat,
+                                            action.isRightClicked
+                                                    && orbiting.atmosphere.canAerobrake
+                                                    && rocket.isFullyShielded
+                                        )
+                                    } else {
+                                        p.sendMessage(NamedTextColor.RED + "You cannot land on ${orbiting.name}")
+                                    }
+                                }
+                            }
+                        } else {
+                            p.sendMessage(NamedTextColor.RED + "You must be sitting in the captain's chair to operate the rocket")
+                        }
+                    }
                 }
             }
-        }
-         */
+        }.newMenu(itemName, b)
     }
 }
-
-private val coordinateRegex = """\s*(-?\d+)\s+(-?\d+)\s+(-?\d+)\s*""".toRegex()
